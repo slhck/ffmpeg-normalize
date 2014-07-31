@@ -13,9 +13,3 @@ Very simple:
     ./normalize.py -i <input-file> -v
 
 The `-v` option turns on info messages. Check out `./normalize.py -h` for more options.
-
-
-What's with the MATLAB Code?
-============================
-
-This is the reference I've used for testing whether the Python script does the same thing. You can of course use it too, if you want.
