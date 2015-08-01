@@ -1,8 +1,34 @@
 #!/usr/bin/env python
-#
-# Audio normalization script, normalizing media files to WAV output
-#
-# Requirements: Recent ffmpeg installed on your system (above 2.0 would suffice)
+"""
+avconv-normalize
+
+ffmpeg / avconv macro for normalizing audio
+
+Audio normalization script, normalizing media files to WAV output
+
+This program normalizes audio to a certain dB level. The default is an RMS-based
+normalization where the mean is lifted. Peak normalization is possible with the
+-m/--max option. It takes any audio or video file as input, and writes the audio
+part as output WAV file.
+
+Usage:
+  avconv-normalize [options] [INPUT ...]
+
+Options:
+  -f --force            Force overwriting existing files
+  -l, --level           dB level to normalize to [default: -26]
+  -p --prefix <prefix>  Normalized file prefix [default: 'normalized']
+  -m --max             Normalize to the maximum (peak) volume instead of RMS
+  -v --verbose          Enable verbose output
+  -n --dry-run          Show what would be done, do not convert
+  -d --debug            Show debug output
+
+Examples:
+
+  avconv-normalize -v file.mp3
+  avconv-normalize -v *.avi
+
+"""
 #
 # The MIT License (MIT)
 #
@@ -26,11 +52,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import argparse
+from docopt import docopt
 import subprocess
 import os
 import re
 import logging
+
+from . import __version__
 
 logger = logging.getLogger('avconv_normalize')
 logger.setLevel(logging.DEBUG)
@@ -50,7 +78,7 @@ def which(program):
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
-    fpath, fname = os.path.split(program)
+    fpath, __ = os.path.split(program)
     if fpath:
         if is_exe(program):
             return program
@@ -122,18 +150,13 @@ def ffmpeg_get_mean(input_file):
 
 def ffmpeg_adjust_volume(input_file, gain, output):
     global args
-    if not args.force and os.path.exists(output):
+    if not args['--force'] and os.path.exists(output):
         logger.warning("output file " + output + " already exists, skipping. Use -f to force overwriting.")
         return
 
     cmd = AVCONV_CMD + ' -y -i "' + input_file + '" -vn -sn -filter:a "volume=' + str(gain) + 'dB" -c:a pcm_s16le "' + output + '"'
-    output = run_command(cmd, True, args.dry_run)
+    output = run_command(cmd, True, args['--dry-run'])
 
-
-def print_verbose(message):
-    global args
-    if args.verbose:
-        print(message)
 
 # -------------------------------------------------------------------------------------------------
 
@@ -141,37 +164,23 @@ def main():
 
     global args
 
-    parser = argparse.ArgumentParser(
-        description="""This program normalizes audio to a certain dB level.
-                       The default is an RMS-based normalization where the mean is lifted. Peak normalization is
-                       possible with the -m/--max option.
-                       It takes any audio or video file as input, and writes the audio part as output WAV file."""
-        )
-    parser.add_argument('-i', '--input', nargs='+', help='Input files to convert', required=True)
-    parser.add_argument('-f', '--force', default=False, action="store_true",
-                        help='Force overwriting existing files')
-    parser.add_argument('-l', '--level', default=-26, help="dB level to normalize to, default: -26 dB")
-    parser.add_argument('-p', '--prefix', default="normalized", help="Normalized file prefix, default: normalized")
-    parser.add_argument('-m', '--max', default=False, action="store_true", help="Normalize to the maximum (peak) volume instead of RMS")
-    parser.add_argument('-v', '--verbose', default=False, action="store_true", help="Enable verbose output")
-    parser.add_argument('-n', '--dry-run', default=False, action="store_true", help="Show what would be done, do not convert")
-    parser.add_argument('-d', '--debug', default=False, action="store_true", help="Show debug output")
+    args = docopt(__doc__, version=str(__version__), options_first=False)
 
-    args = parser.parse_args()
-
-    if args.debug:
+    if args['--debug']:
         ch.setLevel(logging.DEBUG)
-    elif args.debug:
+    elif args['--verbose']:
         ch.setLevel(logging.INFO)
 
-    for input_file in args.input:
+    logger.debug(args)
+
+    for input_file in args['INPUT']:
         if not os.path.exists(input_file):
             logger.error("file " + input_file + " does not exist")
             continue
 
         path, filename = os.path.split(input_file)
         basename = os.path.splitext(filename)[0]
-        output_file = os.path.join(path, args.prefix + "-" + basename + ".wav")
+        output_file = os.path.join(path, args['--prefix'] + "-" + basename + ".wav")
 
         if 'ffmpeg' in AVCONV_CMD:
             logger.info("reading file " + input_file)
@@ -180,13 +189,13 @@ def main():
             logger.warning("mean volume: " + str(mean))
             logger.warning("max volume: " + str(maximum))
 
-            target_level = float(args.level)
-            if args.max:
+            target_level = float(args['--level'])
+            if args['--max']:
                 adjustment = target_level - maximum
             else:
                 adjustment = target_level - mean
 
-            logger.warning("file needs " + str(adjustment) + " dB gain to reach " + str(args.level) + " dB")
+            logger.warning("file needs " + str(adjustment) + " dB gain to reach " + str(args['--level']) + " dB")
 
             if maximum + adjustment > 0:
                 logger.warning("adjusting " + input_file + " will lead to clipping of " + str(maximum + adjustment) + "dB")
@@ -199,9 +208,9 @@ def main():
             # and then convert back to the desired format.
             # http://askubuntu.com/questions/247961/normalizing-video-volume-using-avconv
             cmd = AVCONV_CMD + ' -i ' + input_file + ' -c:a pcm_s16le -vn "' + output_file + '"'
-            output = run_command(cmd, True, args.dry_run)
+            output = run_command(cmd, True, args['--dry-run'])
             cmd = NORMALIZE_CMD + ' "' + output_file + '"'
-            output = run_command(cmd, True, args.dry_run)
+            output = run_command(cmd, True, args['--dry-run'])
             logger.info(output)
 
 
