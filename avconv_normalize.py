@@ -26,6 +26,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+__version__ = "0.1"
+
 import argparse
 import subprocess
 import os
@@ -33,7 +35,7 @@ import re
 
 args = dict()
 
-def run_command(cmd, raw = False, dry = False):
+def run_command(cmd, raw=False, dry=False):
     cmd = cmd.replace("  ", " ")
     cmd = cmd.replace("  ", " ")
     print_verbose("[command] {0}".format(cmd))
@@ -42,9 +44,9 @@ def run_command(cmd, raw = False, dry = False):
         return
 
     if raw:
-        output = subprocess.Popen(cmd, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, shell = True).communicate()[0]
+        output = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True).communicate()[0]
     else:
-        output = subprocess.Popen(cmd.split(" "), stdout = subprocess.PIPE, stderr = subprocess.STDOUT).communicate()[0]
+        output = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0]
     return output
 
 
