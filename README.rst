@@ -13,9 +13,16 @@ Requirements
 Usage
 =====
 
-Very simple::
+Very simple, just install with pip and run it::
 
+    pip install avconv-normalize
     avconv-normalize -i <input-file> -v
+
+
+Or run it directly from source::
+
+    python -m avconv_normalize -i <input-file> -v
+
 
 Options
 =======
