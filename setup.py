@@ -20,15 +20,15 @@ test_requirements = [
 import avconv_normalize
 
 setup(
-    name='avconv-normalize',
+    name='ffmpeg-normalize',
     version=avconv_normalize.__version__,
-    description="Normalize audio via Libav (avconv)",
+    description="Normalize audio via ffmpeg / avconv",
     long_description=readme + '\n\n' + history,
     author="Werner Robitza",
     author_email='unknown@todo.com',
     url='https://github.com/slhck/audio-normalize',
     packages=[
-        'avconv_normalize',
+        'ffmpeg_normalize',
     ],
     include_package_data=True,
     install_requires=requirements,
@@ -51,7 +51,7 @@ setup(
     # tests_require=test_requirements,
     entry_points={
         'console_scripts': [
-            'avconv-normalize = avconv_normalize.__main__:main'
+            'ffmpeg-normalize = ffmpeg_normalize.__main__:main'
         ]
     },
 )
