@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-avconv-normalize
+ffmpeg-normalize
 
 ffmpeg / avconv macro for normalizing audio
 
@@ -12,7 +12,7 @@ normalization where the mean is lifted. Peak normalization is possible with the
 part as output WAV file.
 
 Usage:
-  avconv-normalize [options] [INPUT ...]
+  ffmpeg-normalize [options] [INPUT ...]
 
 Options:
   -f --force            Force overwriting existing files
@@ -25,8 +25,8 @@ Options:
 
 Examples:
 
-  avconv-normalize -v file.mp3
-  avconv-normalize -v *.avi
+  ffmpeg-normalize -v file.mp3
+  ffmpeg-normalize -v *.avi
 
 """
 #
@@ -60,7 +60,7 @@ import logging
 
 from . import __version__
 
-logger = logging.getLogger('avconv_normalize')
+logger = logging.getLogger('ffmpeg_normalize')
 logger.setLevel(logging.DEBUG)
 
 # create console handler with a higher log level
@@ -91,9 +91,9 @@ def which(program):
 
     return None
 
-AVCONV_CMD = which('avconv') or which('ffmpeg') or None
+FFMPEG_CMD = which('ffmpeg') or which('avconv') or None
 
-if 'avconv' in AVCONV_CMD:
+if 'avconv' in FFMPEG_CMD:
     NORMALIZE_CMD = which('normalize-audio')
     if not NORMALIZE_CMD:
         raise SystemExit(
@@ -101,7 +101,7 @@ if 'avconv' in AVCONV_CMD:
             "    sudo apt-get install normalize-audio"
         )
 
-if not AVCONV_CMD:
+if not FFMPEG_CMD:
     raise SystemExit("Could not find ffmpeg or avconv")
 
 
@@ -128,7 +128,7 @@ def run_command(cmd, raw=False, dry=False):
 
 
 def ffmpeg_get_mean(input_file):
-    cmd = AVCONV_CMD + ' -i "' + input_file + '" -filter:a "volumedetect" -vn -sn -f null /dev/null'
+    cmd = FFMPEG_CMD + ' -i "' + input_file + '" -filter:a "volumedetect" -vn -sn -f null /dev/null'
     output = run_command(cmd, True)
     logger.debug(output)
     mean_volume_matches = re.findall(r"mean_volume: ([\-\d\.]+) dB", output)
@@ -154,7 +154,7 @@ def ffmpeg_adjust_volume(input_file, gain, output):
         logger.warning("output file " + output + " already exists, skipping. Use -f to force overwriting.")
         return
 
-    cmd = AVCONV_CMD + ' -y -i "' + input_file + '" -vn -sn -filter:a "volume=' + str(gain) + 'dB" -c:a pcm_s16le "' + output + '"'
+    cmd = FFMPEG_CMD + ' -y -i "' + input_file + '" -vn -sn -filter:a "volume=' + str(gain) + 'dB" -c:a pcm_s16le "' + output + '"'
     output = run_command(cmd, True, args['--dry-run'])
 
 
@@ -182,7 +182,7 @@ def main():
         basename = os.path.splitext(filename)[0]
         output_file = os.path.join(path, args['--prefix'] + "-" + basename + ".wav")
 
-        if 'ffmpeg' in AVCONV_CMD:
+        if 'ffmpeg' in FFMPEG_CMD:
             logger.info("reading file " + input_file)
 
             mean, maximum = ffmpeg_get_mean(input_file)
@@ -207,7 +207,7 @@ def main():
             # instead we use it to convert to wav, then use a separate programme
             # and then convert back to the desired format.
             # http://askubuntu.com/questions/247961/normalizing-video-volume-using-avconv
-            cmd = AVCONV_CMD + ' -i ' + input_file + ' -c:a pcm_s16le -vn "' + output_file + '"'
+            cmd = FFMPEG_CMD + ' -i ' + input_file + ' -c:a pcm_s16le -vn "' + output_file + '"'
             output = run_command(cmd, True, args['--dry-run'])
             cmd = NORMALIZE_CMD + ' "' + output_file + '"'
             output = run_command(cmd, True, args['--dry-run'])
