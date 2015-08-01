@@ -35,6 +35,32 @@ import re
 
 args = dict()
 
+# http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+def which(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+
+AVCONV_CMD = 'avconv'
+
+if not which('avconv') and which('ffmpeg'):
+    AVCONV_CMD = 'ffmpeg'
+else:
+    raise SystemExit("Could not find ffmpeg or avconv")
+
+
 def run_command(cmd, raw=False, dry=False):
     cmd = cmd.replace("  ", " ")
     cmd = cmd.replace("  ", " ")
@@ -51,7 +77,7 @@ def run_command(cmd, raw=False, dry=False):
 
 
 def ffmpeg_get_mean(input_file):
-    cmd = 'ffmpeg -hide_banner -i "' + input_file + '" -filter:a "volumedetect" -vn -sn -f null /dev/null'
+    cmd = AVCONV_CMD + ' -hide_banner -i "' + input_file + '" -filter:a "volumedetect" -vn -sn -f null /dev/null'
     output = run_command(cmd, True)
     mean_volume_matches = re.findall(r"mean_volume: ([\-\d\.]+) dB", output)
     if (mean_volume_matches):
@@ -76,7 +102,7 @@ def ffmpeg_adjust_volume(input_file, gain, output):
         print("[warning] output file " + output + " already exists, skipping. Use -f to force overwriting.")
         return
 
-    cmd = 'ffmpeg -y -i "' + input_file + '" -vn -sn -filter:a "volume=' + str(gain) + 'dB" -c:a pcm_s16le "' + output + '"'
+    cmd = AVCONV_CMD + ' -y -i "' + input_file + '" -vn -sn -filter:a "volume=' + str(gain) + 'dB" -c:a pcm_s16le "' + output + '"'
     output = run_command(cmd, True, args.dry_run)
 
 
@@ -84,24 +110,6 @@ def print_verbose(message):
     global args
     if args.verbose:
         print(message)
-
-# http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
-def which(program):
-    def is_exe(fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
-    fpath, fname = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            return program
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            path = path.strip('"')
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                return exe_file
-
-    return None
 
 # -------------------------------------------------------------------------------------------------
 
@@ -123,10 +131,6 @@ def main():
     parser.add_argument('-n', '--dry-run', default=False, action="store_true", help="Show what would be done, do not convert")
 
     args = parser.parse_args()
-
-    if not which("ffmpeg"):
-        print("[error] ffmpeg could not be found in your PATH")
-        raise SystemExit
 
     for input_file in args.input:
         if not os.path.exists(input_file):
