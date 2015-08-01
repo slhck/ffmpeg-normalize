@@ -105,50 +105,56 @@ def which(program):
 
 # -------------------------------------------------------------------------------------------------
 
-parser = argparse.ArgumentParser(
-    description="""This program normalizes audio to a certain dB level.
-                   The default is an RMS-based normalization where the mean is lifted. Peak normalization is
-                   possible with the -m/--max option.
-                   It takes any audio or video file as input, and writes the audio part as output WAV file."""
-    )
-parser.add_argument('-i', '--input', nargs='+', help='Input files to convert', required=True)
-parser.add_argument('-f', '--force', default=False, action="store_true",
-                    help='Force overwriting existing files')
-parser.add_argument('-l', '--level', default=-26, help="dB level to normalize to, default: -26 dB")
-parser.add_argument('-p', '--prefix', default="normalized", help="Normalized file prefix, default: normalized")
-parser.add_argument('-m', '--max', default=False, action="store_true", help="Normalize to the maximum (peak) volume instead of RMS")
-parser.add_argument('-v', '--verbose', default=False, action="store_true", help="Enable verbose output")
-parser.add_argument('-n', '--dry-run', default=False, action="store_true", help="Show what would be done, do not convert")
+def main():
 
-args = parser.parse_args()
+    parser = argparse.ArgumentParser(
+        description="""This program normalizes audio to a certain dB level.
+                       The default is an RMS-based normalization where the mean is lifted. Peak normalization is
+                       possible with the -m/--max option.
+                       It takes any audio or video file as input, and writes the audio part as output WAV file."""
+        )
+    parser.add_argument('-i', '--input', nargs='+', help='Input files to convert', required=True)
+    parser.add_argument('-f', '--force', default=False, action="store_true",
+                        help='Force overwriting existing files')
+    parser.add_argument('-l', '--level', default=-26, help="dB level to normalize to, default: -26 dB")
+    parser.add_argument('-p', '--prefix', default="normalized", help="Normalized file prefix, default: normalized")
+    parser.add_argument('-m', '--max', default=False, action="store_true", help="Normalize to the maximum (peak) volume instead of RMS")
+    parser.add_argument('-v', '--verbose', default=False, action="store_true", help="Enable verbose output")
+    parser.add_argument('-n', '--dry-run', default=False, action="store_true", help="Show what would be done, do not convert")
 
-if not which("ffmpeg"):
-    print("[error] ffmpeg could not be found in your PATH")
-    raise SystemExit
+    args = parser.parse_args()
 
-for input_file in args.input:
-    if not os.path.exists(input_file):
-        print("[error] file " + input_file + " does not exist")
-        continue
+    if not which("ffmpeg"):
+        print("[error] ffmpeg could not be found in your PATH")
+        raise SystemExit
 
-    print_verbose("[info] reading file " + input_file)
+    for input_file in args.input:
+        if not os.path.exists(input_file):
+            print("[error] file " + input_file + " does not exist")
+            continue
 
-    mean, maximum = ffmpeg_get_mean(input_file)
-    print_verbose("[info] mean volume: " + str(mean))
-    print_verbose("[info] max volume: " + str(maximum))
+        print_verbose("[info] reading file " + input_file)
 
-    target_level = float(args.level)
-    if args.max:
-        adjustment = target_level - maximum
-    else:
-        adjustment = target_level - mean
+        mean, maximum = ffmpeg_get_mean(input_file)
+        print_verbose("[info] mean volume: " + str(mean))
+        print_verbose("[info] max volume: " + str(maximum))
 
-    print_verbose("[info] file needs " + str(adjustment) + " dB gain to reach " + str(args.level) + " dB")
+        target_level = float(args.level)
+        if args.max:
+            adjustment = target_level - maximum
+        else:
+            adjustment = target_level - mean
 
-    if maximum + adjustment > 0:
-        print("[warning] adjusting " + input_file + " will lead to clipping of " + str(maximum + adjustment) + "dB")
+        print_verbose("[info] file needs " + str(adjustment) + " dB gain to reach " + str(args.level) + " dB")
 
-    path, filename = os.path.split(input_file)
-    basename = os.path.splitext(filename)[0]
+        if maximum + adjustment > 0:
+            print("[warning] adjusting " + input_file + " will lead to clipping of " + str(maximum + adjustment) + "dB")
 
-    ffmpeg_adjust_volume(input_file, adjustment, os.path.join(path, args.prefix + "-" + basename + ".wav"))
+        path, filename = os.path.split(input_file)
+        basename = os.path.splitext(filename)[0]
+
+        ffmpeg_adjust_volume(input_file, adjustment, os.path.join(path, args.prefix + "-" + basename + ".wav"))
+
+
+if __name__ == '__main__':
+    main()
