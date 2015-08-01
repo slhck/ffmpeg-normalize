@@ -7,27 +7,28 @@ The script RMS-normalizes media files (video, audio) to -26 dB RMS. It outputs P
 Requirements
 ============
 
-* Python
-* Recent version of ffmpeg (download a [static build](http://ffmpeg.org/download.html) if you don't want to compile) in your `$PATH`
+* Python 2.7 or 3
+* Recent version of ffmpeg (use your distribution's package manager or download a `static build 
+<http://ffmpeg.org/download.html>`_.) if you don't want to compile) in your `$PATH`
 
 Usage
 =====
 
 Very simple, just install with pip and run it::
 
-    pip install avconv-normalize
-    avconv-normalize -i <input-file> -v
+    pip install ffmpeg-normalize
+    ffmpeg-normalize -i <input-file> -v
 
 
 Or run it directly from source::
 
-    python -m avconv_normalize -i <input-file> -v
+    python -m ffmpeg_normalize -i <input-file> -v
 
 
 Options
 =======
 
-Type ``avconv-normalize -h`` for usage::
+Type ``ffmpeg-normalize -h`` for usage::
 
   -f, --force                Force overwriting existing files
   -l  LEVEL, --level LEVEL   level to normalize to (default: -26 dB)
