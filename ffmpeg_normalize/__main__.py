@@ -12,7 +12,7 @@ normalization where the mean is lifted. Peak normalization is possible with the
 part as output WAV file.
 
 Usage:
-  ffmpeg-normalize [options] [INPUT ...]
+  ffmpeg-normalize [options] <input-file>...
 
 Options:
   -f --force            Force overwriting existing files
@@ -173,7 +173,7 @@ def main():
 
     logger.debug(args)
 
-    for input_file in args['INPUT']:
+    for input_file in args['<input-file>']:
         if not os.path.exists(input_file):
             logger.error("file " + input_file + " does not exist")
             continue
