@@ -65,6 +65,14 @@ def which(program):
 
 AVCONV_CMD = which('avconv') or which('ffmpeg') or None
 
+if 'avconv' in AVCONV_CMD:
+    NORMALIZE_CMD = which('normalize-audio')
+    if not NORMALIZE_CMD:
+        raise SystemExit(
+            "avconv needs the normalize-audio command:\n"
+            "    sudo apt-get install normalize-audio"
+        )
+
 if not AVCONV_CMD:
     raise SystemExit("Could not find ffmpeg or avconv")
 
@@ -82,12 +90,13 @@ def run_command(cmd, raw=False, dry=False):
     else:
         p = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE)
 
-    p.communicate()
+    stdout, stderr = p.communicate()
 
     if p.returncode == 0:
-        return p.stdout.read()
+        return stdout
     else:
-        return "ERROR!" + p.stderr.read()
+        logger.error("Error running command: {}".format(cmd))
+        logger.error(str(stderr))
 
 
 def ffmpeg_get_mean(input_file):
@@ -185,13 +194,13 @@ def main():
             ffmpeg_adjust_volume(input_file, adjustment, output_file)
 
         else:
-            # avconv
-            # VIDEO_FILE=$1
-            # VIDEO_FILE_FIXED=${VIDEO_FILE%.*}-fixed.${VIDEO_FILE##*.}
-            # avconv -i $VIDEO_FILE -c:a pcm_s16le -vn audio.wav
-            # normalize-audio audio.wav
-
+            # avconv doesn't seem to have a way to measure volume level, so
+            # instead we use it to convert to wav, then use a separate programme
+            # and then convert back to the desired format.
+            # http://askubuntu.com/questions/247961/normalizing-video-volume-using-avconv
             cmd = AVCONV_CMD + ' -i ' + input_file + ' -c:a pcm_s16le -vn "' + output_file + '"'
+            output = run_command(cmd, True, args.dry_run)
+            cmd = NORMALIZE_CMD + ' "' + output_file + '"'
             output = run_command(cmd, True, args.dry_run)
             logger.info(output)
 
