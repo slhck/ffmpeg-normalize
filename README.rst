@@ -1,15 +1,14 @@
-avconv-normalize
+ffmpeg-normalize
 ================
 
-Audio Normalization Script for Python/avconv.
+Audio Normalization Script for Python/ffmpeg.
 The script RMS-normalizes media files (video, audio) to -26 dB RMS. It outputs PCM WAV files named as `normalized-<input>.wav`. It can also do peak normalization.
 
 Requirements
 ============
 
 * Python 2.7 or 3
-* Recent version of ffmpeg (use your distribution's package manager or download a `static build 
-<http://ffmpeg.org/download.html>`_.) if you don't want to compile) in your `$PATH`
+* Recent version of ffmpeg (use your distribution's package manager or download a static build from http://ffmpeg.org/download.html if you don't want to compile) in your `$PATH`
 
 Usage
 =====
