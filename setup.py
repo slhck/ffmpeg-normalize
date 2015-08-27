@@ -17,11 +17,11 @@ test_requirements = [
     # 'pytest',
 ]
 
-import avconv_normalize
+import ffmpeg_normalize
 
 setup(
     name='ffmpeg-normalize',
-    version=avconv_normalize.__version__,
+    version=ffmpeg_normalize.__version__,
     description="Normalize audio via ffmpeg / avconv",
     long_description=readme + '\n\n' + history,
     author="Werner Robitza",
