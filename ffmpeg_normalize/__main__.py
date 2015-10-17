@@ -16,9 +16,9 @@ Usage:
 
 Options:
   -f --force            Force overwriting existing files
-  -l, --level           dB level to normalize to [default: -26]
-  -p --prefix <prefix>  Normalized file prefix [default: 'normalized']
-  -m --max             Normalize to the maximum (peak) volume instead of RMS
+  -l --level <level>    dB level to normalize to [default: -26]
+  -p --prefix <prefix>  Normalized file prefix [default: normalized]
+  -m --max              Normalize to the maximum (peak) volume instead of RMS
   -v --verbose          Enable verbose output
   -n --dry-run          Show what would be done, do not convert
   -d --debug            Show debug output
@@ -114,14 +114,19 @@ def run_command(cmd, raw=False, dry=False):
         return
 
     if raw:
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        p = subprocess.Popen(cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True)
     else:
-        p = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE)
+        p = subprocess.Popen(cmd.split(" "),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
 
     stdout, stderr = p.communicate()
 
     if p.returncode == 0:
-        return stdout
+        return stdout + stderr
     else:
         logger.error("Error running command: {}".format(cmd))
         logger.error(str(stderr))
