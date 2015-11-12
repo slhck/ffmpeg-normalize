@@ -1,0 +1,4 @@
+include HISTORY.rst
+include README.rst
+include LICENSE
+include setup.cfg
