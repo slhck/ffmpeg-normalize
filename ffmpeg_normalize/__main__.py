@@ -93,6 +93,9 @@ def which(program):
 
 FFMPEG_CMD = which('ffmpeg') or which('avconv') or None
 
+if not FFMPEG_CMD:
+    raise SystemExit("Could not find ffmpeg or avconv in your $PATH")
+
 if 'avconv' in FFMPEG_CMD:
     NORMALIZE_CMD = which('normalize-audio')
     if not NORMALIZE_CMD:
@@ -100,10 +103,6 @@ if 'avconv' in FFMPEG_CMD:
             "avconv needs the normalize-audio command:\n"
             "    sudo apt-get install normalize-audio"
         )
-
-if not FFMPEG_CMD:
-    raise SystemExit("Could not find ffmpeg or avconv")
-
 
 def run_command(cmd, raw=False, dry=False):
     cmd = cmd.replace("  ", " ")
