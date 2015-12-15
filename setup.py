@@ -25,7 +25,7 @@ setup(
     description="Normalize audio via ffmpeg / avconv",
     long_description=readme + '\n\n' + history,
     author="Werner Robitza",
-    author_email='unknown@todo.com',
+    author_email='slhck@me.com',
     url='https://github.com/slhck/audio-normalize',
     packages=[
         'ffmpeg_normalize',

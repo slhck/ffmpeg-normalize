@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize
+ffmpeg-normalize 0.1.3
 
 ffmpeg / avconv macro for normalizing audio
 
@@ -32,7 +32,7 @@ Examples:
 #
 # The MIT License (MIT)
 #
-# Copyright (c) 2014 Werner Robitza
+# Copyright (c) 2015 Werner Robitza
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -56,6 +56,7 @@ from docopt import docopt
 import subprocess
 import os
 import re
+import sys
 import logging
 
 from . import __version__
@@ -76,7 +77,11 @@ args = dict()
 # http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
 def which(program):
     def is_exe(fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+        found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+        if not found and sys.platform == 'win32':
+          fpath = fpath + ".exe"
+          found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+        return found
 
     fpath, __ = os.path.split(program)
     if fpath:

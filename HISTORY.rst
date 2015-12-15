@@ -3,6 +3,13 @@
 History
 -------
 
+0.1.3 (2015-12-15)
+__________________
+
+* Bugfix for detecting ffmpeg or avconv on Windows (as .exe)
+* Add version to Usage message
+* Update year
+
 0.1.2 (2015-11-13)
 __________________
 
