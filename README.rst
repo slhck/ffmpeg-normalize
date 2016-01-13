@@ -16,12 +16,12 @@ Usage
 Very simple, just install with pip and run it::
 
     pip install ffmpeg-normalize
-    ffmpeg-normalize -i <input-file> -v
+    ffmpeg-normalize <options> input-file
 
 
 Or run it directly from source::
 
-    python -m ffmpeg_normalize -i <input-file> -v
+    python -m ffmpeg_normalize -v <input-file>
 
 
 Options
