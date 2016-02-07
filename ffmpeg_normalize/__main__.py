@@ -7,8 +7,8 @@ ffmpeg / avconv macro for normalizing audio
 Audio normalization script, normalizing media files to WAV output
 
 This program normalizes audio to a certain dB level. The default is an RMS-based
-normalization where the mean is lifted. Peak normalization is possible with the
--m/--max option. It takes any audio or video file as input, and writes the audio
+normalization where the mean is lifted. Peak normalization is possible with the -m --max
+option. It takes any audio or video file as input, and writes the audio
 part as output WAV file.
 
 Usage:
@@ -16,17 +16,19 @@ Usage:
 
 Options:
   -f --force            Force overwriting existing files
-  -l --level <level>    dB level to normalize to [default: -26]
+  -l --level <level>    dB level to normalize to [default: -22]
   -p --prefix <prefix>  Normalized file prefix [default: normalized]
+  -o --dir              Create an output folder in stead of prefixing the file
   -m --max              Normalize to the maximum (peak) volume instead of RMS
   -v --verbose          Enable verbose output
   -n --dry-run          Show what would be done, do not convert
   -d --debug            Show debug output
+  -u --merge            Don't create a separate WAV file but update the original file. Use in combination with -p to create a copy
 
 Examples:
-
   ffmpeg-normalize -v file.mp3
   ffmpeg-normalize -v *.avi
+  ffmpeg-normalize -u -v -o -f -m -l -5 *.mp4
 
 """
 #
@@ -52,14 +54,16 @@ Examples:
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from docopt import docopt
 import subprocess
 import os
 import re
 import sys
 import logging
 
+from docopt import docopt
+
 from . import __version__
+
 
 logger = logging.getLogger('ffmpeg_normalize')
 logger.setLevel(logging.DEBUG)
@@ -71,7 +75,6 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-
 args = dict()
 
 # http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
@@ -79,8 +82,8 @@ def which(program):
     def is_exe(fpath):
         found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
         if not found and sys.platform == 'win32':
-          fpath = fpath + ".exe"
-          found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+            fpath = fpath + ".exe"
+            found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
         return found
 
     fpath, __ = os.path.split(program)
@@ -96,6 +99,7 @@ def which(program):
 
     return None
 
+
 FFMPEG_CMD = which('ffmpeg') or which('avconv') or None
 
 if not FFMPEG_CMD:
@@ -109,6 +113,7 @@ if 'avconv' in FFMPEG_CMD:
             "    sudo apt-get install normalize-audio"
         )
 
+
 def run_command(cmd, raw=False, dry=False):
     cmd = cmd.replace("  ", " ")
     cmd = cmd.replace("  ", " ")
@@ -118,14 +123,9 @@ def run_command(cmd, raw=False, dry=False):
         return
 
     if raw:
-        p = subprocess.Popen(cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=True)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     else:
-        p = subprocess.Popen(cmd.split(" "),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+        p = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     stdout, stderr = p.communicate()
 
@@ -145,32 +145,35 @@ def ffmpeg_get_mean(input_file):
         mean_volume = float(mean_volume_matches[0])
     else:
         logger.error("could not get mean volume for " + input_file)
-        raise SystemExit
+        raise ValueError("could not get mean volume for " + input_file)
 
     max_volume_matches = re.findall(r"max_volume: ([\-\d\.]+) dB", output)
     if (max_volume_matches):
         max_volume = float(max_volume_matches[0])
     else:
         logger.error("could not get max volume for " + input_file)
-        raise SystemExit
+        raise ValueError("could not get max volume for " + input_file)
 
     return mean_volume, max_volume
 
 
 def ffmpeg_adjust_volume(input_file, gain, output):
     global args
-    if not args['--force'] and os.path.exists(output):
-        logger.warning("output file " + output + " already exists, skipping. Use -f to force overwriting.")
-        return
 
-    cmd = FFMPEG_CMD + ' -y -i "' + input_file + '" -vn -sn -filter:a "volume=' + str(gain) + 'dB" -c:a pcm_s16le "' + output + '"'
-    output = run_command(cmd, True, args['--dry-run'])
+    if args['--merge']:
+        cmd = FFMPEG_CMD + ' -y -i "' + input_file + '" -strict -2 -vcodec copy -af "volume=' + str(gain) + 'dB"  "' + output + '"'
+    else:
+        cmd = FFMPEG_CMD + ' -y -i "' + input_file + '" -vn -sn -filter:a "volume=' + str(gain) + 'dB" -c:a pcm_s16le "' + output + '"'
+
+    try:
+        output = run_command(cmd, True, args['--dry-run'])
+    except:
+        logger.error("Couldn't convert " + input_file)
 
 
 # -------------------------------------------------------------------------------------------------
 
 def main():
-
     global args
 
     args = docopt(__doc__, version=str(__version__), options_first=False)
@@ -182,34 +185,64 @@ def main():
 
     logger.debug(args)
 
+    count = 0
     for input_file in args['<input-file>']:
+        count = count + 1
         if not os.path.exists(input_file):
             logger.error("file " + input_file + " does not exist")
             continue
 
         path, filename = os.path.split(input_file)
         basename = os.path.splitext(filename)[0]
-        output_file = os.path.join(path, args['--prefix'] + "-" + basename + ".wav")
+
+        output_path = path
+
+        if args['--merge']:
+            output_filename = filename
+        else:
+            output_filename = basename + ".wav"
+
+        if args['--dir']:
+            output_path = os.path.join(path, args['--prefix'])
+        else:
+            output_filename = args['--prefix'] + "-" + output_filename
+
+        if output_path and not os.path.exists(output_path):
+            os.makedirs(output_path)
+
+        output_file = os.path.join(output_path, output_filename)
+
+        logger.debug("writing result in " + output_file)
+
+        if not args['--force'] and os.path.exists(output_file):
+            logger.warning("output file " + output_file + " already exists, skipping. Use -f to force overwriting.")
+            continue
 
         if 'ffmpeg' in FFMPEG_CMD:
-            logger.info("reading file " + input_file)
+            logger.info("reading file " + str(count) + " of " + str(len(args['<input-file>'])) + " - " + input_file)
 
             mean, maximum = ffmpeg_get_mean(input_file)
-            logger.warning("mean volume: " + str(mean))
-            logger.warning("max volume: " + str(maximum))
+            logger.info("mean volume: " + str(mean))
+            logger.info("max volume: " + str(maximum))
 
             target_level = float(args['--level'])
             if args['--max']:
-                adjustment = target_level - maximum
+                adjustment = 0 + target_level - maximum
+                logger.info("file needs " + str(adjustment) + " dB gain to reach maximum")
             else:
                 adjustment = target_level - mean
-
-            logger.warning("file needs " + str(adjustment) + " dB gain to reach " + str(args['--level']) + " dB")
+                logger.info("file needs " + str(adjustment) + " dB gain to reach " + str(args['--level']) + " dB")
 
             if maximum + adjustment > 0:
-                logger.warning("adjusting " + input_file + " will lead to clipping of " + str(maximum + adjustment) + "dB")
+                logger.info("adjusting " + input_file + " will lead to clipping of " + str(maximum + adjustment) + "dB")
+
+            if abs(adjustment) <= 0.5:
+                logger.info("gain = " + str(adjustment) + ", will not adjust file")
+                continue
 
             ffmpeg_adjust_volume(input_file, adjustment, output_file)
+
+            logger.info("--------------------------------------")
 
         else:
             # avconv doesn't seem to have a way to measure volume level, so
