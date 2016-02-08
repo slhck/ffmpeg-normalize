@@ -52,4 +52,4 @@ Examples::
     ffmpeg-normalize -v file.mp3
     ffmpeg-normalize -v *.avi
     ffmpeg-normalize -u -v -o -f -m -l -5 *.mp4
-    ffmpeg-normalize -u -v -a libfdk_aac -e "-b:v 192k" *.mkv
+    ffmpeg-normalize -u -v -a libfdk_aac -e "-b:a 192k" *.mkv
