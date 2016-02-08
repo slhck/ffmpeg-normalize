@@ -1,23 +1,26 @@
 ffmpeg-normalize
 ================
 
-ffmpeg / avconv macro for normalizing audio
+ffmpeg script for normalizing audio.
 
-Audio normalization script, normalizing media files to WAV output
-
-This program normalizes audio to a certain dB level. The default is an
+This program normalizes media files to a certain dB level. The default is an
 RMS-based normalization where the mean is lifted. Peak normalization is
-possible with the -m –max option.
+possible with the ``-m`` option.
 
 It takes any audio or video file as input, and writes the audio part as
 output WAV file. The normalized audio can also be merged with the
 original.
 
-Installation:
+Requirements:
+
+- Python 2.7 (Python 3 is not supported yet)
+- ffmpeg from http://ffmpeg.org/ installed in your $PATH
+
+Installation::
 
     pip install ffmpeg-normalize
 
-Usage:
+Usage::
 
     ffmpeg-normalize [options] <input-file>...
 
@@ -44,7 +47,7 @@ Options:
 -  ``-e``, ``--extra-options <extra-options>`` — Set extra options
    passed to ffmpeg (e.g. “-b:a 192k” to set audio bitrate)
 
-Examples:
+Examples::
 
     ffmpeg-normalize -v file.mp3
     ffmpeg-normalize -v *.avi
