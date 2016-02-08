@@ -16,7 +16,7 @@ Usage:
 
 Options:
   -f --force            Force overwriting existing files
-  -l --level <level>    dB level to normalize to [default: -22]
+  -l --level <level>    dB level to normalize to [default: -28]
   -p --prefix <prefix>  Normalized file prefix [default: normalized]
   -o --dir              Create an output folder in stead of prefixing the file
   -m --max              Normalize to the maximum (peak) volume instead of RMS
