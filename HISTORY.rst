@@ -3,6 +3,17 @@
 History
 -------
 
+0.2.0 (2016-02-08)
+__________________
+
+* Support multiple input files
+* Allow merging with input file instead of creating separate WAV
+* Write to directory instead of using prefix
+* Set the audio codec when merging
+* Set additional encoder or ffmpeg options
+
+Note: avconv support is very limited, use the real ffmpeg from http://ffmpeg.org/ instead.
+
 0.1.3 (2015-12-15)
 __________________
 

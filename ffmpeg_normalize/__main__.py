@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.1.3
+ffmpeg-normalize 0.2.0
 
 ffmpeg / avconv macro for normalizing audio
 
@@ -8,27 +8,33 @@ Audio normalization script, normalizing media files to WAV output
 
 This program normalizes audio to a certain dB level. The default is an RMS-based
 normalization where the mean is lifted. Peak normalization is possible with the -m --max
-option. It takes any audio or video file as input, and writes the audio
-part as output WAV file.
+option.
+
+It takes any audio or video file as input, and writes the audio part as output WAV file.
+The normalized audio can also be merged with the original.
 
 Usage:
   ffmpeg-normalize [options] <input-file>...
 
 Options:
-  -f --force            Force overwriting existing files
-  -l --level <level>    dB level to normalize to [default: -28]
-  -p --prefix <prefix>  Normalized file prefix [default: normalized]
-  -o --dir              Create an output folder in stead of prefixing the file
-  -m --max              Normalize to the maximum (peak) volume instead of RMS
-  -v --verbose          Enable verbose output
-  -n --dry-run          Show what would be done, do not convert
-  -d --debug            Show debug output
-  -u --merge            Don't create a separate WAV file but update the original file. Use in combination with -p to create a copy
+  -f --force                         Force overwriting existing files
+  -l --level <level>                 dB level to normalize to [default: -28]
+  -p --prefix <prefix>               Normalized file prefix [default: normalized]
+  -t --threshold <threshold>         dB threshold below which the audio will be not adjusted [default: 0.5]
+  -o --dir                           Create an output folder in stead of prefixing the file
+  -m --max                           Normalize to the maximum (peak) volume instead of RMS
+  -v --verbose                       Enable verbose output
+  -n --dry-run                       Show what would be done, do not convert
+  -d --debug                         Show debug output
+  -u --merge                         Don't create a separate WAV file but update the original file. Use in combination with -p to create a copy
+  -a --acodec <acodec>               Set audio codec for ffmpeg (see "ffmpeg -encoders") when merging. If not set, default from ffmpeg will be used.
+  -e --extra-options <extra-options> Set extra options passed to ffmpeg (e.g. "-b:a 192k" to set audio bitrate)
 
 Examples:
   ffmpeg-normalize -v file.mp3
   ffmpeg-normalize -v *.avi
   ffmpeg-normalize -u -v -o -f -m -l -5 *.mp4
+  ffmpeg-normalize -u -v -a libfdk_aac -e "-b:v 192k" *.mkv
 
 """
 #
@@ -132,13 +138,17 @@ def run_command(cmd, raw=False, dry=False):
     if p.returncode == 0:
         return stdout + stderr
     else:
-        logger.error("Error running command: {}".format(cmd))
+        logger.error("error running command: {}".format(cmd))
         logger.error(str(stderr))
+        raise StandardError
 
 
 def ffmpeg_get_mean(input_file):
     cmd = FFMPEG_CMD + ' -i "' + input_file + '" -filter:a "volumedetect" -vn -sn -f null /dev/null'
-    output = run_command(cmd, True)
+    try:
+        output = run_command(cmd, True)
+    except Exception as e:
+        raise e
     logger.debug(output)
     mean_volume_matches = re.findall(r"mean_volume: ([\-\d\.]+) dB", output)
     if (mean_volume_matches):
@@ -161,7 +171,12 @@ def ffmpeg_adjust_volume(input_file, gain, output):
     global args
 
     if args['--merge']:
-        cmd = FFMPEG_CMD + ' -y -i "' + input_file + '" -strict -2 -vcodec copy -af "volume=' + str(gain) + 'dB"  "' + output + '"'
+        cmd = FFMPEG_CMD + ' -y -i "' + input_file + '" -strict -2 -vcodec copy -af "volume=' + str(gain) + 'dB"'
+        if args['--acodec']:
+            cmd += ' -codec:a ' + args['--acodec'] + ' '
+        if args['--extra-options']:
+            cmd += ' ' + args['--extra-options'] + ' '
+        cmd += ' "' + output + '"'
     else:
         cmd = FFMPEG_CMD + ' -y -i "' + input_file + '" -vn -sn -filter:a "volume=' + str(gain) + 'dB" -c:a pcm_s16le "' + output + '"'
 
@@ -169,6 +184,7 @@ def ffmpeg_adjust_volume(input_file, gain, output):
         output = run_command(cmd, True, args['--dry-run'])
     except:
         logger.error("Couldn't convert " + input_file)
+        raise StandardError
 
 
 # -------------------------------------------------------------------------------------------------
@@ -221,7 +237,11 @@ def main():
         if 'ffmpeg' in FFMPEG_CMD:
             logger.info("reading file " + str(count) + " of " + str(len(args['<input-file>'])) + " - " + input_file)
 
-            mean, maximum = ffmpeg_get_mean(input_file)
+            try:
+                mean, maximum = ffmpeg_get_mean(input_file)
+            except Exception as e:
+                continue # with next file
+
             logger.info("mean volume: " + str(mean))
             logger.info("max volume: " + str(maximum))
 
@@ -236,19 +256,26 @@ def main():
             if maximum + adjustment > 0:
                 logger.info("adjusting " + input_file + " will lead to clipping of " + str(maximum + adjustment) + "dB")
 
-            if abs(adjustment) <= 0.5:
+            if abs(adjustment) <= float(args['--threshold']):
                 logger.info("gain = " + str(adjustment) + ", will not adjust file")
                 continue
 
-            ffmpeg_adjust_volume(input_file, adjustment, output_file)
+            try:
+                ffmpeg_adjust_volume(input_file, adjustment, output_file)
+            except Exception as e:
+                continue
 
-            logger.info("--------------------------------------")
+            logger.info("normalized file written to " + output_file)
+
 
         else:
             # avconv doesn't seem to have a way to measure volume level, so
             # instead we use it to convert to wav, then use a separate programme
             # and then convert back to the desired format.
             # http://askubuntu.com/questions/247961/normalizing-video-volume-using-avconv
+
+            logger.warning("avconv support is limited. Install ffmpeg from http://ffmpeg.org/download.html instead!")
+
             cmd = FFMPEG_CMD + ' -i ' + input_file + ' -c:a pcm_s16le -vn "' + output_file + '"'
             output = run_command(cmd, True, args['--dry-run'])
             cmd = NORMALIZE_CMD + ' "' + output_file + '"'

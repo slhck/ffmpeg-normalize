@@ -1,37 +1,52 @@
 ffmpeg-normalize
 ================
 
-Audio Normalization Script for Python/ffmpeg.
-The script RMS-normalizes media files (video, audio) to -26 dB RMS. It outputs PCM WAV files named as `normalized-<input>.wav`. It can also do peak normalization.
+ffmpeg / avconv macro for normalizing audio
 
-Requirements
-============
+Audio normalization script, normalizing media files to WAV output
 
-* Python 2.7 or 3
-* Recent version of ffmpeg (use your distribution's package manager or download a static build from http://ffmpeg.org/download.html if you don't want to compile) in your `$PATH`
+This program normalizes audio to a certain dB level. The default is an
+RMS-based normalization where the mean is lifted. Peak normalization is
+possible with the -m –max option.
 
-Usage
-=====
+It takes any audio or video file as input, and writes the audio part as
+output WAV file. The normalized audio can also be merged with the
+original.
 
-Very simple, just install with pip and run it::
+Installation:
 
     pip install ffmpeg-normalize
-    ffmpeg-normalize <options> input-file
 
+Usage:
 
-Or run it directly from source::
+    ffmpeg-normalize [options] <input-file>...
 
-    python -m ffmpeg_normalize -v <input-file>
+Options:
 
+-  ``-f``, ``--force`` — Force overwriting existing files
+-  ``-l``, ``--level <level>`` — dB level to normalize to [default: -28]
+-  ``-p``, ``--prefix <prefix>`` — Normalized file prefix [default:
+   normalized]
+-  ``-t``, ``--threshold <threshold>`` — dB threshold below which the
+   audio will be not adjusted [default: 0.5]
+-  ``-o``, ``--dir`` — Create an output folder in stead of prefixing the
+   file
+-  ``-m``, ``--max`` — Normalize to the maximum (peak) volume instead of
+   RMS
+-  ``-v``, ``--verbose`` — Enable verbose output
+-  ``-n``, ``--dry-run`` — Show what would be done, do not convert
+-  ``-d``, ``--debug`` — Show debug output
+-  ``-u``, ``--merge`` — Don’t create a separate WAV file but update the
+   original file. Use in combination with -p to create a copy
+-  ``-a``, ``--acodec <acodec>`` — Set audio codec for ffmpeg (see
+   “ffmpeg -encoders”) when merging. If not set, default from ffmpeg
+   will be used.
+-  ``-e``, ``--extra-options <extra-options>`` — Set extra options
+   passed to ffmpeg (e.g. “-b:a 192k” to set audio bitrate)
 
-Options
-=======
+Examples:
 
-Type ``ffmpeg-normalize -h`` for usage::
-
-  -f, --force                Force overwriting existing files
-  -l  LEVEL, --level LEVEL   level to normalize to (default: -26 dB)
-  -p PREFIX, --prefix PREFIX Normalized file prefix (default: "normalized")
-  -m, --max                  Normalize to the maximum (peak) volume instead of RMS
-  -v, --verbose              Enable verbose output
-  -n, --dry-run              Show what would be done, do not convert
+    ffmpeg-normalize -v file.mp3
+    ffmpeg-normalize -v *.avi
+    ffmpeg-normalize -u -v -o -f -m -l -5 *.mp4
+    ffmpeg-normalize -u -v -a libfdk_aac -e "-b:v 192k" *.mkv
