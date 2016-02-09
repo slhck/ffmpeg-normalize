@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.2.1
+ffmpeg-normalize 0.2.2
 
 ffmpeg script for normalizing audio.
 
@@ -17,7 +17,7 @@ Usage:
 
 Options:
   -f --force                         Force overwriting existing files
-  -l --level <level>                 dB level to normalize to [default: -28]
+  -l --level <level>                 dB level to normalize to [default: -26]
   -p --prefix <prefix>               Normalized file prefix [default: normalized]
   -t --threshold <threshold>         dB threshold below which the audio will be not adjusted [default: 0.5]
   -o --dir                           Create an output folder in stead of prefixing the file
