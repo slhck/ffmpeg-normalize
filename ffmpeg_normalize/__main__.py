@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.2.2
+ffmpeg-normalize 0.2.3
 
 ffmpeg script for normalizing audio.
 
@@ -143,7 +143,7 @@ def run_command(cmd, raw=False, dry=False):
 
 
 def ffmpeg_get_mean(input_file):
-    cmd = FFMPEG_CMD + ' -i "' + input_file + '" -filter:a "volumedetect" -vn -sn -f null /dev/null'
+    cmd = '"' + FFMPEG_CMD + '" -i "' + input_file + '" -filter:a "volumedetect" -vn -sn -f null /dev/null'
     try:
         output = run_command(cmd, True)
     except Exception as e:
@@ -170,7 +170,7 @@ def ffmpeg_adjust_volume(input_file, gain, output):
     global args
 
     if args['--merge']:
-        cmd = FFMPEG_CMD + ' -y -i "' + input_file + '" -strict -2 -vcodec copy -af "volume=' + str(gain) + 'dB"'
+        cmd = '"' + FFMPEG_CMD + '" -y -i "' + input_file + '" -strict -2 -vcodec copy -af "volume=' + str(gain) + 'dB"'
         if args['--acodec']:
             cmd += ' -codec:a ' + args['--acodec'] + ' '
         if args['--extra-options']:

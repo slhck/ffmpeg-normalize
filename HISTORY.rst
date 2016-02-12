@@ -3,6 +3,11 @@
 History
 -------
 
+0.2.2 (2016-02-12)
+__________________
+
+* Fixed issue where ffmpeg could not be found if path included spaces
+
 0.2.2 (2016-02-09)
 __________________
 
