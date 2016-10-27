@@ -3,7 +3,12 @@
 History
 -------
 
-0.2.2 (2016-02-12)
+0.2.4 (2016-10-27)
+__________________
+
+* Fixed issue where multiple spaces were collapsed into one
+
+0.2.3 (2016-02-12)
 __________________
 
 * Fixed issue where ffmpeg could not be found if path included spaces

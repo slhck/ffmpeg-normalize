@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.2.3
+ffmpeg-normalize 0.2.4
 
 ffmpeg script for normalizing audio.
 
@@ -120,8 +120,6 @@ if 'avconv' in FFMPEG_CMD:
 
 
 def run_command(cmd, raw=False, dry=False):
-    cmd = cmd.replace("  ", " ")
-    cmd = cmd.replace("  ", " ")
     logger.debug("[command] {0}".format(cmd))
 
     if dry:
