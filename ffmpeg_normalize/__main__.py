@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.2.4
+ffmpeg-normalize 0.2.5
 
 ffmpeg script for normalizing audio.
 
@@ -19,6 +19,7 @@ Options:
   -f --force                         Force overwriting existing files
   -l --level <level>                 dB level to normalize to [default: -26]
   -p --prefix <prefix>               Normalized file prefix [default: normalized]
+  -np --no-prefix                    Write output file without prefix
   -t --threshold <threshold>         dB threshold below which the audio will be not adjusted [default: 0.5]
   -o --dir                           Create an output folder in stead of prefixing the file
   -m --max                           Normalize to the maximum (peak) volume instead of RMS
@@ -215,10 +216,15 @@ def main():
         else:
             output_filename = basename + ".wav"
 
-        if args['--dir']:
-            output_path = os.path.join(path, args['--prefix'])
+        if args['--no-prefix']:
+            if args['--dir']:
+                logger.error("Cannot write to directory if '--no-prefix' is set.")
+                raise StandardError
         else:
-            output_filename = args['--prefix'] + "-" + output_filename
+            if args['--dir']:
+                output_path = os.path.join(path, args['--prefix'])
+            else:
+                output_filename = args['--prefix'] + "-" + output_filename
 
         if output_path and not os.path.exists(output_path):
             os.makedirs(output_path)

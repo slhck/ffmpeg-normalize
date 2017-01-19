@@ -30,10 +30,11 @@ Options:
 -  ``-l``, ``--level <level>`` — dB level to normalize to [default: -26]
 -  ``-p``, ``--prefix <prefix>`` — Normalized file prefix [default:
    normalized]
+-  ``-np``, ``--no-prefix`` — Write output file without prefix
 -  ``-t``, ``--threshold <threshold>`` — dB threshold below which the
    audio will be not adjusted [default: 0.5]
--  ``-o``, ``--dir`` — Create an output folder in stead of prefixing the
-   file
+-  ``-o``, ``--dir`` — Create an output folder with the prefix instead of prefixing the
+   file (does not work if "--no-prefix" is chosen)
 -  ``-m``, ``--max`` — Normalize to the maximum (peak) volume instead of
    RMS
 -  ``-v``, ``--verbose`` — Enable verbose output
