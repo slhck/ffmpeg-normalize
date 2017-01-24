@@ -50,22 +50,22 @@ Options:
 
 Examples::
 
-Normalize a file and write to `normalized-file.wav`:
+Normalize a file and write to `normalized-file.wav`::
 
     ffmpeg-normalize -v file.mp3
     ffmpeg-normalize --verbose *.avi
 
-Normalize a number of AVI files and write to `normalized-<file>.wav`:
+Normalize a number of AVI files and write to `normalized-<file>.wav`::
 
     ffmpeg-normalize -v *.avi
     ffmpeg-normalize --verbose *.avi
 
-Normalize a number of MP4 files to -5 dB peak volume and merge the audio stream back into the MP4 files, in a new directory called `normalized`:
+Normalize a number of MP4 files to -5 dB peak volume and merge the audio stream back into the MP4 files, in a new directory called `normalized`::
 
     ffmpeg-normalize -vuofm -l -5 *.mp4
     ffmpeg-normalize --verbose --merge --dir --force --max --level -5 *.mp4
 
-Normalize a number of MKV files and merge the audio back in using the `libfdk_aac` encoder with 192 kBit/s CBR:
+Normalize a number of MKV files and merge the audio back in using the `libfdk_aac` encoder with 192 kBit/s CBR::
 
     ffmpeg-normalize -vu -a libfdk_aac -e "-b:a 192k" *.mkv
     ffmpeg-normalize --verbose --merge --acodec libfdk_aac --extra-options "-b:a 192k" *.mkv
