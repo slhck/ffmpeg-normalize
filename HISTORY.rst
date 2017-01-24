@@ -3,6 +3,15 @@
 History
 -------
 
+0.4 (2017-01-24)
+__________________
+
+* Cleanup in code, make it class-based
+* Drop avconv support, it was never good anyway
+* Add support for specifying codec for non-merging operations
+* Add support for specifying output format
+* README improvements
+
 0.3 (2017-01-19)
 __________________
 
