@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.3.1
+ffmpeg-normalize 0.4.1
 
 ffmpeg script for normalizing audio.
 
@@ -133,7 +133,7 @@ def run_command(cmd, raw=True, dry=False):
     stdout, stderr = p.communicate()
 
     if p.returncode == 0:
-        return stdout + stderr
+        return (stdout + stderr)
     else:
         logger.error("error running command: {}".format(cmd))
         logger.error(str(stderr))

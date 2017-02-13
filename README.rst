@@ -13,7 +13,7 @@ original.
 
 Requirements:
 
-- Python (2.7 tested, 3.x should be working but untested)
+- Python
 - `ffmpeg` and `ffprobe` from http://ffmpeg.org/ installed in your `$PATH`
 
 Installation::
