@@ -4,23 +4,26 @@ ffmpeg-normalize
 ffmpeg script for normalizing audio.
 
 This program normalizes media files to a certain dB level. The default is an
-RMS-based normalization where the mean is lifted. Peak normalization is
+RMS-based normalization where the mean is lifted or attenuated. Peak normalization is
 possible with the ``-m`` option.
 
 It takes any audio or video file as input, and writes the audio part as
 output WAV file. The normalized audio can also be merged with the
 original.
 
-Requirements:
+Requirements
+------------
 
 - Python
-- `ffmpeg` and `ffprobe` from http://ffmpeg.org/ installed in your `$PATH`
+- `ffmpeg` from http://ffmpeg.org/ installed in your `$PATH` (3.x or above recommended)
 
-Installation::
+Installation
+------------
 
     pip install ffmpeg-normalize
 
-Usage::
+Usage
+-----
 
     ffmpeg-normalize [options] <input-file>...
 
@@ -48,7 +51,8 @@ Options:
 -  ``-e``, ``--extra-options <extra-options>`` — Set extra options
    passed to ffmpeg (e.g. “-b:a 192k” to set audio bitrate)
 
-Examples::
+Examples
+--------
 
 Normalize a file and write to `normalized-file.wav`::
 
@@ -69,3 +73,28 @@ Normalize a number of MKV files and merge the audio back in using the `libfdk_aa
 
     ffmpeg-normalize -vu -a libfdk_aac -e "-b:a 192k" *.mkv
     ffmpeg-normalize --verbose --merge --acodec libfdk_aac --extra-options "-b:a 192k" *.mkv
+
+License
+-------
+
+The MIT License (MIT)
+
+Copyright (c) 2015-2017 Werner Robitza
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

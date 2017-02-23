@@ -5,8 +5,8 @@ ffmpeg-normalize 0.4.1
 ffmpeg script for normalizing audio.
 
 This program normalizes media files to a certain dB level. The default is an
-RMS-based normalization where the mean is lifted. Peak normalization is
-possible with the -m option.
+RMS-based normalization where the mean is lifted or attenuated. Peak normalization
+is possible with the -m option.
 
 It takes any audio or video file as input, and writes the audio part as
 output WAV file. The normalized audio can also be merged with the
@@ -42,7 +42,7 @@ Examples:
 #
 # The MIT License (MIT)
 #
-# Copyright (c) 2015 Werner Robitza
+# Copyright (c) 2015-2017 Werner Robitza
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
