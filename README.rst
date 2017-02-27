@@ -43,8 +43,7 @@ Options:
 -  ``-v``, ``--verbose`` — Enable verbose output
 -  ``-n``, ``--dry-run`` — Show what would be done, do not convert
 -  ``-d``, ``--debug`` — Show debug output
--  ``-u``, ``--merge`` — Don’t create a separate WAV file but update the
-   original file. Use in combination with -p to create a copy
+-  ``-u``, ``--merge`` — Take original file's streams and merge the normalized audio. Note: This will not overwrite the input file, but output to ``normalized-<input>``.
 -  ``-a``, ``--acodec <acodec>`` — Set audio codec for ffmpeg (see
    `ffmpeg -encoders`) (will be chosen based on format, default pcm_s16le for WAV)
 -  ``-r``, ``--format <format>`` – Set format for ffmpeg (see `ffmpeg -formats`) to use for output file [default: wav]

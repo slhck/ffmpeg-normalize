@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.4.1
+ffmpeg-normalize 0.4.2
 
 ffmpeg script for normalizing audio.
 
@@ -27,7 +27,7 @@ Options:
   -v --verbose                       Enable verbose output
   -n --dry-run                       Show what would be done, do not convert
   -d --debug                         Show debug output
-  -u --merge                         Don't create a separate WAV file but update the original file. Use in combination with -p to create a copy
+  -u --merge                         Take original file's streams and merge the normalized audio. Note: This will not overwrite the input file, but output to `normalized-<input>`.
   -a --acodec <acodec>               Set audio codec for ffmpeg (see `ffmpeg -encoders`) to use for output (will be chosen based on format, default pcm_s16le for WAV)
   -r --format <format>               Set format for ffmpeg (see `ffmpeg -formats`) to use for output file [default: wav]
   -e --extra-options <extra-options> Set extra options passed to ffmpeg (e.g. "-b:a 192k" to set audio bitrate)
@@ -287,9 +287,9 @@ class InputFile(object):
 
         if self.merge:
             # when merging, copy the video and subtitle stream over and apply the audio filter
-            cmd += '-strict -2 -c:v copy -c:s copy -filter:a "volume=' + str(self.adjustment) + 'dB" '
+            cmd += '-strict -2 -c:v copy -c:s copy -map_metadata 0 -filter:a "volume=' + str(self.adjustment) + 'dB" '
             if not self.acodec:
-                logger.warn("Merging audio back into original file, but encoder was automatically chosen. Set '--acodec' to overwrite.")
+                logger.warn("Merging audio with the original file, but encoder was automatically chosen. Set '--acodec' to overwrite.")
         else:
             # when outputting a file, disable video and subtitles
             cmd += '-vn -sn -filter:a "volume=' + str(self.adjustment) + 'dB" '
