@@ -33,7 +33,7 @@ Options:
 -  ``-l``, ``--level <level>`` — dB level to normalize to [default: -26]
 -  ``-p``, ``--prefix <prefix>`` — Prefix for normalized files or output folder name [default:
    normalized]
--  ``-np``, ``--no-prefix`` — Write output file without prefix (cannot be used when `--dir` is used)
+-  ``-x``, ``--no-prefix`` — Write output file without prefix (cannot be used when `--dir` is used)
 -  ``-t``, ``--threshold <threshold>`` — dB threshold below which the
    audio will be not adjusted [default: 0.5]
 -  ``-o``, ``--dir`` — Create an output folder under the input file's directory with the prefix instead of prefixing the

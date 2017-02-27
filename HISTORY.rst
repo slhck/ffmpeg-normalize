@@ -3,6 +3,12 @@
 History
 -------
 
+0.4.3 (2017-02-27)
+__________________
+
+* Fix option ``-np``, should be ``-x`` short
+* Abort when input and output file are the same (ffmpeg can't overwrite it)
+
 0.4.2 (2017-02-27)
 __________________
 

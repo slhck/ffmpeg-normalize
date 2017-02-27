@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.4.2
+ffmpeg-normalize 0.4.3
 
 ffmpeg script for normalizing audio.
 
@@ -19,7 +19,7 @@ Options:
   -f --force                         Force overwriting existing files
   -l --level <level>                 dB level to normalize to [default: -26]
   -p --prefix <prefix>               Prefix for normalized files or output folder name [default: normalized]
-  -np --no-prefix                    Write output file without prefix (cannot be used when `--dir` is used)
+  -x --no-prefix                     Write output file without prefix (cannot be used when `--dir` is used)
   -t --threshold <threshold>         dB threshold below which the audio will be not adjusted [default: 0.5]
   -o --dir                           Create an output folder under the input file's directory with the prefix
                                      instead of prefixing the file (does not work if `--no-prefix` is chosen)
@@ -192,12 +192,8 @@ class InputFile(object):
         Set all the required output filenames and paths
         """
 
-        # if merging is enabled, the output filename is the same as the filename
-        if self.merge:
-            self.output_filename = self.filename
-        else:
-            # if not merging, we need to create a separate file with a different format
-            self.output_filename = self.basename + '.' + self.format
+        # by default, output filename is the input filename
+        self.output_filename = self.filename
 
         # prefix is disabled, so we need to make sure we're not writing ot a directory
         if self.no_prefix:
@@ -219,6 +215,9 @@ class InputFile(object):
         self.output_file = os.path.join(self.output_dir, self.output_filename)
 
         logger.debug("writing result in " + self.output_file)
+
+        if self.output_file == self.input_file:
+            raise SystemExit("output file is the same as input file, cannot proceed")
 
         # some checks
         if not self.force and os.path.exists(self.output_file):
