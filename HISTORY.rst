@@ -12,6 +12,7 @@ __________________
 0.4.2 (2017-02-27)
 __________________
 
+* Map metadata from input to output when merging
 * Clarify use of merge option
 
 0.4.1 (2017-02-13)
