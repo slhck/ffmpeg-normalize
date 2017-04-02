@@ -28,29 +28,30 @@ original.
 
 Normalization:
 
-- `-l`, `--level <level>`                 dB level to normalize to [default: -26]
-- `-m`, `--max`                           Normalize to the maximum (peak) volume instead of RMS
+- `-l`, `--level <level>`: dB level to normalize to [default: -26]
+- `-m`, `--max`: Normalize to the maximum (peak) volume instead of RMS
+- `-b`, `--ebu`: Normalize according to EBU R128 (ffmpeg `loudnorm` filter)
+- `-t`, `--threshold <threshold>`: dB threshold below which the audio will be not adjusted [default: 0.5]
 
 Encoding / Format:
 
-- `-a`, `--acodec <acodec>`               Set audio codec for ffmpeg (see `ffmpeg -encoders`) to use for output (will be chosen based on format, default pcm_s16le for WAV)
-- `-r`, `--format <format>`               Set format / file extension for ffmpeg (see `ffmpeg -formats`) to use for output file [default: `wav`]
+- `-a`, `--acodec <acodec>`: Set audio codec for ffmpeg (see `ffmpeg -encoders`) to use for output (will be chosen based on format, default pcm_s16le for WAV)
+- `-r`, `--format <format>`: Set format / file extension for ffmpeg (see `ffmpeg -formats`) to use for output file [default: `wav`]
 - `-e`, `--extra-options <extra-options>` Set extra options passed to ffmpeg (e.g. `-b:a 192k` to set audio bitrate)
 
 File Handling:
 
-- `-t`, `--threshold <threshold>`         dB threshold below which the audio will be not adjusted [default: 0.5]
-- `-f`, `--force`                         Force overwriting existing files
-- `-p`, `--prefix <prefix>`               Prefix for normalized files or output folder name [default: normalized]
-- `-x`, `--no-prefix`                     Write output file without prefix (cannot be used when `--dir` is used)
-- `-o`, `--dir`                           Create an output folder under the input file's directory with the prefix instead of prefixing the file (does not work if `--no-prefix` is chosen)
-- `-u`, `--merge`                         Take original file's streams and merge the normalized audio. Note: This will not overwrite the input file, but output to `normalized-<input>`.
+- `-f`, `--force`: Force overwriting existing files
+- `-p`, `--prefix <prefix>`: Prefix for normalized files or output folder name [default: normalized]
+- `-x`, `--no-prefix`: Write output file without prefix (cannot be used when `--dir` is used)
+- `-o`, `--dir`: Create an output folder under the input file's directory with the prefix instead of prefixing the file (does not work if `--no-prefix` is chosen)
+- `-u`, `--merge`: Take original file's streams and merge the normalized audio. Note: This will not overwrite the input file, but output to `normalized-<input>`.
 
 General:
 
-- `-v`, `--verbose`                       Enable verbose output
-- `-n`, `--dry-run`                       Show what would be done, do not convert
-- `-d`, `--debug`                         Show debug output
+- `-v`, `--verbose`: Enable verbose output
+- `-n`, `--dry-run`: Show what would be done, do not convert
+- `-d`, `--debug`: Show debug output
 
 # Examples
 

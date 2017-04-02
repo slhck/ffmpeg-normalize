@@ -1,5 +1,12 @@
 # History
 
+0.5 (2017-04-02)
+----------------
+
+- Add new EBU R128 normalization filter
+- Fix issue with output file extension not being WAV by default
+- Fix issue #24 where setup.py fails on Windows / Python 3.6
+
 0.4.3 (2017-02-27)
 ------------------
 
