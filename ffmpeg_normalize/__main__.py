@@ -24,13 +24,14 @@ Options:
   -o --dir                           Create an output folder under the input file's directory with the prefix
                                      instead of prefixing the file (does not work if `--no-prefix` is chosen)
   -m --max                           Normalize to the maximum (peak) volume instead of RMS
+  -b --ebu                           Normalize according to EBU R128 (ffmpeg `loudnorm` filter)
   -v --verbose                       Enable verbose output
   -n --dry-run                       Show what would be done, do not convert
   -d --debug                         Show debug output
   -u --merge                         Take original file's streams and merge the normalized audio. Note: This will not overwrite the input file, but output to `normalized-<input>`.
   -a --acodec <acodec>               Set audio codec for ffmpeg (see `ffmpeg -encoders`) to use for output (will be chosen based on format, default pcm_s16le for WAV)
   -r --format <format>               Set format for ffmpeg (see `ffmpeg -formats`) to use for output file [default: wav]
-  -e --extra-options <extra-options> Set extra options passed to ffmpeg (e.g. "-b:a 192k" to set audio bitrate)
+  -e --extra-options <extra-options> Set extra options passed to ffmpeg (e.g. `-b:a 192k` to set audio bitrate)
 
 Examples:
   ffmpeg-normalize -v file.mp3
@@ -155,6 +156,7 @@ class InputFile(object):
         self.force         = self.args['--force']
         self.format        = self.args['--format']
         self.max           = self.args['--max']
+        self.ebu           = self.args['--ebu']
         self.merge         = self.args['--merge']
         self.no_prefix     = self.args['--no-prefix']
         self.prefix        = self.args['--prefix']
@@ -169,6 +171,12 @@ class InputFile(object):
                 raise SystemExit("No ffmpeg installed")
             else:
                 raise SystemExit("Could not find ffmpeg in your $PATH")
+
+        if self.max and self.ebu:
+            raise SystemExit("Either --max or --ebu have to be specified.")
+
+        if self.ebu and ((self.target_level > -5.0) or (self.target_level < -70.0)):
+            raise SystemExit("Target levels for EBU R128 must lie between -70 and -5")
 
         self.skip = False # whether the file should be skipped
 
@@ -284,14 +292,20 @@ class InputFile(object):
 
         cmd = '"' + self.ffmpeg_cmd + '" -y -i "' + self.input_file + '" '
 
+        if self.ebu:
+            chosen_filter = 'loudnorm=' + str(self.target_level) + ' '
+        else:
+            chosen_filter = 'volume=' + str(self.adjustment) + 'dB '
+
         if self.merge:
             # when merging, copy the video and subtitle stream over and apply the audio filter
-            cmd += '-strict -2 -c:v copy -c:s copy -map_metadata 0 -filter:a "volume=' + str(self.adjustment) + 'dB" '
+            cmd += '-strict -2 -c:v copy -c:s copy -map_metadata 0 -filter:a ' + chosen_filter
             if not self.acodec:
                 logger.warn("Merging audio with the original file, but encoder was automatically chosen. Set '--acodec' to overwrite.")
         else:
             # when outputting a file, disable video and subtitles
-            cmd += '-vn -sn -filter:a "volume=' + str(self.adjustment) + 'dB" '
+            cmd += '-vn -sn -filter:a ' + chosen_filter
+
 
         # set codec
         if self.acodec:
@@ -362,8 +376,9 @@ class FFmpegNormalize(object):
 
             logger.info("reading file " + str(count) + " of " + str(self.file_count) + " - " + input_file.filename)
 
-            input_file.get_mean()
-            input_file.set_adjustment()
+            if not self.args["--ebu"]:
+                input_file.get_mean()
+                input_file.set_adjustment()
 
             input_file.adjust_volume()
             logger.info("normalized file written to " + input_file.output_file)
