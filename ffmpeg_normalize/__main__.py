@@ -201,7 +201,7 @@ class InputFile(object):
         """
 
         # by default, output filename is the input filename
-        self.output_filename = self.filename
+        self.output_filename = os.path.splitext(os.path.basename(self.filename))[0] + "." + self.format
 
         # prefix is disabled, so we need to make sure we're not writing ot a directory
         if self.no_prefix:
