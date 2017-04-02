@@ -1,4 +1,4 @@
-include HISTORY.rst
-include README.rst
+include HISTORY.md
+include README.md
 include LICENSE
 include setup.cfg
