@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.5
+ffmpeg-normalize 0.5.1
 
 ffmpeg script for normalizing audio.
 
@@ -200,8 +200,12 @@ class InputFile(object):
         Set all the required output filenames and paths
         """
 
-        # by default, output filename is the input filename
-        self.output_filename = os.path.splitext(os.path.basename(self.filename))[0] + "." + self.format
+        if self.merge:
+            # when merging, output file is the same as input file
+            self.output_filename = self.filename
+        else:
+            # by default, output filename is the input filename, plus the format chosen (default: WAV)
+            self.output_filename = os.path.splitext(self.filename)[0] + "." + self.format
 
         # prefix is disabled, so we need to make sure we're not writing ot a directory
         if self.no_prefix:
