@@ -79,6 +79,11 @@ Normalize a number of MKV files and merge the audio back in using the
     ffmpeg-normalize -vu -a libfdk_aac -e "-b:a 192k" *.mkv
     ffmpeg-normalize --verbose --merge --acodec libfdk_aac --extra-options "-b:a 192k" *.mkv
 
+One user (@pannal) suggested this for an old series with bad sound mixing:
+
+    ffmpeg-normalize --verbose --merge --force --acodec libfdk_aac --ebu \
+    --extra-options "-threads 4 -b:a 224k -filter:a 'compand=0|0:1|1:-90/-900|-70/-70|-30/-9|0/-3:6:0:0:0'" *.mkv
+
 # License
 
 The MIT License (MIT)
