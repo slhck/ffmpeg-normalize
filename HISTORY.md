@@ -1,6 +1,6 @@
 # History
 
-next (2017-07-31)
+0.5.2 (2017-07-31)
 ------------------
 
 - Improve command-line handling
