@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.5.2
+ffmpeg-normalize 0.6.0
 
 ffmpeg script for normalizing audio.
 
@@ -68,6 +68,7 @@ import os
 import re
 import sys
 import logging
+import tempfile
 
 from docopt import docopt
 
@@ -162,6 +163,7 @@ class InputFile(object):
         self.prefix        = self.args['--prefix']
         self.target_level  = float(self.args['--level'])
         self.threshold     = float(self.args['--threshold'])
+        self.uses_tmp_file = False
 
         # Find ffmpeg command in PATH
         self.ffmpeg_exe = which('ffmpeg')
@@ -228,8 +230,15 @@ class InputFile(object):
 
         logger.debug("writing result in " + self.output_file)
 
+        # if the same file should be used, create temporary file instead
         if self.output_file == self.input_file:
-            raise SystemExit("output file is the same as input file, cannot proceed")
+            if not self.force:
+                logger.warning("Your input file will be overwritten and cannot be recovered. Use -f to force overwriting.")
+                self.skip = True
+            else:
+                self.output_file = tempfile.NamedTemporaryFile(delete=False).name
+                self.output_file += os.path.splitext(self.input_file)[1]
+                self.uses_tmp_file = True
 
         # some checks
         if not self.force and os.path.exists(self.output_file):
@@ -294,6 +303,7 @@ class InputFile(object):
         """
         if self.skip:
             logger.error("Cannot run adjustment, file should be skipped")
+            return
 
         cmd = [self.ffmpeg_exe, "-nostdin", "-y", "-i", self.input_file]
 
@@ -305,7 +315,7 @@ class InputFile(object):
         if self.merge:
             # when merging, copy the video and subtitle stream over and apply the audio filter
             cmd.extend(["-strict", "-2", "-c:v", "copy", "-c:s", "copy",
-                        "-map_metadata", "0", "-filter:a", chosen_filter])
+                        "-map_metadata", "0", "-map", "0", "-filter:a", chosen_filter])
             if not self.acodec:
                 logger.warn("Merging audio with the original file, but encoder was automatically chosen. Set '--acodec' to overwrite.")
         else:
@@ -325,6 +335,13 @@ class InputFile(object):
 
         run_command(cmd, dry=self.dry_run)
 
+
+    def move_tmp_file(self):
+        """
+        Move back the temporary file to the original, overwriting it
+        """
+        logger.debug("Moving " + str(self.output_file) + " to " + str(self.input_file))
+        os.rename(self.output_file, self.input_file)
 
 class FFmpegNormalize(object):
     """
@@ -386,8 +403,16 @@ class FFmpegNormalize(object):
                 input_file.get_mean()
                 input_file.set_adjustment()
 
+            if input_file.skip:
+                return
+
             input_file.adjust_volume()
-            logger.info("normalized file written to " + input_file.output_file)
+
+            if input_file.uses_tmp_file:
+                input_file.move_tmp_file()
+                logger.info("normalized file written to " + input_file.input_file)
+            else:
+                logger.info("normalized file written to " + input_file.output_file)
 
 # -------------------------------------------------------------------------------------------------
 
