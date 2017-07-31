@@ -73,6 +73,11 @@ stream back into the MP4 files, in a new directory called
     ffmpeg-normalize -vuofm -l -5 *.mp4
     ffmpeg-normalize --verbose --merge --dir --force --max --level -5 *.mp4
 
+Normalize the input file and irrevocably overwrite it:
+
+    ffmpeg-normalize -vuxf input.wav
+    ffmpeg-normalize --verbose --merge --no-prefix --force input.wav
+
 Normalize a number of MKV files and merge the audio back in using the
 `libfdk_aac` encoder with 192 kBit/s CBR:
 
