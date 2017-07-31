@@ -113,7 +113,7 @@ def which(program):
     return None
 
 
-def run_command(cmd, raw=True, dry=False):
+def run_command(cmd, raw=False, dry=False):
     """
     Generic function to run a command.
     Set raw to pass the actual command.
@@ -129,7 +129,7 @@ def run_command(cmd, raw=True, dry=False):
     if raw:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
     else:
-        p = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
 
     stdout, stderr = p.communicate()
 
@@ -164,8 +164,8 @@ class InputFile(object):
         self.threshold     = float(self.args['--threshold'])
 
         # Find ffmpeg command in PATH
-        self.ffmpeg_cmd = which('ffmpeg')
-        if not self.ffmpeg_cmd:
+        self.ffmpeg_exe = which('ffmpeg')
+        if not self.ffmpeg_exe:
             if which('avconv'):
                 logger.error("avconv is not supported anymore. Please install ffmpeg from http://ffmpeg.org instead.")
                 raise SystemExit("No ffmpeg installed")
@@ -246,7 +246,8 @@ class InputFile(object):
         else:
             nul = "/dev/null"
 
-        cmd = '"' + self.ffmpeg_cmd + '" -i "' + self.input_file + '" -filter:a "volumedetect" -vn -sn -f null ' + nul
+        cmd = [self.ffmpeg_exe, "-nostdin", "-y", "-i", self.input_file,
+                "-filter:a", "volumedetect", "-vn", "-sn", "-f", "null", nul]
 
         output = run_command(cmd)
 
@@ -294,32 +295,33 @@ class InputFile(object):
         if self.skip:
             logger.error("Cannot run adjustment, file should be skipped")
 
-        cmd = '"' + self.ffmpeg_cmd + '" -y -i "' + self.input_file + '" '
+        cmd = [self.ffmpeg_exe, "-nostdin", "-y", "-i", self.input_file]
 
         if self.ebu:
-            chosen_filter = 'loudnorm=' + str(self.target_level) + ' '
+            chosen_filter = 'loudnorm=' + str(self.target_level)
         else:
-            chosen_filter = 'volume=' + str(self.adjustment) + 'dB '
+            chosen_filter = 'volume=' + str(self.adjustment) + 'dB'
 
         if self.merge:
             # when merging, copy the video and subtitle stream over and apply the audio filter
-            cmd += '-strict -2 -c:v copy -c:s copy -map_metadata 0 -filter:a ' + chosen_filter
+            cmd.extend(["-strict", "-2", "-c:v", "copy", "-c:s", "copy",
+                        "-map_metadata", "0", "-filter:a", chosen_filter])
             if not self.acodec:
                 logger.warn("Merging audio with the original file, but encoder was automatically chosen. Set '--acodec' to overwrite.")
         else:
             # when outputting a file, disable video and subtitles
-            cmd += '-vn -sn -filter:a ' + chosen_filter
+            cmd.extend(["-vn", "-sn", "-filter:a", chosen_filter])
 
 
         # set codec
         if self.acodec:
-            cmd += '-c:a ' + self.acodec + ' '
+            cmd.extend(["-c:a", self.acodec])
 
         # any extra options passed to ffmpeg
         if self.extra_options:
-            cmd += self.extra_options + ' '
+            cmd.extend([self.extra_options])
 
-        cmd += '"' + self.output_file + '"'
+        cmd.extend([self.output_file])
 
         run_command(cmd, dry=self.dry_run)
 
