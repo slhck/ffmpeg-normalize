@@ -112,6 +112,7 @@ def setup_custom_logger(name, debug=False):
 
     return logger
 
+
 logger = setup_custom_logger('ffmpeg_normalize')
 
 # -------------------------------------------------------------------------------------------------
@@ -179,20 +180,20 @@ class InputFile(object):
     """
 
     def __init__(self, path, args):
-        self.args          = args
-        self.acodec        = self.args['--acodec']
-        self.write_to_dir  = self.args['--dir']
-        self.dry_run       = self.args['--dry-run']
+        self.args = args
+        self.acodec = self.args['--acodec']
+        self.write_to_dir = self.args['--dir']
+        self.dry_run = self.args['--dry-run']
         self.extra_options = self.args['--extra-options']
-        self.force         = self.args['--force']
-        self.format        = self.args['--format']
-        self.max           = self.args['--max']
-        self.ebu           = self.args['--ebu']
-        self.merge         = self.args['--merge']
-        self.no_prefix     = self.args['--no-prefix']
-        self.prefix        = self.args['--prefix']
-        self.target_level  = float(self.args['--level'])
-        self.threshold     = float(self.args['--threshold'])
+        self.force = self.args['--force']
+        self.format = self.args['--format']
+        self.max = self.args['--max']
+        self.ebu = self.args['--ebu']
+        self.merge = self.args['--merge']
+        self.no_prefix = self.args['--no-prefix']
+        self.prefix = self.args['--prefix']
+        self.target_level = float(self.args['--level'])
+        self.threshold = float(self.args['--threshold'])
         self.uses_tmp_file = False
 
         # Find ffmpeg command in PATH
@@ -210,20 +211,20 @@ class InputFile(object):
         if self.ebu and ((self.target_level > -5.0) or (self.target_level < -70.0)):
             raise SystemExit("Target levels for EBU R128 must lie between -70 and -5")
 
-        self.skip = False # whether the file should be skipped
+        self.skip = False  # whether the file should be skipped
 
         self.mean_volume = None
-        self.max_volume  = None
-        self.adjustment  = None
+        self.max_volume = None
+        self.adjustment = None
 
         self.input_file = path
         self.dir, self.filename = os.path.split(self.input_file)
         self.basename = os.path.splitext(self.filename)[0]
 
         # by default, the output path is the same as the input file's one
-        self.output_file     = None
+        self.output_file = None
         self.output_filename = None
-        self.output_dir     = self.dir
+        self.output_dir = self.dir
 
         self.set_output_filename()
 
@@ -275,7 +276,6 @@ class InputFile(object):
             logger.warning("output file " + self.output_file + " already exists, skipping. Use -f to force overwriting.")
             self.skip = True
 
-
     def get_mean(self):
         """
         Use ffmpeg with volumedetect filter to get the mean volume of the input file.
@@ -286,7 +286,7 @@ class InputFile(object):
             nul = "/dev/null"
 
         cmd = [self.ffmpeg_exe, "-nostdin", "-y", "-i", self.input_file,
-                "-filter:a", "volumedetect", "-vn", "-sn", "-f", "null", nul]
+               "-filter:a", "volumedetect", "-vn", "-sn", "-f", "null", nul]
 
         output = run_command(cmd)
 
@@ -308,7 +308,6 @@ class InputFile(object):
         logger.info("mean volume: " + str(self.mean_volume))
         logger.info("max volume: " + str(self.max_volume))
 
-
     def set_adjustment(self):
         """
         Set the adjustment gain based on chosen option and mean/max volume
@@ -326,7 +325,6 @@ class InputFile(object):
         if abs(self.adjustment) <= self.threshold:
             logger.info("gain of " + str(self.adjustment) + " is below threshold, will not adjust file")
             self.skip = True
-
 
     def adjust_volume(self):
         """
@@ -353,7 +351,6 @@ class InputFile(object):
             # when outputting a file, disable video and subtitles
             cmd.extend(["-vn", "-sn", "-filter:a", chosen_filter])
 
-
         # set codec
         if self.acodec:
             cmd.extend(["-c:a", self.acodec])
@@ -365,7 +362,6 @@ class InputFile(object):
         cmd.extend([self.output_file])
 
         run_command(cmd, dry=self.dry_run)
-
 
     def move_tmp_file(self):
         """
@@ -381,9 +377,9 @@ class FFmpegNormalize(object):
 
     def __init__(self, args):
         # Set arguments
-        self.args          = args
-        self.debug         = self.args['--debug']
-        self.verbose       = self.args['--verbose']
+        self.args = args
+        self.debug = self.args['--debug']
+        self.verbose = self.args['--verbose']
 
         if self.debug:
             logger.setLevel(logging.DEBUG)
@@ -395,7 +391,6 @@ class FFmpegNormalize(object):
         # Checks
         self.input_files = []
         self.create_input_files(self.args['<input-file>'])
-
 
     def create_input_files(self, input_files):
         """
@@ -415,7 +410,6 @@ class FFmpegNormalize(object):
 
         for input_file in input_files:
             self.input_files.append(InputFile(input_file, self.args))
-
 
     def run(self):
         """
