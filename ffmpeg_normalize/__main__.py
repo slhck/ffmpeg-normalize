@@ -76,17 +76,10 @@ from . import __version__
 
 # -------------------------------------------------------------------------------------------------
 
-loggers = {}
-
 def setup_custom_logger(name, debug=False):
     """
     Create a logger with a certain name and level
     """
-    global loggers
-
-    if loggers.get(name):
-        return loggers.get(name)
-
     formatter = logging.Formatter(
         fmt='%(levelname)s: %(message)s'
     )
@@ -103,12 +96,8 @@ def setup_custom_logger(name, debug=False):
     if debug:
         logger.setLevel(logging.DEBUG)
     else:
-        logger.setLevel(logging.INFO)
-
-    if logger.hasHandlers():
-        logger.handlers.clear()
+        logger.setLevel(logging.WARNING)
     logger.addHandler(handler)
-    loggers.update(dict(name=logger))
 
     return logger
 
@@ -156,6 +145,7 @@ def run_command(cmd, raw=False, dry=False):
     logger.debug("Running command: {0}".format(cmd))
 
     if dry:
+        logger.warn("Dry mode specified, not actually running command")
         return
 
     if raw:
@@ -170,7 +160,7 @@ def run_command(cmd, raw=False, dry=False):
     else:
         logger.error("error running command: {}".format(cmd))
         logger.error(str(stderr))
-        raise SystemExit("Failed running a command")
+        sys.exit(1)
 
 # -------------------------------------------------------------------------------------------------
 
@@ -179,37 +169,14 @@ class InputFile(object):
     Class that holds a file, its streams and adjustments
     """
 
-    def __init__(self, path, args):
-        self.args = args
-        self.acodec = self.args['--acodec']
-        self.write_to_dir = self.args['--dir']
-        self.dry_run = self.args['--dry-run']
-        self.extra_options = self.args['--extra-options']
-        self.force = self.args['--force']
-        self.format = self.args['--format']
-        self.max = self.args['--max']
-        self.ebu = self.args['--ebu']
-        self.merge = self.args['--merge']
-        self.no_prefix = self.args['--no-prefix']
-        self.prefix = self.args['--prefix']
-        self.target_level = float(self.args['--level'])
-        self.threshold = float(self.args['--threshold'])
+    def __init__(self, path, ffmpeg_normalize):
+        self.ffmpeg_normalize = ffmpeg_normalize
         self.uses_tmp_file = False
 
-        # Find ffmpeg command in PATH
-        self.ffmpeg_exe = which('ffmpeg')
-        if not self.ffmpeg_exe:
-            if which('avconv'):
-                logger.error("avconv is not supported anymore. Please install ffmpeg from http://ffmpeg.org instead.")
-                raise SystemExit("No ffmpeg installed")
-            else:
-                raise SystemExit("Could not find ffmpeg in your $PATH")
-
-        if self.max and self.ebu:
-            raise SystemExit("Either --max or --ebu have to be specified.")
-
-        if self.ebu and ((self.target_level > -5.0) or (self.target_level < -70.0)):
-            raise SystemExit("Target levels for EBU R128 must lie between -70 and -5")
+        if self.ffmpeg_normalize.ebu and ((self.ffmpeg_normalize.target_level > -5.0) or
+           (self.ffmpeg_normalize.target_level < -70.0)):
+            logger.error("Target levels for EBU R128 must lie between -70 and -5")
+            sys.exit(1)
 
         self.skip = False  # whether the file should be skipped
 
@@ -233,24 +200,25 @@ class InputFile(object):
         Set all the required output filenames and paths
         """
 
-        if self.merge:
+        if self.ffmpeg_normalize.merge:
             # when merging, output file is the same as input file
             self.output_filename = self.filename
         else:
             # by default, output filename is the input filename, plus the format chosen (default: WAV)
-            self.output_filename = os.path.splitext(self.filename)[0] + "." + self.format
+            self.output_filename = os.path.splitext(self.filename)[0] + "." + self.ffmpeg_normalize.output_format
 
         # prefix is disabled, so we need to make sure we're not writing ot a directory
-        if self.no_prefix:
-            if self.write_to_dir:
-                raise SystemExit("Cannot write to a directory if '--no-prefix' is set.")
+        if self.ffmpeg_normalize.no_prefix:
+            if self.ffmpeg_normalize.write_to_dir:
+                logger.error("Cannot write to a directory if '--no-prefix' is set.")
+                sys.exit(1)
         else:
             # if writing to a directory, change the output path by using the prefix
-            if self.write_to_dir:
-                self.output_dir = os.path.join(self.dir, self.prefix)
+            if self.ffmpeg_normalize.write_to_dir:
+                self.output_dir = os.path.join(self.dir, self.ffmpeg_normalize.prefix)
             else:
                 # if not, the output filename is prefixed (this is the default behavior)
-                self.output_filename = self.prefix + "-" + self.output_filename
+                self.output_filename = self.ffmpeg_normalize.prefix + "-" + self.output_filename
 
         # create the output dir if necessary
         if self.output_dir and not os.path.exists(self.output_dir):
@@ -263,7 +231,7 @@ class InputFile(object):
 
         # if the same file should be used, create temporary file instead
         if self.output_file == self.input_file:
-            if not self.force:
+            if not self.ffmpeg_normalize.force:
                 logger.warning("Your input file will be overwritten and cannot be recovered. Use -f to force overwriting.")
                 self.skip = True
             else:
@@ -272,7 +240,7 @@ class InputFile(object):
                 self.uses_tmp_file = True
 
         # some checks
-        if not self.force and os.path.exists(self.output_file):
+        if not self.ffmpeg_normalize.force and os.path.exists(self.output_file):
             logger.warning("output file " + self.output_file + " already exists, skipping. Use -f to force overwriting.")
             self.skip = True
 
@@ -285,7 +253,7 @@ class InputFile(object):
         else:
             nul = "/dev/null"
 
-        cmd = [self.ffmpeg_exe, "-nostdin", "-y", "-i", self.input_file,
+        cmd = [self.ffmpeg_normalize.ffmpeg_exe, "-nostdin", "-y", "-i", self.input_file,
                "-filter:a", "volumedetect", "-vn", "-sn", "-f", "null", nul]
 
         output = run_command(cmd)
@@ -297,13 +265,15 @@ class InputFile(object):
         if mean_volume_matches:
             self.mean_volume = float(mean_volume_matches[0])
         else:
-            raise ValueError("could not get mean volume for " + self.input_file)
+            logger.error("could not get mean volume for " + self.input_file)
+            sys.exit(1)
 
         max_volume_matches = re.findall(r"max_volume: ([\-\d\.]+) dB", output)
         if max_volume_matches:
             self.max_volume = float(max_volume_matches[0])
         else:
-            raise ValueError("could not get max volume for " + self.input_file)
+            logger.error("could not get max volume for " + self.input_file)
+            sys.exit(1)
 
         logger.info("mean volume: " + str(self.mean_volume))
         logger.info("max volume: " + str(self.max_volume))
@@ -312,17 +282,17 @@ class InputFile(object):
         """
         Set the adjustment gain based on chosen option and mean/max volume
         """
-        if self.max:
-            self.adjustment = 0 + self.target_level - self.max_volume
+        if self.ffmpeg_normalize.use_max:
+            self.adjustment = 0 + self.ffmpeg_normalize.target_level - self.max_volume
             logger.info("file needs " + str(self.adjustment) + " dB gain to reach maximum")
         else:
-            self.adjustment = self.target_level - self.mean_volume
-            logger.info("file needs " + str(self.adjustment) + " dB gain to reach " + str(self.target_level) + " dB")
+            self.adjustment = self.ffmpeg_normalize.target_level - self.mean_volume
+            logger.info("file needs " + str(self.adjustment) + " dB gain to reach " + str(self.ffmpeg_normalize.target_level) + " dB")
 
         if self.max_volume + self.adjustment > 0:
             logger.info("adjusting " + self.filename + " will lead to clipping of " + str(self.max_volume + self.adjustment) + "dB")
 
-        if abs(self.adjustment) <= self.threshold:
+        if abs(self.adjustment) <= self.ffmpeg_normalize.threshold:
             logger.info("gain of " + str(self.adjustment) + " is below threshold, will not adjust file")
             self.skip = True
 
@@ -334,34 +304,34 @@ class InputFile(object):
             logger.error("Cannot run adjustment, file should be skipped")
             return
 
-        cmd = [self.ffmpeg_exe, "-nostdin", "-y", "-i", self.input_file]
+        cmd = [self.ffmpeg_normalize.ffmpeg_exe, "-nostdin", "-y", "-i", self.input_file]
 
-        if self.ebu:
-            chosen_filter = 'loudnorm=' + str(self.target_level)
+        if self.ffmpeg_normalize.ebu:
+            chosen_filter = 'loudnorm=' + str(self.ffmpeg_normalize.target_level)
         else:
             chosen_filter = 'volume=' + str(self.adjustment) + 'dB'
 
-        if self.merge:
+        if self.ffmpeg_normalize.merge:
             # when merging, copy the video and subtitle stream over and apply the audio filter
             cmd.extend(["-strict", "-2", "-c:v", "copy", "-c:s", "copy",
                         "-map_metadata", "0", "-map", "0", "-filter:a", chosen_filter])
-            if not self.acodec:
+            if not self.ffmpeg_normalize.acodec:
                 logger.warn("Merging audio with the original file, but encoder was automatically chosen. Set '--acodec' to overwrite.")
         else:
             # when outputting a file, disable video and subtitles
             cmd.extend(["-vn", "-sn", "-filter:a", chosen_filter])
 
         # set codec
-        if self.acodec:
-            cmd.extend(["-c:a", self.acodec])
+        if self.ffmpeg_normalize.acodec:
+            cmd.extend(["-c:a", self.ffmpeg_normalize.acodec])
 
         # any extra options passed to ffmpeg
-        if self.extra_options:
-            cmd.extend([self.extra_options])
+        if self.ffmpeg_normalize.extra_options:
+            cmd.extend([self.ffmpeg_normalize.extra_options])
 
         cmd.extend([self.output_file])
 
-        run_command(cmd, dry=self.dry_run)
+        run_command(cmd, dry=self.ffmpeg_normalize.dry_run)
 
     def move_tmp_file(self):
         """
@@ -375,22 +345,40 @@ class FFmpegNormalize(object):
     ffmpeg-normalize class.
     """
 
-    def __init__(self, args):
-        # Set arguments
-        self.args = args
-        self.debug = self.args['--debug']
-        self.verbose = self.args['--verbose']
-
-        if self.debug:
-            logger.setLevel(logging.DEBUG)
-        elif self.verbose:
-            logger.setLevel(logging.INFO)
-
-        logger.debug(self.args)
+    def __init__(self, input_files, acodec, write_to_dir, dry_run, extra_options, force, output_format,
+                 use_max, ebu, merge, no_prefix, prefix, target_level, threshold):
+        self.acodec = acodec
+        self.write_to_dir = write_to_dir
+        self.dry_run = dry_run
+        self.extra_options = extra_options
+        self.force = force
+        self.output_format = output_format
+        self.use_max = use_max
+        self.ebu = ebu
+        self.merge = merge
+        self.no_prefix = no_prefix
+        self.prefix = prefix
+        self.target_level = target_level
+        self.threshold = threshold
 
         # Checks
+        # Find ffmpeg command in PATH
+        self.ffmpeg_exe = which('ffmpeg')
+        if not self.ffmpeg_exe:
+            if which('avconv'):
+                logger.error("avconv is not supported anymore. Please install ffmpeg from http://ffmpeg.org instead.")
+                logger.error("No ffmpeg installed")
+                sys.exit(1)
+            else:
+                logger.error("Could not find ffmpeg in your $PATH. Please install ffmpeg from http://ffmpeg.org")
+                sys.exit(1)
+
+        if self.use_max and self.ebu:
+            logger.error("--max and --ebu are mutually exclusive.")
+            sys.exit(1)
+
         self.input_files = []
-        self.create_input_files(self.args['<input-file>'])
+        self.create_input_files(input_files)
 
     def create_input_files(self, input_files):
         """
@@ -409,7 +397,7 @@ class FFmpegNormalize(object):
         self.file_count = len(input_files)
 
         for input_file in input_files:
-            self.input_files.append(InputFile(input_file, self.args))
+            self.input_files.append(InputFile(input_file, self))
 
     def run(self):
         """
@@ -424,7 +412,7 @@ class FFmpegNormalize(object):
 
             logger.info("reading file " + str(count) + " of " + str(self.file_count) + " - " + input_file.filename)
 
-            if not self.args["--ebu"]:
+            if not self.ebu:
                 input_file.get_mean()
                 input_file.set_adjustment()
 
@@ -444,7 +432,27 @@ class FFmpegNormalize(object):
 def main():
     args = docopt(__doc__, version=str(__version__), options_first=False)
 
-    ffmpeg_normalize = FFmpegNormalize(args)
+    if args['--debug']:
+        logger.setLevel(logging.DEBUG)
+    elif args['--verbose']:
+        logger.setLevel(logging.INFO)
+
+    ffmpeg_normalize = FFmpegNormalize(
+        input_files=args['<input-file>'],
+        acodec=args['--acodec'],
+        write_to_dir=args['--dir'],
+        dry_run=args['--dry-run'],
+        extra_options=args['--extra-options'],
+        force=args['--force'],
+        output_format=args['--format'],
+        use_max=args['--max'],
+        ebu=args['--ebu'],
+        merge=args['--merge'],
+        no_prefix=args['--no-prefix'],
+        prefix=args['--prefix'],
+        target_level=float(args['--level']),
+        threshold=float(args['--threshold']),
+    )
     ffmpeg_normalize.run()
 
 
