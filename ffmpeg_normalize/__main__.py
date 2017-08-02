@@ -76,15 +76,43 @@ from . import __version__
 
 # -------------------------------------------------------------------------------------------------
 
-logger = logging.getLogger('ffmpeg_normalize')
-logger.setLevel(logging.DEBUG)
+loggers = {}
 
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.ERROR)
+def setup_custom_logger(name, debug=False):
+    """
+    Create a logger with a certain name and level
+    """
+    global loggers
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-stream_handler.setFormatter(formatter)
-logger.addHandler(stream_handler)
+    if loggers.get(name):
+        return loggers.get(name)
+
+    formatter = logging.Formatter(
+        fmt='%(levelname)s: %(message)s'
+    )
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+
+    logging.addLevelName(logging.ERROR, "\033[1;31m%s\033[1;0m" % logging.getLevelName(logging.ERROR))
+    logging.addLevelName(logging.WARNING, "\033[1;33m%s\033[1;0m" % logging.getLevelName(logging.WARNING))
+    logging.addLevelName(logging.INFO, "\033[1;34m%s\033[1;0m" % logging.getLevelName(logging.INFO))
+    logging.addLevelName(logging.DEBUG, "\033[1;35m%s\033[1;0m" % logging.getLevelName(logging.DEBUG))
+
+    logger = logging.getLogger(name)
+    if debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
+    if logger.hasHandlers():
+        logger.handlers.clear()
+    logger.addHandler(handler)
+    loggers.update(dict(name=logger))
+
+    return logger
+
+logger = setup_custom_logger('ffmpeg_normalize')
 
 # -------------------------------------------------------------------------------------------------
 
@@ -103,12 +131,14 @@ def which(program):
     fpath, _ = os.path.split(program)
     if fpath:
         if is_exe(program):
+            logger.debug("found executable: " + str(program))
             return program
     else:
         for path in os.environ["PATH"].split(os.pathsep):
             path = path.strip('"')
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
+                logger.debug("found executable: " + str(exe_file))
                 return exe_file
 
     return None
@@ -122,7 +152,7 @@ def run_command(cmd, raw=False, dry=False):
 
     Returns stdout + stderr.
     """
-    logger.debug("[command] {0}".format(cmd))
+    logger.debug("Running command: {0}".format(cmd))
 
     if dry:
         return
@@ -260,6 +290,7 @@ class InputFile(object):
 
         output = run_command(cmd)
 
+        logger.debug("Output from ffmpeg: ")
         logger.debug(output)
 
         mean_volume_matches = re.findall(r"mean_volume: ([\-\d\.]+) dB", output)
@@ -355,9 +386,9 @@ class FFmpegNormalize(object):
         self.verbose       = self.args['--verbose']
 
         if self.debug:
-            stream_handler.setLevel(logging.DEBUG)
+            logger.setLevel(logging.DEBUG)
         elif self.verbose:
-            stream_handler.setLevel(logging.INFO)
+            logger.setLevel(logging.INFO)
 
         logger.debug(self.args)
 
