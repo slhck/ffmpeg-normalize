@@ -11,6 +11,7 @@ python -m ffmpeg_normalize "test/test.wav" -f -b
 python -m ffmpeg_normalize "test/test.wav" -f -b -m || true
 python -m ffmpeg_normalize "test/test.wav" -f -t 80 -v 2>&1 | grep "will not"
 python -m ffmpeg_normalize "test/test.wav" -f -a "pcm_s24le"
+python -m ffmpeg_normalize "test/test.wav" -f -a "aac" -e "-b:a 192k -filter:a 'acompressor'"
 [ -f "test/normalized-test.wav" ]
 
 # General handling

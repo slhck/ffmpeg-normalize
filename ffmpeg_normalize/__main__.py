@@ -69,6 +69,7 @@ import re
 import sys
 import logging
 import tempfile
+import shlex
 
 from docopt import docopt
 
@@ -327,7 +328,7 @@ class InputFile(object):
 
         # any extra options passed to ffmpeg
         if self.ffmpeg_normalize.extra_options:
-            cmd.extend([self.ffmpeg_normalize.extra_options])
+            cmd.extend(shlex.split(self.ffmpeg_normalize.extra_options))
 
         cmd.extend([self.output_file])
 
