@@ -16,19 +16,42 @@ Usage:
   ffmpeg-normalize [options] <input-file>...
 
 Options:
+
+Normalization:
   -l --level <level>                 dB level to normalize to [default: -26]
   -m --max                           Normalize to the maximum (peak) volume instead of RMS
-  -b --ebu                           Normalize according to EBU R128 (ffmpeg `loudnorm` filter)
-  -t --threshold <threshold>         dB threshold below which the audio will be not adjusted [default: 0.5]
-  -a --acodec <acodec>               Set audio codec for ffmpeg (see `ffmpeg -encoders`) to use for output (will be chosen based on format, default pcm_s16le for WAV)
-  -r --format <format>               Set format for ffmpeg (see `ffmpeg -formats`) to use for output file [default: wav]
-  -e --extra-options <extra-options> Set extra options passed to ffmpeg (e.g. `-b:a 192k` to set audio bitrate)
+  -b --ebu                           Normalize according to EBU R128 (ffmpeg `loudnorm` filter).
+                                     Note that current ffmpeg versions have a bug
+                                     (https://trac.ffmpeg.org/ticket/6570) that changes the sample
+                                     rate of the input file, which some players do not support. If
+                                     you want to set the sample rate to a normal value, use the
+                                     `-e "-ar 44100"` option.
+  -t --threshold <threshold>         dB threshold below which the audio will be not adjusted
+                                     [default: 0.5]
+
+Encoding / Format:
+  -a --acodec <acodec>               Set audio codec for ffmpeg (see `ffmpeg -encoders`) to use for
+                                     output (will be chosen based on format, default pcm_s16le for
+                                     WAV)
+  -r --format <format>               Set format for ffmpeg (see `ffmpeg -formats`) to use for output
+                                     file [default: wav]
+  -e --extra-options <extra-options> Set extra options passed to ffmpeg (e.g. `-b:a 192k` to set
+                                     audio bitrate)
+
+File Handling:
   -f --force                         Force overwriting existing files
-  -p --prefix <prefix>               Prefix for normalized files or output folder name [default: normalized]
-  -x --no-prefix                     Write output file without prefix (cannot be used when `--dir` is used)
-  -o --dir                           Create an output folder under the input file's directory with the prefix
-                                     instead of prefixing the file (does not work if `--no-prefix` is chosen)
-  -u --merge                         Take original file's streams and merge the normalized audio. Note: This will not overwrite the input file, but output to `normalized-<input>`.
+  -p --prefix <prefix>               Prefix for normalized files or output folder name
+                                     [default: normalized]
+  -x --no-prefix                     Write output file without prefix (cannot be used when `--dir`
+                                     is used)
+  -o --dir                           Create an output folder under the input file's directory with
+                                     the prefix instead of prefixing the file (does not work if
+                                     `--no-prefix` is chosen)
+  -u --merge                         Take original file's streams and merge the normalized audio.
+                                     Note: This will not overwrite the input file, but output to
+                                     `normalized-<input>`.
+
+General:
   -v --verbose                       Enable verbose output
   -n --dry-run                       Show what would be done, do not convert
   -d --debug                         Show debug output

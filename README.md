@@ -4,7 +4,8 @@ ffmpeg script for normalizing audio.
 
 This program normalizes media files to a certain dB level. The default
 is an RMS-based normalization where the mean is lifted or attenuated.
-Peak normalization is possible with the `-m` option.
+Peak normalization is possible with the `-m` option. EBU R128
+normalization is possible with the `-b` option.
 
 It takes any audio or video file as input, and writes the audio part as
 output WAV file. The normalized audio can also be merged with the
@@ -30,7 +31,7 @@ Normalization:
 
 - `-l`, `--level <level>`: dB level to normalize to [default: -26]
 - `-m`, `--max`: Normalize to the maximum (peak) volume instead of RMS
-- `-b`, `--ebu`: Normalize according to EBU R128 (ffmpeg `loudnorm` filter)
+- `-b`, `--ebu`: Normalize according to EBU R128 (ffmpeg `loudnorm` filter). Note that current ffmpeg versions [have a bug](https://trac.ffmpeg.org/ticket/6570) that changes the sample rate of the input file, which some players do not support. If you want to set the sample rate to a normal value, use the `-e "-ar 44100"` option.
 - `-t`, `--threshold <threshold>`: dB threshold below which the audio will be not adjusted [default: 0.5]
 
 Encoding / Format:
