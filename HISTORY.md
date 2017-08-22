@@ -1,5 +1,12 @@
 # History
 
+0.7.0 (2017-08-02)
+------------------
+
+- Internal code cleanup
+- Add more examples
+- Add simple test suite
+
 0.6.0 (2017-07-31)
 ------------------
 
