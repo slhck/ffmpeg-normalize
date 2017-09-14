@@ -1,5 +1,9 @@
 # History
 
+0.7.1 (2017-09-14)
+
+- Fix for expanding variables in `$PATH`
+
 0.7.0 (2017-08-02)
 ------------------
 
