@@ -148,7 +148,7 @@ def which(program):
             return program
     else:
         for path in os.environ["PATH"].split(os.pathsep):
-            path = path.strip('"')
+            path = os.path.expandvars(os.path.expanduser(path)).strip('"')
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
                 logger.debug("found executable: " + str(exe_file))
