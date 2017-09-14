@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.7.0
+ffmpeg-normalize 0.7.1
 
 ffmpeg script for normalizing audio.
 
