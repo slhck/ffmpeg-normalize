@@ -1,6 +1,12 @@
 # History
 
+0.7.2 (2017-09-17)
+------------------
+
+- Allow setting threshold to 0 to always normalize file, see #38
+
 0.7.1 (2017-09-14)
+------------------
 
 - Fix for expanding variables in `$PATH`
 

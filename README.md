@@ -32,7 +32,7 @@ Normalization:
 - `-l`, `--level <level>`: dB level to normalize to [default: -26]
 - `-m`, `--max`: Normalize to the maximum (peak) volume instead of RMS
 - `-b`, `--ebu`: Normalize according to EBU R128 (ffmpeg `loudnorm` filter). Note that the sample rate of the input file will be changed, which some players do not support. If you want to set the sample rate to a normal value, use the `-e "-ar 44100"` option.
-- `-t`, `--threshold <threshold>`: dB threshold below which the audio will be not adjusted [default: 0.5]
+- `-t`, `--threshold <threshold>`: dB threshold below which the audio will be not adjusted, set to 0 to always normalize file [default: 0.5]
 
 Encoding / Format:
 

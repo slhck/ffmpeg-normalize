@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.7.1
+ffmpeg-normalize 0.7.2
 
 ffmpeg script for normalizing audio.
 
@@ -25,8 +25,8 @@ Normalization:
                                      which some players do not support. If you want to set the
                                      sample rate to a normal value, use the `-e "-ar 44100"`
                                      option.
-  -t --threshold <threshold>         dB threshold below which the audio will be not adjusted
-                                     [default: 0.5]
+  -t --threshold <threshold>         dB threshold below which the audio will be not adjusted, set
+                                     to 0 to always normalize file [default: 0.5]
 
 Encoding / Format:
   -a --acodec <acodec>               Set audio codec for ffmpeg (see `ffmpeg -encoders`) to use for
@@ -315,7 +315,7 @@ class InputFile(object):
         if self.max_volume + self.adjustment > 0:
             logger.info("adjusting " + self.filename + " will lead to clipping of " + str(self.max_volume + self.adjustment) + "dB")
 
-        if abs(self.adjustment) <= self.ffmpeg_normalize.threshold:
+        if self.ffmpeg_normalize.threshold > 0 and abs(self.adjustment) <= self.ffmpeg_normalize.threshold:
             logger.info("gain of " + str(self.adjustment) + " is below threshold, will not adjust file")
             self.skip = True
 
