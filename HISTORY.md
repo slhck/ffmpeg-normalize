@@ -1,5 +1,10 @@
 # History
 
+0.7.3 (2017-10-09)
+------------------
+
+- Use shutil.move instead of os.rename for cross-FS compatibility
+
 0.7.2 (2017-09-17)
 ------------------
 

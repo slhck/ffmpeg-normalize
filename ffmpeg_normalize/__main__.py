@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-ffmpeg-normalize 0.7.2
+ffmpeg-normalize 0.7.3
 
 ffmpeg script for normalizing audio.
 
@@ -92,6 +92,7 @@ import sys
 import logging
 import tempfile
 import shlex
+import shutil
 
 from docopt import docopt
 
@@ -361,7 +362,7 @@ class InputFile(object):
         Move back the temporary file to the original, overwriting it
         """
         logger.debug("Moving " + str(self.output_file) + " to " + str(self.input_file))
-        os.rename(self.output_file, self.input_file)
+        shutil.move(self.output_file, self.input_file)
 
 class FFmpegNormalize(object):
     """
