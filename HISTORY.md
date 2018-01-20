@@ -1,5 +1,12 @@
 # History
 
+1.0 (2018-01-21)
+----------------
+
+- General rewrite of the program
+- New input/output file handling
+- Default to two-pass linear EBU normalization
+
 0.7.3 (2017-10-09)
 ------------------
 

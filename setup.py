@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages
+from setuptools import setup
 # To use a consistent encoding
 from codecs import open
 from os import path
+import ffmpeg_normalize
 
 here = path.abspath(path.dirname(__file__))
 
@@ -22,8 +23,6 @@ try:
 except ImportError:
     print("pypandoc module not found, could not convert Markdown to RST")
 
-import ffmpeg_normalize
-
 setup(
     name='ffmpeg-normalize',
     version=ffmpeg_normalize.__version__,
@@ -34,10 +33,9 @@ setup(
     url='https://github.com/slhck/ffmpeg-normalize',
     packages=['ffmpeg_normalize'],
     include_package_data=True,
-    install_requires=["docopt"],
     license="MIT",
     zip_safe=False,
-    keywords='avconv, ffmpeg, libav, normalize, audio',
+    keywords='ffmpeg, normalize, audio',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

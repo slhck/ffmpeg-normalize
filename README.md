@@ -1,100 +1,107 @@
 # ffmpeg-normalize
 
-ffmpeg script for normalizing audio.
+A utility for batch-normalizing audio using ffmpeg.
 
-This program normalizes media files to a certain dB level. The default
-is an RMS-based normalization where the mean is lifted or attenuated.
-Peak normalization is possible with the `-m` option. EBU R128
-normalization is possible with the `-b` option.
+This program normalizes media files to a certain LUFS level using the EBU R128 loudness normalization procedure. It can also perform RMS-based normalization (where the mean is lifted or attenuated), or peak normalization to a certain target level.
 
-It takes any audio or video file as input, and writes the audio part as
-output WAV file. The normalized audio can also be merged with the
-original.
+Batch processing of several input files is possible, including video files.
 
 # Requirements
 
--   Python
--   ffmpeg from <http://ffmpeg.org/> installed in your \$PATH (3.x or
-    above recommended)
+-   Python 2.7 or 3
+-   ffmpeg v3.1 or above from <http://ffmpeg.org/> installed in your \$PATH
 
 # Installation
 
-    pip install ffmpeg-normalize
+    pip3 install ffmpeg-normalize
 
 # Usage
 
-    ffmpeg-normalize [options] <input-file> ...
+    ffmpeg-normalize [-h] [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER] [-f]
+                    [-d] [-v] [-n] [-nt {ebu,rms,peak}] [-t TARGET_LEVEL]
+                    [-lrt LOUDNESS_RANGE_TARGET] [-tp TRUE_PEAK]
+                    [--offset OFFSET] [--dual-mono] [-c:a AUDIO_CODEC]
+                    [-b:a AUDIO_BITRATE] [-ar SAMPLE_RATE] [-vn]
+                    [-c:v VIDEO_CODEC] [-sn] [-mn]
+                    [-e EXTRA_OUTPUT_OPTIONS] [-ofmt OUTPUT_FORMAT]
+                    [-ext EXTENSION]
+                    input [input ...]
 
-# Options
+The program takes a number of input files and, by default, writes them to a folder called `normalized`, using an `.mkv` container. You can specify an output file name for each input file with the `-o` option. In this case, the container format will be inferred from the file name extension.
 
-Normalization:
+By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently. The video and subtitle tracks will be copied over to the output file.
 
-- `-l`, `--level <level>`: dB level to normalize to [default: -26]
-- `-m`, `--max`: Normalize to the maximum (peak) volume instead of RMS
-- `-b`, `--ebu`: Normalize according to EBU R128 (ffmpeg `loudnorm` filter). Note that the sample rate of the input file will be changed, which some players do not support. If you want to set the sample rate to a normal value, use the `-e "-ar 44100"` option.
-- `-t`, `--threshold <threshold>`: dB threshold below which the audio will be not adjusted, set to 0 to always normalize file [default: 0.5]
-
-Encoding / Format:
-
-- `-a`, `--acodec <acodec>`: Set audio codec for ffmpeg (see `ffmpeg -encoders`) to use for output (will be chosen based on format, default pcm_s16le for WAV)
-- `-r`, `--format <format>`: Set format / file extension for ffmpeg (see `ffmpeg -formats`) to use for output file [default: `wav`]
-- `-e`, `--extra-options <extra-options>` Set extra options passed to ffmpeg (e.g. `-b:a 192k` to set audio bitrate)
-
-File Handling:
-
-- `-f`, `--force`: Force overwriting existing files
-- `-p`, `--prefix <prefix>`: Prefix for normalized files or output folder name [default: normalized]
-- `-x`, `--no-prefix`: Write output file without prefix (cannot be used when `--dir` is used)
-- `-o`, `--dir`: Create an output folder under the input file's directory with the prefix instead of prefixing the file (does not work if `--no-prefix` is chosen)
-- `-u`, `--merge`: Take original file's streams and merge the normalized audio. Note: This will not overwrite the input file, but output to `normalized-<input>`.
-
-General:
-
-- `-v`, `--verbose`: Enable verbose output
-- `-n`, `--dry-run`: Show what would be done, do not convert
-- `-d`, `--debug`: Show debug output
+**Important Note:** The default audio encoding method is uncompressed PCM to avoid introducing compression artifacts. This will result in a much higher bitrate than you might want, for example if your input files are MP3s. Some containers (like MP4) also cannot handle PCM audio. If you want to use such containers and/or keep the file size down, use `-c:a` and specify an audio codec (e.g., `-c:a aac` for ffmpeg's built-in AAC encoder).
 
 # Examples
 
-Normalize a file and write to `normalized-file.wav`:
+Normalize a bunch of WAV files and write them to the specified output files with uncompressed PCM WAV as audio codec:
 
-    ffmpeg-normalize -v file.mp3
-    ffmpeg-normalize --verbose *.avi
+    ffmpeg-normalize file1.wav file2.wav -o file1-normalized.wav -o file2-normalized.wav
 
-Normalize a number of AVI files and write to
-`normalized-<file>.wav`:
+Normalize a number of videos in the current folder and write them to a folder called `normalized`, converting all audio streams to AAC with 192 kBit/s.
 
-    ffmpeg-normalize -v *.avi
-    ffmpeg-normalize --verbose *.avi
+    ffmpeg-normalize *.mkv -c:a aac -b:a 192k
 
-Normalize a number of MP4 files to -5 dB peak volume and merge the audio
-stream back into the MP4 files, in a new directory called
-`normalized`:
+Instead of EBU R128, one might just want to use simple peak normalization to 0 dB:
 
-    ffmpeg-normalize -vuofm -l -5 *.mp4
-    ffmpeg-normalize --verbose --merge --dir --force --max --level -5 *.mp4
+    ffmpeg-normalize test.wav --normalization-type peak --target-level 0 -o normalized.wav
 
-Normalize the input file and irrevocably overwrite it:
+You can (if you really want) also overwrite your input file:
 
-    ffmpeg-normalize -vuxf input.wav
-    ffmpeg-normalize --verbose --merge --no-prefix --force input.wav
+    ffmpeg-normalize input.mp4 -o input.mp4 -f
 
-Normalize a number of MKV files and merge the audio back in using the
-`libfdk_aac` encoder with 192 kBit/s CBR:
+If you need some fancy extra options, such as `vbr` for the `libfdk_aac` encoder:
 
-    ffmpeg-normalize -vu -a libfdk_aac -e "-b:a 192k" *.mkv
-    ffmpeg-normalize --verbose --merge --acodec libfdk_aac --extra-options "-b:a 192k" *.mkv
+    ffmpeg-normalize input.m4a -c:a libfdk_aac -e '["vbr": "3"]' -o output.m4a
 
-One user (@pannal) suggested this for an old series with bad sound mixing:
+Further examples? Please submit a PR so I can collect them.
 
-    ffmpeg-normalize --verbose --merge --force --acodec libfdk_aac --ebu \
-    --extra-options "-threads 4 -b:a 224k -filter:a 'compand=0|0:1|1:-90/-900|-70/-70|-30/-9|0/-3:6:0:0:0'" *.mkv
+# FAQ
+
+### This program does not work like expected anymore!
+
+You are probably using a 0.x version of this program. There are significant changes to the command line arguments and inner workings of this program, so please either continue using the old version (find it under *Releases* on GitHub or request the specific version from PyPi) or adapt your scripts to the new one.
+
+### The program doesn't work because the "loudnorm" filter can't be found
+
+Make sure you run ffmpeg v3.1 or higher. Many distributions package outdated ffmpeg 2.x versions. You can always download a static build from [their website](http://ffmpeg.org/download.html) and use that.
+
+If you have to use an outdated ffmpeg version, you can only use `rms` or `peak` as normalization types, but I can't promise that the program will work correctly.
+
+### Should I use this to normalize my music collection?
+
+When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this on your precious music collection, unless you have a backup of the originals or accept potential quality reduction. If you just want to normalize the subjective volume of the files without changing the actual content, consider using [MP3Gain](http://mp3gain.sourceforge.net/) and [aacgain](http://aacgain.altosdesign.com/).
+
+### The conversion does not work and I get a cryptic ffmpeg error!
+
+One possible reason is that the input file contains some streams that cannot be mapped to the output file. Examples:
+
+- You are trying to normalize a movie file, writing to a `.wav` or `.mp3` file. WAV/MP3 files only support audio. Disable video and subtitles with `-vn` and `-sn`.
+
+- You are trying to normalize a file, writing to an `.mp4` container. MP4 does not support PCM audio. Make sure that your audio codec is set (e.g. `-c:a aac`).
+
+The default output container is `.mkv` as it will support most input stream types. If you want a different output container, make sure that it supports your input file's video, audio, and subtitle streams (if any).
+
+Also, if there is some other broken metadata, you can try to disable copying over of metadata with `-mn`.
+
+### What are the different normalization algorithms?
+
+- **EBU R128** is an EBU standard that is commonly used in the broadcasting world. The normalization is performed using a psychoacoustic model that targets a subjective loudness level measured in LUFS (Loudness Unit Full Scale). R128 is subjectively more accurate than any peak or RMS-based normalization. More info on R128 can be found in the [official document](https://tech.ebu.ch/docs/r/r128.pdf) and [the `loudnorm` filter description](http://k.ylo.ph/2016/04/04/loudnorm.html) by its original author.
+
+- **Peak Normalization** analyzes the peak signal level in dBFS and increases the volume of the input signal such that the maximum in the output is 0 dB (or any other chosen threshold). Since spikes in the signal can cause high volume peaks, peak normalization might still result in files that are subjectively quieter than other, non-peak-normalized files.
+
+- **RMS-based Normalization** analyzes the [RMS power](https://en.wikipedia.org/wiki/Root_mean_square#Average_power) of the signal and changes the volume such that a new RMS target is reached. Otherwise it works similar to peak normalization.
+
+### Can I buy you a beer / coffee / random drink?
+
+If you found this script useful and feel like giving back, feel free to send a donation [via PayPal](https://paypal.me/slhck).
 
 # License
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2017 Werner Robitza
+Copyright (c) 2015-2018 Werner Robitza
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
