@@ -73,8 +73,9 @@ def run_command(cmd, dry=False):
     else:
         raise RuntimeError("Error running command {}: {}".format(cmd, str(stderr)))
 
-
+# run feature detection on ffmpeg after module import
 ffmpeg_exe = which('ffmpeg')
+FFMPEG_HAS_LOUDNORM = False
 if not ffmpeg_exe:
     if which('avconv'):
         raise FFmpegNormalizeError(
@@ -86,3 +87,7 @@ if not ffmpeg_exe:
             "Could not find ffmpeg in your $PATH."
             "Please install ffmpeg from http://ffmpeg.org"
         )
+else:
+    output = run_command(['ffmpeg', '-filters'])
+    if 'loudnorm' in output:
+        FFMPEG_HAS_LOUDNORM = True

@@ -2,6 +2,7 @@ import os
 import json
 from numbers import Number
 
+from ._cmd_utils import FFMPEG_HAS_LOUDNORM
 from ._media_file import MediaFile
 from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
@@ -55,6 +56,11 @@ class FFmpegNormalize():
         debug=False
     ):
         self.normalization_type = normalization_type
+        if not FFMPEG_HAS_LOUDNORM and self.normalization_type == 'ebu':
+            raise FFmpegNormalizeError(
+                "Your ffmpeg version does not support the 'loudnorm' EBU R128 filter. "
+                "Please install ffmpeg v3.1 or above, or choose another normalization type."
+            )
 
         self.target_level = check_range(
             target_level, -70, -5, name='target_level'

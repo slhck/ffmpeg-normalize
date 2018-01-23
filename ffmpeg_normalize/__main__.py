@@ -35,7 +35,7 @@ def create_parser():
         Output file names. Will be applied per input file.
 
         If no output file name is specified for an input file, the output files
-        will be written to the default output folder with the name '<input>.wav'.
+        will be written to the default output folder with the name `<input>.wav`.
         """)
     )
     group_io.add_argument(
@@ -226,7 +226,7 @@ def create_parser():
         dashes. Wrap in quotes to prevent shell expansion and to preserve
         literal quotes inside string.
 
-        Example: "-e '[ "-vbr", "3" ]'"
+        Example: `-e '[ "-vbr", "3" ]'`
         """)
     )
     group_format.add_argument(
