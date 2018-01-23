@@ -45,6 +45,10 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = sys_call(['test/test.mp4', '-v'])
         self.assertTrue("exists" in output)
 
+    def test_dry(self):
+        sys_call(['test/test.mp4', '-n'])
+        self.assertFalse(os.path.isfile('normalized/test.mkv'))
+
     def test_output(self):
         Path('normalized').mkdir(exist_ok=True)
         output, _ = sys_call(['test/test.mp4', '-o', 'normalized/test.wav', '-v'])
@@ -99,6 +103,10 @@ class TestFFmpegNormalize(unittest.TestCase):
     def test_ext(self):
         sys_call(['test/test.mp4', '-ext', 'mp3'])
         self.assertTrue(os.path.isfile('normalized/test.mp3'))
+
+    def test_version(self):
+        output, _ = sys_call(['--version'])
+        self.assertTrue("ffmpeg-normalize v" in output)
 
     def tearDown(self):
         for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac']:

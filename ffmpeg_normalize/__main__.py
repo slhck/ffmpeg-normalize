@@ -10,9 +10,9 @@ logger = setup_custom_logger('ffmpeg_normalize')
 
 def create_parser():
     parser = argparse.ArgumentParser(
-        prog="ffmpeg_normalize",
+        prog="ffmpeg-normalize",
         description=textwrap.dedent("""\
-            ffmpeg_normalize v{} -- command line tool for normalizing audio files
+            ffmpeg-normalize v{} -- command line tool for normalizing audio files
             """.format(__version__)),
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=textwrap.dedent("""\
@@ -70,6 +70,12 @@ def create_parser():
         '-n', '--dry-run',
         action='store_true',
         help="Do not run normalization, only print what would be done"
+    )
+    group_general.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s v{}'.format(__version__),
+        help="Print version and exit"
     )
 
     group_normalization = parser.add_argument_group("Normalization")
@@ -290,7 +296,7 @@ def main():
                 os.path.splitext(os.path.basename(input_file))[0] +
                 '.' + cli_args.extension,
             )
-            if not os.path.isdir(cli_args.output_folder):
+            if not os.path.isdir(cli_args.output_folder) and not cli_args.dry_run:
                 logger.warning(
                     "Output directory '{}' does not exist, will create"
                     .format(cli_args.output_folder)

@@ -18,11 +18,11 @@ Batch processing of several input files is possible, including video files.
 ## Usage
 
     ffmpeg-normalize [-h] [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER] [-f]
-                    [-d] [-v] [-n] [-nt {ebu,rms,peak}] [-t TARGET_LEVEL]
-                    [-lrt LOUDNESS_RANGE_TARGET] [-tp TRUE_PEAK]
-                    [--offset OFFSET] [--dual-mono] [-c:a AUDIO_CODEC]
-                    [-b:a AUDIO_BITRATE] [-ar SAMPLE_RATE] [-vn]
-                    [-c:v VIDEO_CODEC] [-sn] [-mn]
+                    [-d] [-v] [-n] [--version] [-nt {ebu,rms,peak}]
+                    [-t TARGET_LEVEL] [-lrt LOUDNESS_RANGE_TARGET]
+                    [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
+                    [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE]
+                    [-ar SAMPLE_RATE] [-vn] [-c:v VIDEO_CODEC] [-sn] [-mn]
                     [-e EXTRA_OUTPUT_OPTIONS] [-ofmt OUTPUT_FORMAT]
                     [-ext EXTENSION]
                     input [input ...]
@@ -88,6 +88,8 @@ File Input/Output:
 - `-v, --verbose`: Print verbose output
 
 - `-n, --dry-run`: Do not run normalization, only print what would be done
+
+- `--version`: Print version and exit
 
 Normalization:
 
