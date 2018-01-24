@@ -1,5 +1,10 @@
 # History
 
+1.0.1 (2018-01-21)
+------------------
+
+- Set default threshold to -23 as recommended
+
 1.0 (2018-01-21)
 ----------------
 
