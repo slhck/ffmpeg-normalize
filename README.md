@@ -101,7 +101,7 @@ Normalization:
 
     Peak normalization brings the signal to the specified peak level.
 
-- `-t TARGET_LEVEL, --target-level TARGET_LEVEL`: Normalization target level in dB/LUFS (default: -24).
+- `-t TARGET_LEVEL, --target-level TARGET_LEVEL`: Normalization target level in dB/LUFS (default: -23).
 
     For EBU normalization, it corresponds to Integrated Loudness Target in LUFS. The range is -70.0 - -5.0.
 
@@ -111,7 +111,7 @@ Ebu R128 Normalization:
 
     Range is 1.0 - 20.0.
 
-- `-tp TRUE_PEAK, --true-peak TRUE_PEAK`: EBU Maximum True Peak (default: -2.0).
+- `-tp TRUE_PEAK, --true-peak TRUE_PEAK`: EBU Maximum True Peak in dBTP (default: -2.0).
 
     Range is -9.0 - +0.0.
 

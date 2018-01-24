@@ -100,7 +100,7 @@ def create_parser():
         '-t', '--target-level',
         type=float,
         help=textwrap.dedent("""\
-        Normalization target level in dB/LUFS (default: -24).
+        Normalization target level in dB/LUFS (default: -23).
 
         For EBU normalization, it corresponds to Integrated Loudness Target
         in LUFS. The range is -70.0 - -5.0.
@@ -133,7 +133,7 @@ def create_parser():
         '-tp', '--true-peak',
         type=float,
         help=textwrap.dedent("""\
-        EBU Maximum True Peak (default: -2.0).
+        EBU Maximum True Peak in dBTP (default: -2.0).
         Range is -9.0 - +0.0.
         """),
         default=-2.0

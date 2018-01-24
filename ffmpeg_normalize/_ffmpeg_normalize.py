@@ -37,7 +37,7 @@ class FFmpegNormalize():
     def __init__(
         self,
         normalization_type='ebu',
-        target_level=-24.0,
+        target_level=-23.0,
         # threshold=0.5,
         loudness_range_target=7.0,
         true_peak=-2.0,
