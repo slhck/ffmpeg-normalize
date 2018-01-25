@@ -1,5 +1,7 @@
 # ffmpeg-normalize
 
+[![Build Status](https://travis-ci.org/slhck/ffmpeg-normalize.svg?branch=master)](https://travis-ci.org/slhck/ffmpeg-normalize)
+
 A utility for batch-normalizing audio using ffmpeg.
 
 This program normalizes media files to a certain LUFS level using the EBU R128 loudness normalization procedure. It can also perform RMS-based normalization (where the mean is lifted or attenuated), or peak normalization to a certain target level.
