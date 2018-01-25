@@ -19,8 +19,7 @@ from ffmpeg_normalize import MediaFile
 from ffmpeg_normalize._cmd_utils import run_command
 
 def sys_call(args):
-    python = 'python3' if sys.version_info.major == 3 else 'python'
-    cmd = [python, '-m', 'ffmpeg_normalize']
+    cmd = [sys.executable, '-m', 'ffmpeg_normalize']
     cmd.extend(args)
     print()
     print(" ".join(cmd))
@@ -55,11 +54,11 @@ class TestFFmpegNormalize(unittest.TestCase):
         self.assertTrue("Output file only supports one stream." in output)
 
     def test_peak(self):
-        sys_call(['test/test.mp4', '-nt', 'peak'])
+        sys_call(['test/test.mp4', '-nt', 'peak', '-t', '0'])
         self.assertTrue(os.path.isfile('normalized/test.mkv'))
 
     def test_rms(self):
-        sys_call(['test/test.mp4', '-nt', 'rms'])
+        sys_call(['test/test.mp4', '-nt', 'rms', '-t', '-16'])
         self.assertTrue(os.path.isfile('normalized/test.mkv'))
 
     def test_lrt(self):
