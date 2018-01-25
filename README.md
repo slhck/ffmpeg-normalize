@@ -128,7 +128,7 @@ Audio Encoding:
 
 - `-c:a AUDIO_CODEC, --audio-codec AUDIO_CODEC`: Audio codec to use for output files.
 
-    See 'ffmpeg -encoders' for a list.
+    See `ffmpeg -encoders` for a list.
 
     Will use PCM audio with input stream bit depth by default.
 
@@ -146,7 +146,7 @@ Other Encoding Options:
 
 - `-c:v VIDEO_CODEC, --video-codec VIDEO_CODEC`: Video codec to use for output files (default: 'copy').
 
-    See 'ffmpeg -encoders' for a list.
+    See `ffmpeg -encoders` for a list.
 
     Will attempt to copy video codec by default.
 
@@ -164,11 +164,11 @@ Output Format:
 
 - `-ofmt OUTPUT_FORMAT, --output-format OUTPUT_FORMAT`: Media format to use for output file(s).
 
-    See 'ffmpeg -formats' for a list.
+    See `ffmpeg -formats` for a list.
 
     If not specified, the format will be inferred by ffmpeg from the output file name. If the output file name is not explicitly specified, the extension will govern the format (see '--extension' option).
 
-- `-ext EXTENSION, --extension EXTENSION`: Output file extension to use for output files that were not explicitly specified.
+- `-ext EXTENSION, --extension EXTENSION`: Output file extension to use for output files that were not explicitly specified. (Default: `mkv`)
 
 ## FAQ
 

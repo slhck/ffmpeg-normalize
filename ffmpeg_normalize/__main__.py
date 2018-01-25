@@ -169,7 +169,7 @@ def create_parser():
         type=str,
         help=textwrap.dedent("""\
         Audio codec to use for output files.
-        See 'ffmpeg -encoders' for a list.
+        See `ffmpeg -encoders` for a list.
 
         Will use PCM audio with input stream bit depth by default.
         """)
@@ -204,7 +204,7 @@ def create_parser():
         type=str,
         help=textwrap.dedent("""\
         Video codec to use for output files (default: 'copy').
-        See 'ffmpeg -encoders' for a list.
+        See `ffmpeg -encoders` for a list.
 
         Will attempt to copy video codec by default.
         """),
@@ -252,7 +252,7 @@ def create_parser():
         type=str,
         help=textwrap.dedent("""\
         Output file extension to use for output files that were not explicitly
-        specified.
+        specified. (Default: `mkv`)
         """),
         default='mkv'
     )
