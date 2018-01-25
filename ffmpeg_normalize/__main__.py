@@ -104,6 +104,8 @@ def create_parser():
 
         For EBU normalization, it corresponds to Integrated Loudness Target
         in LUFS. The range is -70.0 - -5.0.
+
+        Otherwise, the range is -99 to 0.
         """),
         default=-24.0
     )

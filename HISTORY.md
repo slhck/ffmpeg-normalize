@@ -1,6 +1,10 @@
 # History
 
-1.0.1 (2018-01-21)
+1.0.2 (2018-01-25)
+
+- Fix bug with target level for Peak/RMS
+
+1.0.1 (2018-01-24)
 ------------------
 
 - Set default threshold to -23 as recommended

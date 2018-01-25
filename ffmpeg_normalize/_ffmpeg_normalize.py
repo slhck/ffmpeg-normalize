@@ -62,9 +62,14 @@ class FFmpegNormalize():
                 "Please install ffmpeg v3.1 or above, or choose another normalization type."
             )
 
-        self.target_level = check_range(
-            target_level, -70, -5, name='target_level'
-        )
+        if self.normalization_type == 'ebu':
+            self.target_level = check_range(
+                target_level, -70, -5, name='target_level'
+            )
+        else:
+            self.target_level = check_range(
+                target_level, -99, 0, name='target_level'
+            )
 
         # self.threshold = float(threshold)
 

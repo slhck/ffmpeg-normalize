@@ -105,6 +105,8 @@ Normalization:
 
     For EBU normalization, it corresponds to Integrated Loudness Target in LUFS. The range is -70.0 - -5.0.
 
+    Otherwise, the range is -99 to 0.
+
 Ebu R128 Normalization:
 
 - `-lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET`: EBU Loudness Range Target in LUFS (default: 7.0).
