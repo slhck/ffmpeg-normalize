@@ -234,7 +234,8 @@ class MediaFile():
         except Exception as e:
             logger.error("Error while running command {}!".format(cmd))
             # remove dangling temporary file
-            os.remove(temp_file_name)
+            if os.path.isfile(temp_file_name):
+                os.remove(temp_file_name)
             raise e
 
         logger.debug("Normalization finished")
