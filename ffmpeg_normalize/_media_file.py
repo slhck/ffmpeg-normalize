@@ -54,7 +54,7 @@ class MediaFile():
 
         cmd = [
             ffmpeg_exe, '-i', self.input_file,
-            '-t', '0', '-map', '0',
+            '-c', 'copy', '-t', '0', '-map', '0',
             '-f', 'null', NUL
         ]
 
