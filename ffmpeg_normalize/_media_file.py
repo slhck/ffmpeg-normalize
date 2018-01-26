@@ -211,13 +211,13 @@ class MediaFile():
             run_command(cmd, dry=True)
             return
 
-        # make a temporary output file
+        # create a temporary output file name
         output_file_suffix = os.path.splitext(self.output_file)[1]
-        temp_file = tempfile.NamedTemporaryFile(
-            suffix=output_file_suffix,
-            delete=False
+        temp_file_name = os.path.join(
+            tempfile.gettempdir(),
+            next(tempfile._get_candidate_names()) + output_file_suffix
         )
-        cmd.append(temp_file.name)
+        cmd.append(temp_file_name)
 
         # run the actual command
         try:
@@ -228,13 +228,13 @@ class MediaFile():
             # move file from TMP to output file
             logger.debug(
                 "Moving temporary file from {} to {}"
-                .format(temp_file.name, self.output_file)
+                .format(temp_file_name, self.output_file)
             )
-            shutil.move(temp_file.name, self.output_file)
+            shutil.move(temp_file_name, self.output_file)
         except Exception as e:
             logger.error("Error while running command {}!".format(cmd))
             # remove dangling temporary file
-            os.remove(temp_file.name)
+            os.remove(temp_file_name)
             raise e
 
         logger.debug("Normalization finished")

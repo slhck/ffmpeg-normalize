@@ -1,6 +1,13 @@
 # History
 
+1.0.3 (2018-01-26)
+------------------
+
+- Always streamcopy when detecting streams to avoid initializing encoder
+- Fix handling of temporary file names
+
 1.0.2 (2018-01-25)
+------------------
 
 - Fix bug with target level for Peak/RMS
 
