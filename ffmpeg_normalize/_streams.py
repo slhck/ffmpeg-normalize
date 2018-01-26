@@ -153,6 +153,14 @@ class AudioStream(MediaStream):
         logger.debug("Loudnorm stats parsed: {}".format(json.dumps(loudnorm_stats)))
 
         self.loudness_statistics['ebu'] = loudnorm_stats
+        for key, val in self.loudness_statistics['ebu'].items():
+            if key == 'normalization_type':
+                continue
+            # FIXME: drop Python 2 support and just use math.inf
+            if float(val) == -float("inf"):
+                self.loudness_statistics['ebu'][key] = -99
+            elif float(val) == float("inf"):
+                self.loudness_statistics['ebu'][key] = 0
 
     def get_second_pass_opts_ebu(self):
         """

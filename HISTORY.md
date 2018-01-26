@@ -1,5 +1,9 @@
 # History
 
+1.0.5 (2018-01-26)
+
+- Handle edge case for short input clips
+
 1.0.4 (2018-01-26)
 ------------------
 
