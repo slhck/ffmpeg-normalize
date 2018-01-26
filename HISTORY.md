@@ -1,5 +1,10 @@
 # History
 
+1.0.4 (2018-01-26)
+------------------
+
+- Do not try to remove file that doesn't exist
+
 1.0.3 (2018-01-26)
 ------------------
 
