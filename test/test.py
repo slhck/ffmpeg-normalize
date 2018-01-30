@@ -18,7 +18,7 @@ from ffmpeg_normalize import FFmpegNormalize
 from ffmpeg_normalize import MediaFile
 from ffmpeg_normalize._cmd_utils import run_command
 
-def sys_call(args):
+def sys_call(args, env=None):
     cmd = [sys.executable, '-m', 'ffmpeg_normalize']
     cmd.extend(args)
     print()
@@ -27,7 +27,8 @@ def sys_call(args):
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        universal_newlines=True
+        universal_newlines=True,
+        env=env
     )
     stdout, stderr = p.communicate()
 

@@ -16,6 +16,18 @@ def create_parser():
             """.format(__version__)),
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=textwrap.dedent("""\
+            The program additionally respects environment variables:
+
+              - `TMP` / `TEMP` / `TEMPDIR`
+                    Sets the path to the temporary directory in which files are
+                    stored before being moved to the final output directory.
+                    Note: You need to use full paths.
+
+              - `FFMPEG_PATH`
+                    Sets the full path to an `ffmpeg` executable other than
+                    the system default.
+
+
             Author: Werner Robitza
             License: MIT
             Homepage / Issues: https://github.com/slhck/ffmpeg-normalize

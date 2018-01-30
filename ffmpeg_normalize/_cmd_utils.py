@@ -73,21 +73,31 @@ def run_command(cmd, dry=False):
     else:
         raise RuntimeError("Error running command {}: {}".format(cmd, str(stderr)))
 
+
 # run feature detection on ffmpeg after module import
-ffmpeg_exe = which('ffmpeg')
+if 'FFMPEG_PATH' in os.environ:
+    ffmpeg_exe = os.environ['FFMPEG_PATH']
+else:
+    ffmpeg_exe = which('ffmpeg')
+
 FFMPEG_HAS_LOUDNORM = False
-if not ffmpeg_exe:
+if not ffmpeg_exe or not os.path.isfile(ffmpeg_exe):
     if which('avconv'):
         raise FFmpegNormalizeError(
-            "avconv is not supported."
+            "avconv is not supported. "
             "Please install ffmpeg from http://ffmpeg.org instead."
         )
     else:
         raise FFmpegNormalizeError(
-            "Could not find ffmpeg in your $PATH."
+            "Could not find ffmpeg in your $PATH or $FFMPEG_PATH. "
             "Please install ffmpeg from http://ffmpeg.org"
         )
 else:
     output = run_command(['ffmpeg', '-filters'])
     if 'loudnorm' in output:
         FFMPEG_HAS_LOUDNORM = True
+    else:
+        logger.warning(
+            "Your ffmpeg version does not support the 'loudnorm' filter. "
+            "Please make sure you are running ffmpeg v3.1 or above."
+        )

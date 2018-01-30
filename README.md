@@ -174,6 +174,20 @@ Output Format:
 
 - `-ext EXTENSION, --extension EXTENSION`: Output file extension to use for output files that were not explicitly specified. (Default: `mkv`)
 
+The program additionally respects environment variables:
+
+- `TMP` / `TEMP` / `TEMPDIR`
+
+    Sets the path to the temporary directory in which files are
+    stored before being moved to the final output directory.
+    Note: You need to use full paths.
+
+- `FFMPEG_PATH`
+
+    Sets the full path to an `ffmpeg` executable other than
+    the system default.
+
+
 ## FAQ
 
 ### After updating, this program does not work as expected anymore!

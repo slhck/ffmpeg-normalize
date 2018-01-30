@@ -212,9 +212,10 @@ class MediaFile():
             return
 
         # create a temporary output file name
+        temp_dir = tempfile.gettempdir()
         output_file_suffix = os.path.splitext(self.output_file)[1]
         temp_file_name = os.path.join(
-            tempfile.gettempdir(),
+            temp_dir,
             next(tempfile._get_candidate_names()) + output_file_suffix
         )
         cmd.append(temp_file_name)
