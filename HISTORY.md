@@ -1,5 +1,9 @@
 # History
 
+## 1.0.8 (2018-02-01)
+
+- Do not check for ffmpeg on module import
+
 ## 1.0.7 (2018-02-01)
 
 - Fix issue with wrong normalization parameters
