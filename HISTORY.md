@@ -1,5 +1,9 @@
 # History
 
+## 1.0.7 (2018-02-01)
+
+- Fix issue with wrong normalization parameters
+
 ## 1.0.6 (2018-01-30)
 
 - Document temporary directory env variable
