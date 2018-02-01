@@ -220,4 +220,4 @@ class AudioStream(MediaStream):
                 .format(self.loudness_statistics['max'] + adjustment)
             )
 
-        return 'volume={}'.format(adjustment)
+        return 'volume={}dB'.format(adjustment)
