@@ -5,7 +5,7 @@ import shutil
 
 from ._streams import AudioStream, VideoStream, SubtitleStream
 from ._errors import FFmpegNormalizeError
-from ._cmd_utils import NUL, run_command, ffmpeg_exe
+from ._cmd_utils import NUL, run_command
 from ._logger import setup_custom_logger
 logger = setup_custom_logger('ffmpeg_normalize')
 
@@ -53,7 +53,7 @@ class MediaFile():
         logger.debug("Parsing streams of {}".format(self.input_file))
 
         cmd = [
-            ffmpeg_exe, '-i', self.input_file,
+            self.ffmpeg_normalize.ffmpeg_exe, '-i', self.input_file,
             '-c', 'copy', '-t', '0', '-map', '0',
             '-f', 'null', NUL
         ]
@@ -159,7 +159,7 @@ class MediaFile():
 
         # base command, here we will add all other options
         cmd = [
-            ffmpeg_exe, '-y', '-nostdin', '-i', self.input_file,
+            self.ffmpeg_normalize.ffmpeg_exe, '-y', '-nostdin', '-i', self.input_file,
             '-filter_complex', audio_filter_cmd
         ]
 

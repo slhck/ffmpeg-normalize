@@ -3,7 +3,7 @@ import re
 import json
 
 from ._errors import FFmpegNormalizeError
-from ._cmd_utils import NUL, run_command, ffmpeg_exe, dict_to_filter_opts
+from ._cmd_utils import NUL, run_command, dict_to_filter_opts
 from ._logger import setup_custom_logger
 logger = setup_custom_logger('ffmpeg_normalize')
 
@@ -74,7 +74,7 @@ class AudioStream(MediaStream):
         filter_str = '[0:{}]volumedetect'.format(self.stream_id)
 
         cmd = [
-            ffmpeg_exe, '-nostdin', '-y',
+            self.media_file.ffmpeg_normalize.ffmpeg_exe, '-nostdin', '-y',
             '-i', self.media_file.input_file,
             '-filter_complex', filter_str,
             '-vn', '-sn', '-f', 'null', NUL
@@ -124,7 +124,7 @@ class AudioStream(MediaStream):
             'loudnorm=' + dict_to_filter_opts(opts)
 
         cmd = [
-            ffmpeg_exe, '-nostdin', '-y',
+            self.media_file.ffmpeg_normalize.ffmpeg_exe, '-nostdin', '-y',
             '-i', self.media_file.input_file,
             '-filter_complex', filter_str,
             '-vn', '-sn', '-f', 'null', NUL

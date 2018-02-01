@@ -4,7 +4,7 @@ from setuptools import setup
 # To use a consistent encoding
 from codecs import open
 from os import path
-import ffmpeg_normalize
+from ffmpeg_normalize import __version__ as version
 
 here = path.abspath(path.dirname(__file__))
 
@@ -25,7 +25,7 @@ except ImportError:
 
 setup(
     name='ffmpeg-normalize',
-    version=ffmpeg_normalize.__version__,
+    version=version,
     description="Normalize audio via ffmpeg",
     long_description=long_description + '\n\n' + history,
     author="Werner Robitza",
