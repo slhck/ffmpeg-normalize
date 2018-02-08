@@ -1,5 +1,11 @@
 # History
 
+## 1.0.9 (2018-02-08)
+
+- Add normalized folder to gitignore
+- Do not print escape sequences on Windows
+- Do not check for file existence, fixes #57
+
 ## 1.0.8 (2018-02-01)
 
 - Do not check for ffmpeg on module import
