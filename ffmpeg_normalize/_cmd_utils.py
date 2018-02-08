@@ -36,7 +36,7 @@ def which(program):
             path = os.path.expandvars(os.path.expanduser(path)).strip('"')
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
-                logger.debug("found executable: " + str(exe_file))
+                logger.debug("found executable in path: " + str(exe_file))
                 return exe_file
 
     return None
@@ -93,10 +93,6 @@ def get_ffmpeg_exe():
                 "Could not find ffmpeg in your $PATH or $FFMPEG_PATH. "
                 "Please install ffmpeg from http://ffmpeg.org"
             )
-    elif not os.path.isfile(ffmpeg_exe):
-        raise FFmpegNormalizeError(
-            "{} is not a file".format(ffmpeg_exe)
-        )
 
     return ffmpeg_exe
 
