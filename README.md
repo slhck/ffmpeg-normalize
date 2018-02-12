@@ -232,7 +232,7 @@ You absolutely can. However, you can get better accuracy and linear normalizatio
 
 ### Can I buy you a beer / coffee / random drink?
 
-If you found this program useful and feel like giving back, feel free to send a donation [via PayPal](https://paypal.me/slhck).
+If you found this program useful and feel like giving back, feel free to send a donation [via PayPal](https://paypal.me/WernerRobitza).
 
 # License
 
