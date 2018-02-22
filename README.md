@@ -49,6 +49,10 @@ Normalize a number of videos in the current folder and write them to a folder ca
 
     ffmpeg-normalize *.mkv -c:a aac -b:a 192k
 
+Normalize an MP3 file and write an MP3 file (you have to explicitly specify the encoder):
+
+    ffmpeg-normalize input.mp3 -c:a libmp3lame -b:a 320k -o output.mp3
+
 Instead of EBU R128, one might just want to use simple peak normalization to 0 dB:
 
     ffmpeg-normalize test.wav --normalization-type peak --target-level 0 --output normalized.wav
