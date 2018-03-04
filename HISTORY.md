@@ -1,5 +1,9 @@
 # History
 
+## 1.0.10 (2018-03-04)
+
+- Restrict parsing to valid JSON only, fixes #61
+
 ## 1.0.9 (2018-02-08)
 
 - Add normalized folder to gitignore
