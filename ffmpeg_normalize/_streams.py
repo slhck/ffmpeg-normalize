@@ -137,18 +137,22 @@ class AudioStream(MediaStream):
 
         output_lines = [line.strip() for line in output.split('\n')]
         loudnorm_start = False
+        loudnorm_end = False
         for index, line in enumerate(output_lines):
             if line.startswith('[Parsed_loudnorm'):
-                loudnorm_start = index
+                loudnorm_start = index + 1
+                continue
+            if loudnorm_start and line.startswith('}'):
+                loudnorm_end = index + 1
                 break
 
-        if not loudnorm_start:
-            raise FFmpegNormalizeError("Could not parse loudnorm stats")
+        if not (loudnorm_start and loudnorm_end):
+            raise FFmpegNormalizeError("Could not parse loudnorm stats; no loudnorm-related output found")
 
         try:
-            loudnorm_stats = json.loads('\n'.join(output_lines[loudnorm_start + 1:]))
+            loudnorm_stats = json.loads('\n'.join(output_lines[loudnorm_start:loudnorm_end]))
         except Exception as e:
-            raise FFmpegNormalizeError("Could not parse loudnorm stats")
+            raise FFmpegNormalizeError("Could not parse loudnorm stats; wrong JSON format in string: {}".format(e))
 
         logger.debug("Loudnorm stats parsed: {}".format(json.dumps(loudnorm_stats)))
 
