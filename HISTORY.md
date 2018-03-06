@@ -1,5 +1,9 @@
 # History
 
+## 1.1.0 (2018-03-06)
+
+- Add option to print first pass statistics
+
 ## 1.0.10 (2018-03-04)
 
 - Restrict parsing to valid JSON only, fixes #61

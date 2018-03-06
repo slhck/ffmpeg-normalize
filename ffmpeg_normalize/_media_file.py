@@ -2,6 +2,7 @@ import os
 import re
 import tempfile
 import shutil
+import json
 
 from ._streams import AudioStream, VideoStream, SubtitleStream
 from ._errors import FFmpegNormalizeError
@@ -118,12 +119,15 @@ class MediaFile():
     def _first_pass(self):
         logger.debug("Parsing normalization info for {}".format(self.input_file))
 
-        if self.ffmpeg_normalize.normalization_type == 'ebu':
-            for audio_stream in self.streams['audio'].values():
+        for audio_stream in self.streams['audio'].values():
+            if self.ffmpeg_normalize.normalization_type == 'ebu':
                 audio_stream.parse_loudnorm_stats()
-        else:
-            for audio_stream in self.streams['audio'].values():
+            else:
                 audio_stream.parse_volumedetect_stats()
+
+        if self.ffmpeg_normalize.print_stats:
+            stats = [audio_stream.get_stats() for audio_stream in self.streams['audio'].values()]
+            print(json.dumps(stats, indent=4))
 
     def _get_audio_filter_cmd(self):
         """

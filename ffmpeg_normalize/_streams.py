@@ -50,6 +50,18 @@ class AudioStream(MediaStream):
             os.path.basename(self.media_file.input_file), self.stream_id
         )
 
+    def get_stats(self):
+        """
+        Return statistics
+        """
+        stats = {
+            "input_file": self.media_file.input_file,
+            "output_file": self.media_file.output_file,
+            "stream_id": self.stream_id
+        }
+        stats.update(self.loudness_statistics)
+        return stats
+
     def get_pcm_codec(self):
         if not self.bit_depth:
             return 'pcm_s16le'

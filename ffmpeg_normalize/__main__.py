@@ -121,6 +121,12 @@ def create_parser():
         """),
         default=-24.0
     )
+    group_normalization.add_argument(
+        '-p', '--print-stats',
+        action='store_true',
+        help="Print first pass loudness statistics formatted as JSON to stdout"
+    )
+
     # group_normalization.add_argument(
     #     '--threshold',
     #     type=float,
@@ -284,6 +290,7 @@ def main():
     ffmpeg_normalize = FFmpegNormalize(
         normalization_type=cli_args.normalization_type,
         target_level=cli_args.target_level,
+        print_stats=cli_args.print_stats,
         loudness_range_target=cli_args.loudness_range_target,
         # threshold=cli_args.threshold,
         true_peak=cli_args.true_peak,

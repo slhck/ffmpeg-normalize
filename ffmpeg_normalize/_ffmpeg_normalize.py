@@ -38,6 +38,7 @@ class FFmpegNormalize():
         self,
         normalization_type='ebu',
         target_level=-23.0,
+        print_stats=False,
         # threshold=0.5,
         loudness_range_target=7.0,
         true_peak=-2.0,
@@ -73,6 +74,8 @@ class FFmpegNormalize():
             self.target_level = check_range(
                 target_level, -99, 0, name='target_level'
             )
+
+        self.print_stats = print_stats
 
         # self.threshold = float(threshold)
 

@@ -21,7 +21,8 @@ Batch processing of several input files is possible, including video files.
 
     ffmpeg-normalize [-h] [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER] [-f]
                     [-d] [-v] [-n] [--version] [-nt {ebu,rms,peak}]
-                    [-t TARGET_LEVEL] [-lrt LOUDNESS_RANGE_TARGET]
+                    [-t TARGET_LEVEL] [-p]
+                    [-lrt LOUDNESS_RANGE_TARGET]
                     [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
                     [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE]
                     [-ar SAMPLE_RATE] [-vn] [-c:v VIDEO_CODEC] [-sn] [-mn]
@@ -112,6 +113,8 @@ Normalization:
     For EBU normalization, it corresponds to Integrated Loudness Target in LUFS. The range is -70.0 - -5.0.
 
     Otherwise, the range is -99 to 0.
+
+- `-p, --print-stats`: Print first pass loudness statistics formatted as JSON to stdout.
 
 Ebu R128 Normalization:
 
