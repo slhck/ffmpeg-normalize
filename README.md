@@ -203,7 +203,9 @@ You are probably using a 0.x version of this program. There are significant chan
 
 ### The program doesn't work because the "loudnorm" filter can't be found
 
-Make sure you run ffmpeg v3.1 or higher. Many distributions package outdated ffmpeg 2.x versions, or (even worse), Libav's `ffmpeg` disguising as a real `ffmpeg` from the FFmpeg project.
+Make sure you run ffmpeg v3.1 or higher and that `loudnorm` is part of the output when you run `ffmpeg -filters`. Many distributions package outdated ffmpeg 2.x versions, or (even worse), Libav's `ffmpeg` disguising as a real `ffmpeg` from the FFmpeg project.
+
+Some ffmpeg builds also do not have the `loudnorm` filter enabled.
 
 You can always download a static build from [their website](http://ffmpeg.org/download.html) and use that.
 
@@ -217,11 +219,11 @@ When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will in
 
 One possible reason is that the input file contains some streams that cannot be mapped to the output file. Examples:
 
-- You are trying to normalize a movie file, writing to a `.wav` or `.mp3` file. WAV/MP3 files only support audio. Disable video and subtitles with `-vn` and `-sn`.
+- You are trying to normalize a movie file, writing to a `.wav` or `.mp3` file. WAV/MP3 files only support audio, not video. Disable video and subtitles with `-vn` and `-sn`, or choose a container that supports video (e.g. `.mkv`).
 
-- You are trying to normalize a file, writing to an `.mp4` container. MP4 does not support PCM audio. Make sure that your audio codec is set (e.g. `-c:a aac`).
+- You are trying to normalize a file, writing to an `.mp4` container. This program defaults to PCM audio, but MP4 does not support PCM audio. Make sure that your audio codec is set to something MP4 containers support (e.g. `-c:a aac).
 
-The default output container is `.mkv` as it will support most input stream types. If you want a different output container, make sure that it supports your input file's video, audio, and subtitle streams (if any).
+The default output container is `.mkv` as it will support most input stream types. If you want a different output container, [make sure that it supports](https://en.wikipedia.org/wiki/Comparison_of_container_file_formats) your input file's video, audio, and subtitle streams (if any).
 
 Also, if there is some other broken metadata, you can try to disable copying over of metadata with `-mn`.
 
