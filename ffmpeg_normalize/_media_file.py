@@ -182,24 +182,26 @@ class MediaFile():
         for ol in output_labels:
             cmd.extend(['-map', ol])
 
+        # set audio codec (never copy)
+        if self.ffmpeg_normalize.audio_codec:
+            cmd.extend(['-c:a', self.ffmpeg_normalize.audio_codec])
+        else:
+            map_offset = len(self.streams['video'])
+            for index, (_, audio_stream) in enumerate(self.streams['audio'].items()):
+                cmd.extend(['-c:{}'.format(map_offset + index), audio_stream.get_pcm_codec()])
+
+        # other audio options (if any)
+        if self.ffmpeg_normalize.audio_bitrate:
+            cmd.extend(['-b:a', str(self.ffmpeg_normalize.audio_bitrate)])
+        if self.ffmpeg_normalize.sample_rate:
+            cmd.extend(['-ar', str(self.ffmpeg_normalize.sample_rate)])
+
         # ... and subtitles
         if not self.ffmpeg_normalize.subtitle_disable:
             for s in self.streams['subtitle'].keys():
                 cmd.extend(['-map', '0:{}'.format(s)])
             # copy subtitles
             cmd.extend(['-c:s', 'copy'])
-
-        # set audio codec (never copy)
-        if self.ffmpeg_normalize.audio_codec:
-            cmd.extend(['-c:a', self.ffmpeg_normalize.audio_codec])
-        else:
-            for idx, audio_stream in self.streams['audio'].items():
-                cmd.extend(['-c:{}'.format(idx), audio_stream.get_pcm_codec()])
-        # other audio options (if any)
-        if self.ffmpeg_normalize.audio_bitrate:
-            cmd.extend(['-b:a', str(self.ffmpeg_normalize.audio_bitrate)])
-        if self.ffmpeg_normalize.sample_rate:
-            cmd.extend(['-ar', str(self.ffmpeg_normalize.sample_rate)])
 
         # extra options (if any)
         if self.ffmpeg_normalize.extra_output_options:
