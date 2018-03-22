@@ -1,5 +1,10 @@
 # History
 
+## 1.2.0 (2018-03-22)
+
+- Add errors for impossible format combinations, fixes #60
+- Fix bug with output stream ordering (#63)
+
 ## 1.1.0 (2018-03-06)
 
 - Add option to print first pass statistics
