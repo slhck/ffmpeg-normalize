@@ -95,13 +95,22 @@ class TestFFmpegNormalize(unittest.TestCase):
         ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac', '-e', '[ "-vbr", "3" ]'])
         self.assertTrue(os.path.isfile('normalized/test.mkv'))
 
-    def test_ofmt(self):
+    def test_ofmt_fail(self):
         Path('normalized').mkdir(exist_ok=True)
-        ffmpeg_normalize_call(['test/test.mp4', '-ofmt', 'mp3', '-o', 'normalized/test.mp3', '-vn', '-sn'])
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ofmt', 'mp3', '-o', 'normalized/test.mp3', '-vn', '-sn'])
+        self.assertTrue("does not support" in output)
+
+    def test_ofmt_mp3(self):
+        Path('normalized').mkdir(exist_ok=True)
+        ffmpeg_normalize_call(['test/test.mp4', '-ofmt', 'mp3', '-o', 'normalized/test.mp3', '-c:a', 'libmp3lame', '-vn', '-sn'])
         self.assertTrue(os.path.isfile('normalized/test.mp3'))
 
-    def test_ext(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-ext', 'mp3'])
+    def test_ext_fail(self):
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ext', 'mp3'])
+        self.assertTrue("does not support" in output)
+
+    def test_ext_mp3(self):
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ext', 'mp3', '-c:a', 'libmp3lame'])
         self.assertTrue(os.path.isfile('normalized/test.mp3'))
 
     def test_version(self):
