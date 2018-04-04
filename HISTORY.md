@@ -1,5 +1,9 @@
 # History
 
+## 1.2.1 (2018-04-04)
+
+- Fix decoding UTF-8 stderr/stdout
+
 ## 1.2.0 (2018-03-22)
 
 - Add errors for impossible format combinations, fixes #60
