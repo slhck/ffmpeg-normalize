@@ -64,10 +64,12 @@ def run_command(cmd, dry=False):
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        universal_newlines=True
+        universal_newlines=False
     )
     stdout, stderr = p.communicate()
 
+    stdout = stdout.decode("utf8", errors='replace')
+    stderr = stderr.decode("utf8", errors='replace')
     if p.returncode == 0:
         return (stdout + stderr)
     else:
