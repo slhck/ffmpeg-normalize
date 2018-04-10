@@ -1,5 +1,9 @@
 # History
 
+## 1.2.2 (2018-04-10)
+
+- Set default loudness target to -23, fixes #48
+
 ## 1.2.1 (2018-04-04)
 
 - Fix decoding UTF-8 stderr/stdout
