@@ -119,7 +119,7 @@ def create_parser():
 
         Otherwise, the range is -99 to 0.
         """),
-        default=-24.0
+        default=-23.0
     )
     group_normalization.add_argument(
         '-p', '--print-stats',
