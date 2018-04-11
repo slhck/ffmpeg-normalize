@@ -118,6 +118,11 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-mn', '-c:a', 'aac', '-o', 'normalized/test.mp4'])
         self.assertTrue(os.path.isfile('normalized/test.mp4'))
 
+    def test_chapters_disable(self):
+        Path('normalized').mkdir(exist_ok=True)
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-cn', '-c:a', 'aac', '-o', 'normalized/test.mp4'])
+        self.assertTrue(os.path.isfile('normalized/test.mp4'))
+
     def test_version(self):
         output, _ = ffmpeg_normalize_call(['--version'])
         self.assertTrue("ffmpeg-normalize v" in output)
