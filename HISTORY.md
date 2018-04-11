@@ -1,5 +1,9 @@
 # History
 
+## 1.2.3 (2018-04-11)
+
+- Fix problems with metadata disabling, also allow to disable chapters
+
 ## 1.2.2 (2018-04-10)
 
 - Set default loudness target to -23, fixes #48
