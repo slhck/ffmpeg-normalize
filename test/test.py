@@ -114,8 +114,9 @@ class TestFFmpegNormalize(unittest.TestCase):
         self.assertTrue(os.path.isfile('normalized/test.mp3'))
 
     def test_metadata_disable(self):
+        Path('normalized').mkdir(exist_ok=True)
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-mn', '-c:a', 'aac', '-o', 'normalized/test.mp4'])
-        self.assertTrue(os.path.isfile('normalized/test.mp3'))
+        self.assertTrue(os.path.isfile('normalized/test.mp4'))
 
     def test_version(self):
         output, _ = ffmpeg_normalize_call(['--version'])
