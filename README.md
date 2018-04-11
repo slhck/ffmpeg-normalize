@@ -165,6 +165,8 @@ Other Encoding Options:
 
 - `-mn, --metadata-disable`: Do not write metadata to output
 
+- `-cn, --chapters-disable`: Do not write metadata to output
+
 Output Format:
 
 - `-e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS`: Extra output options list.

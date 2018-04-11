@@ -53,6 +53,7 @@ class FFmpegNormalize():
         video_disable=False,
         subtitle_disable=False,
         metadata_disable=False,
+        chapters_disable=False,
         extra_output_options=None,
         output_format=None,
         dry_run=False,
@@ -99,6 +100,7 @@ class FFmpegNormalize():
         self.video_disable = video_disable
         self.subtitle_disable = subtitle_disable
         self.metadata_disable = metadata_disable
+        self.chapters_disable = chapters_disable
 
         if extra_output_options:
             try:

@@ -168,8 +168,16 @@ class MediaFile():
         ]
 
         # map metadata if needed
-        if not self.ffmpeg_normalize.metadata_disable:
+        if self.ffmpeg_normalize.metadata_disable:
+            cmd.extend(['-map_metadata', '-1'])
+        else:
             cmd.extend(['-map_metadata', '0'])
+
+        # map chapters if needed
+        if self.ffmpeg_normalize.chapters_disable:
+            cmd.extend(['-map_chapters', '-1'])
+        else:
+            cmd.extend(['-map_chapters', '0'])
 
         # collect all '-map' needed for output based on input video
         if not self.ffmpeg_normalize.video_disable:

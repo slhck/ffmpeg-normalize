@@ -240,6 +240,11 @@ def create_parser():
         action='store_true',
         help="Do not write metadata to output"
     )
+    group_vcodec.add_argument(
+        '-cn', '--chapters-disable',
+        action='store_true',
+        help="Do not write chapters to output"
+    )
 
     group_format = parser.add_argument_group("Output Format")
     group_format.add_argument(
@@ -303,6 +308,7 @@ def main():
         video_disable=cli_args.video_disable,
         subtitle_disable=cli_args.subtitle_disable,
         metadata_disable=cli_args.metadata_disable,
+        chapters_disable=cli_args.chapters_disable,
         extra_output_options=cli_args.extra_output_options,
         output_format=cli_args.output_format,
         dry_run=cli_args.dry_run

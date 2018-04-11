@@ -113,6 +113,10 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ext', 'mp3', '-c:a', 'libmp3lame'])
         self.assertTrue(os.path.isfile('normalized/test.mp3'))
 
+    def test_metadata_disable(self):
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-mn', '-c:a', 'aac', '-o', 'normalized/test.mp4'])
+        self.assertTrue(os.path.isfile('normalized/test.mp3'))
+
     def test_version(self):
         output, _ = ffmpeg_normalize_call(['--version'])
         self.assertTrue("ffmpeg-normalize v" in output)
@@ -122,7 +126,7 @@ class TestFFmpegNormalize(unittest.TestCase):
         self.assertTrue('"ebu": {' in output)
 
     def tearDown(self):
-        for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac']:
+        for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac', 'test.mp4']:
             if os.path.isfile('normalized/' + file):
                 os.remove('normalized/' + file)
         if os.path.isdir('normalized'):
