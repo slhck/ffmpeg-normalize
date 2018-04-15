@@ -1,8 +1,8 @@
 # History
 
-## next
+## 1.3.0 (2018-04-15)
 
-- Progress bar for files and streams
+- Progress bar for files and streams, fixes #56
 - Minor documentation fixes
 
 ## 1.2.3 (2018-04-11)

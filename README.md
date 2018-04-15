@@ -17,6 +17,8 @@ Batch processing of several input files is possible, including video files.
 
     pip3 install ffmpeg-normalize
 
+Or download this repository, then run `pip install .`.
+
 ## Usage
 
     ffmpeg-normalize [-h] [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER] [-f]
