@@ -14,10 +14,6 @@ except ImportError:
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
 
-from ffmpeg_normalize import FFmpegNormalize
-from ffmpeg_normalize import MediaFile
-from ffmpeg_normalize._cmd_utils import run_command
-
 def ffmpeg_normalize_call(args, env=None):
     cmd = [sys.executable, '-m', 'ffmpeg_normalize']
     cmd.extend(args)
