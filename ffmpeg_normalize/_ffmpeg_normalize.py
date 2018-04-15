@@ -177,7 +177,7 @@ class FFmpegNormalize():
         for index, media_file in enumerate(
                 tqdm(
                     self.media_files,
-                    desc="File #",
+                    desc="File",
                     disable=not self.progress,
                     position=0
                 )):

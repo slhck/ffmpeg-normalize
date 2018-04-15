@@ -34,49 +34,59 @@ def to_ms(s=None, des=None, **kwargs):
     return result
 
 class CommandRunner():
+    DUR_REGEX = re.compile(r'Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
+    TIME_REGEX = re.compile(r'\stime=(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
+
     def __init__(self, cmd, dry=False):
         self.cmd = cmd
         self.dry = dry
         self.output = None
 
     def run_ffmpeg_command(self):
+        """
+        Run an ffmpeg command, trying to capture the process output and calculate
+        the duration / progress.
+        Yields the progress in percent.
+        """
         logger.debug("Running ffmpeg command: {}".format(self.cmd))
 
-        dur_regex = re.compile(r'Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
-        time_regex = re.compile(r'\stime=(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
-        dur = None
+        if self.dry:
+            logger.debug("Dry mode specified, not actually running command")
+            return
 
-        stdout = []
+        total_dur = None
+
         stderr = []
 
         p = subprocess.Popen(
             self.cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=False
+            universal_newlines=True
         )
 
-        for stderr_line in iter(p.stderr):
-        # while p.poll() is None:
-            # stderr_line = p.stderr.readline()
-            stderr_line = stderr_line.decode("utf8", errors='replace')
-            stderr.append(stderr_line)
-
+        # for stderr_line in iter(p.stderr):
+        while True:
+            line = p.stderr.readline()
+            if line == '' and p.poll() is not None:
+                break
+            stderr.append(line.strip())
             self.output = "\n".join(stderr)
 
-            if not dur and dur_regex.search(stderr_line):
-                dur = dur_regex.search(stderr_line).groupdict()
-                dur = to_ms(**dur)
+            if not total_dur and CommandRunner.DUR_REGEX.search(line):
+                total_dur = CommandRunner.DUR_REGEX.search(line).groupdict()
+                total_dur = to_ms(**total_dur)
                 continue
-            if dur:
-                result = time_regex.search(stderr_line)
+            if total_dur:
+                result = CommandRunner.TIME_REGEX.search(line)
                 if result:
-                    import pdb; pdb.set_trace()
                     elapsed_time = to_ms(**result.groupdict())
-                    yield elapsed_time / dur * 100
+                    yield int(elapsed_time / total_dur * 100)
+
+        if p.returncode != 0:
+            raise RuntimeError("Error running command {}: {}".format(self.cmd, str("\n".join(stderr))))
 
         yield 100
-        return
 
     def run_command(self):
         logger.debug("Running command: {}".format(self.cmd))
@@ -97,6 +107,7 @@ class CommandRunner():
 
         stdout = stdout.decode("utf8", errors='replace')
         stderr = stderr.decode("utf8", errors='replace')
+
         if p.returncode == 0:
             self.output = (stdout + stderr)
         else:

@@ -116,34 +116,42 @@ class MediaFile():
     def run_normalization(self):
         logger.debug("Running normalization for {}".format(self.input_file))
 
-        with tqdm(
-            total=100,
-            position=1,
-            disable=not self.ffmpeg_normalize.progress,
-            desc="Pass 1"
-        ) as pbar:
-            for progress in self._first_pass():
-                pbar.update(progress)
+        # run the first pass to get loudness stats
+        self._first_pass()
 
-        with tqdm(
-            total=100,
-            position=2,
-            disable=not self.ffmpeg_normalize.progress,
-            desc="Pass 2"
-        ) as pbar:
-            for progress in self._second_pass():
-                pbar.update(progress)
+        # run the second pass as a whole
+        if self.ffmpeg_normalize.progress:
+            with tqdm(
+                total=100,
+                position=1,
+                desc="Second Pass"
+            ) as pbar:
+                for progress in self._second_pass():
+                    pbar.update(progress - pbar.n)
+        else:
+            for _ in self._second_pass():
+                pass
 
     def _first_pass(self):
         logger.debug("Parsing normalization info for {}".format(self.input_file))
 
-        for audio_stream in self.streams['audio'].values():
+        for index, audio_stream in enumerate(self.streams['audio'].values()):
             if self.ffmpeg_normalize.normalization_type == 'ebu':
-                for progress in audio_stream.parse_loudnorm_stats():
-                    yield progress
+                fun = getattr(audio_stream, 'parse_loudnorm_stats')
             else:
-                for progress in audio_stream.parse_volumedetect_stats():
-                    yield progress
+                fun = getattr(audio_stream, 'parse_volumedetect_stats')
+
+            if self.ffmpeg_normalize.progress:
+                with tqdm(
+                    total=100,
+                    position=1,
+                    desc="Stream {}/{}".format(index + 1, len(self.streams['audio'].values()))
+                ) as pbar:
+                    for progress in fun():
+                        pbar.update(progress - pbar.n)
+            else:
+                for _ in fun():
+                    pass
 
         if self.ffmpeg_normalize.print_stats:
             stats = [audio_stream.get_stats() for audio_stream in self.streams['audio'].values()]
@@ -258,9 +266,9 @@ class MediaFile():
 
         # run the actual command
         try:
-            yield 50
-            CommandRunner(cmd).run_command()
-            yield 100
+            cmd_runner = CommandRunner(cmd)
+            for progress in cmd_runner.run_ffmpeg_command():
+                yield progress
 
             # move file from TMP to output file
             logger.debug(

@@ -92,11 +92,10 @@ class AudioStream(MediaStream):
             '-vn', '-sn', '-f', 'null', NUL
         ]
 
-        yield 50
         cmd_runner = CommandRunner(cmd)
-        cmd_runner.run_command()
+        for progress in cmd_runner.run_ffmpeg_command():
+            yield progress
         output = cmd_runner.get_output()
-        yield 100
 
         logger.debug("Volumedetect command output:")
         logger.debug(output)
@@ -146,11 +145,10 @@ class AudioStream(MediaStream):
             '-vn', '-sn', '-f', 'null', NUL
         ]
 
-        yield 50
         cmd_runner = CommandRunner(cmd)
-        cmd_runner.run_command()
+        for progress in cmd_runner.run_ffmpeg_command():
+            yield progress
         output = cmd_runner.get_output()
-        yield 100
 
         logger.debug("Loudnorm first pass command output:")
         logger.debug(output)

@@ -127,6 +127,10 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '--print-stats'])
         self.assertTrue('"ebu": {' in output)
 
+    def test_progress(self):
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-pr'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+
     def tearDown(self):
         for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac', 'test.mp4']:
             if os.path.isfile('normalized/' + file):

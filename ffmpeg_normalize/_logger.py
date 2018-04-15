@@ -27,9 +27,9 @@ class TqdmToLogger(io.StringIO):
         self.logger.log(self.level, self.buf)
 
 # https://stackoverflow.com/questions/38543506/
-class TqdmLoggingHandler (logging.Handler):
+class TqdmLoggingHandler(logging.Handler):
     def __init__(self, level=logging.NOTSET):
-        super(self.__class__, self).__init__(level)
+        super(TqdmLoggingHandler, self).__init__(level)
 
     def emit(self, record):
         try:
