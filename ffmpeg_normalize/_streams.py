@@ -3,7 +3,7 @@ import re
 import json
 
 from ._errors import FFmpegNormalizeError
-from ._cmd_utils import NUL, run_command, dict_to_filter_opts
+from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
 from ._logger import setup_custom_logger
 logger = setup_custom_logger('ffmpeg_normalize')
 
@@ -92,7 +92,11 @@ class AudioStream(MediaStream):
             '-vn', '-sn', '-f', 'null', NUL
         ]
 
-        output = run_command(cmd)
+        yield 50
+        cmd_runner = CommandRunner(cmd)
+        cmd_runner.run_command()
+        output = cmd_runner.get_output()
+        yield 100
 
         logger.debug("Volumedetect command output:")
         logger.debug(output)
@@ -142,7 +146,11 @@ class AudioStream(MediaStream):
             '-vn', '-sn', '-f', 'null', NUL
         ]
 
-        output = run_command(cmd)
+        yield 50
+        cmd_runner = CommandRunner(cmd)
+        cmd_runner.run_command()
+        output = cmd_runner.get_output()
+        yield 100
 
         logger.debug("Loudnorm first pass command output:")
         logger.debug(output)

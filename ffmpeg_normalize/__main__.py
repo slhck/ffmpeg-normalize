@@ -62,7 +62,7 @@ def create_parser():
         default='normalized'
     )
 
-    group_general = parser.add_argument_group("File Input/Output")
+    group_general = parser.add_argument_group("General Options")
     group_general.add_argument(
         '-f', '--force',
         action='store_true',
@@ -82,6 +82,11 @@ def create_parser():
         '-n', '--dry-run',
         action='store_true',
         help="Do not run normalization, only print what would be done"
+    )
+    group_general.add_argument(
+        '-pr', '--progress',
+        action='store_true',
+        help="Show progress bar"
     )
     group_general.add_argument(
         '--version',
@@ -311,7 +316,8 @@ def main():
         chapters_disable=cli_args.chapters_disable,
         extra_output_options=cli_args.extra_output_options,
         output_format=cli_args.output_format,
-        dry_run=cli_args.dry_run
+        dry_run=cli_args.dry_run,
+        progress=cli_args.progress,
     )
 
     for index, input_file in enumerate(cli_args.input):

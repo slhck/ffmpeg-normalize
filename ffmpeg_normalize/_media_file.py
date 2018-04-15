@@ -3,10 +3,11 @@ import re
 import tempfile
 import shutil
 import json
+from tqdm import tqdm
 
 from ._streams import AudioStream, VideoStream, SubtitleStream
 from ._errors import FFmpegNormalizeError
-from ._cmd_utils import NUL, run_command
+from ._cmd_utils import NUL, CommandRunner
 from ._logger import setup_custom_logger
 logger = setup_custom_logger('ffmpeg_normalize')
 
@@ -59,7 +60,9 @@ class MediaFile():
             '-f', 'null', NUL
         ]
 
-        output = run_command(cmd)
+        cmd_runner = CommandRunner(cmd)
+        cmd_runner.run_command()
+        output = cmd_runner.get_output()
 
         logger.debug("Stream parsing command output:")
         logger.debug(output)
@@ -113,17 +116,34 @@ class MediaFile():
     def run_normalization(self):
         logger.debug("Running normalization for {}".format(self.input_file))
 
-        self._first_pass()
-        self._second_pass()
+        with tqdm(
+            total=100,
+            position=1,
+            disable=not self.ffmpeg_normalize.progress,
+            desc="Pass 1"
+        ) as pbar:
+            for progress in self._first_pass():
+                pbar.update(progress)
+
+        with tqdm(
+            total=100,
+            position=2,
+            disable=not self.ffmpeg_normalize.progress,
+            desc="Pass 2"
+        ) as pbar:
+            for progress in self._second_pass():
+                pbar.update(progress)
 
     def _first_pass(self):
         logger.debug("Parsing normalization info for {}".format(self.input_file))
 
         for audio_stream in self.streams['audio'].values():
             if self.ffmpeg_normalize.normalization_type == 'ebu':
-                audio_stream.parse_loudnorm_stats()
+                for progress in audio_stream.parse_loudnorm_stats():
+                    yield progress
             else:
-                audio_stream.parse_volumedetect_stats()
+                for progress in audio_stream.parse_volumedetect_stats():
+                    yield progress
 
         if self.ffmpeg_normalize.print_stats:
             stats = [audio_stream.get_stats() for audio_stream in self.streams['audio'].values()]
@@ -222,7 +242,9 @@ class MediaFile():
         # if dry run, only show sample command
         if self.ffmpeg_normalize.dry_run:
             cmd.append(self.output_file)
-            run_command(cmd, dry=True)
+            cmd_runner = CommandRunner(cmd, dry=True)
+            cmd_runner.run_command()
+            yield 100
             return
 
         # create a temporary output file name
@@ -236,9 +258,9 @@ class MediaFile():
 
         # run the actual command
         try:
-            output = run_command(cmd)
-            logger.debug("Normalization command output:")
-            logger.debug(output)
+            yield 50
+            CommandRunner(cmd).run_command()
+            yield 100
 
             # move file from TMP to output file
             logger.debug(

@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 from platform import system as _current_os
+import re
 
 from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
@@ -13,6 +14,96 @@ IS_NIX = (not IS_WIN) and any(
     CUR_OS.startswith(i) for i in
     ['CYGWIN', 'MSYS', 'Linux', 'Darwin', 'SunOS', 'FreeBSD', 'NetBSD'])
 NUL = 'NUL' if IS_WIN else '/dev/null'
+
+# https://gist.github.com/Hellowlol/5f8545e999259b4371c91ac223409209
+def to_ms(s=None, des=None, **kwargs):
+    if s:
+        hour = int(s[0:2])
+        minute = int(s[3:5])
+        sec = int(s[6:8])
+        ms = int(s[10:11])
+    else:
+        hour = int(kwargs.get('hour', 0))
+        minute = int(kwargs.get('min', 0))
+        sec = int(kwargs.get('sec', 0))
+        ms = int(kwargs.get('ms'))
+
+    result = (hour * 60 * 60 * 1000) + (minute * 60 * 1000) + (sec * 1000) + ms
+    if des and isinstance(des, int):
+        return round(result, des)
+    return result
+
+class CommandRunner():
+    def __init__(self, cmd, dry=False):
+        self.cmd = cmd
+        self.dry = dry
+        self.output = None
+
+    def run_ffmpeg_command(self):
+        logger.debug("Running ffmpeg command: {}".format(self.cmd))
+
+        dur_regex = re.compile(r'Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
+        time_regex = re.compile(r'\stime=(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
+        dur = None
+
+        stdout = []
+        stderr = []
+
+        p = subprocess.Popen(
+            self.cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=False
+        )
+
+        for stderr_line in iter(p.stderr):
+        # while p.poll() is None:
+            # stderr_line = p.stderr.readline()
+            stderr_line = stderr_line.decode("utf8", errors='replace')
+            stderr.append(stderr_line)
+
+            self.output = "\n".join(stderr)
+
+            if not dur and dur_regex.search(stderr_line):
+                dur = dur_regex.search(stderr_line).groupdict()
+                dur = to_ms(**dur)
+                continue
+            if dur:
+                result = time_regex.search(stderr_line)
+                if result:
+                    import pdb; pdb.set_trace()
+                    elapsed_time = to_ms(**result.groupdict())
+                    yield elapsed_time / dur * 100
+
+        yield 100
+        return
+
+    def run_command(self):
+        logger.debug("Running command: {}".format(self.cmd))
+
+        if self.dry:
+            logger.debug("Dry mode specified, not actually running command")
+            return
+
+        p = subprocess.Popen(
+            self.cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=False
+        )
+
+        # simple running of command
+        stdout, stderr = p.communicate()
+
+        stdout = stdout.decode("utf8", errors='replace')
+        stderr = stderr.decode("utf8", errors='replace')
+        if p.returncode == 0:
+            self.output = (stdout + stderr)
+        else:
+            raise RuntimeError("Error running command {}: {}".format(self.cmd, str(stderr)))
+
+    def get_output(self):
+        return self.output
 
 def which(program):
     """
@@ -47,34 +138,6 @@ def dict_to_filter_opts(opts):
         filter_opts.append("{}={}".format(k, v))
     return ":".join(filter_opts)
 
-def run_command(cmd, dry=False):
-    """
-    Generic function to run a command.
-    Set dry to just print and don't actually run.
-
-    Returns stdout + stderr.
-    """
-    logger.debug("Running command: {}".format(cmd))
-
-    if dry:
-        logger.debug("Dry mode specified, not actually running command")
-        return
-
-    p = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=False
-    )
-    stdout, stderr = p.communicate()
-
-    stdout = stdout.decode("utf8", errors='replace')
-    stderr = stderr.decode("utf8", errors='replace')
-    if p.returncode == 0:
-        return (stdout + stderr)
-    else:
-        raise RuntimeError("Error running command {}: {}".format(cmd, str(stderr)))
-
 def get_ffmpeg_exe():
     """
     Return path to ffmpeg executable
@@ -103,7 +166,9 @@ def ffmpeg_has_loudnorm():
     Run feature detection on ffmpeg, returns True if ffmpeg supports
     the loudnorm filter
     """
-    output = run_command([get_ffmpeg_exe(), '-filters'])
+    cmd_runner = CommandRunner([get_ffmpeg_exe(), '-filters'])
+    cmd_runner.run_command()
+    output = cmd_runner.get_output()
     if 'loudnorm' in output:
         return True
     else:

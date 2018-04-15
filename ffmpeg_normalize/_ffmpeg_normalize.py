@@ -1,6 +1,7 @@
 import os
 import json
 from numbers import Number
+from tqdm import tqdm
 
 from ._cmd_utils import get_ffmpeg_exe, ffmpeg_has_loudnorm
 from ._media_file import MediaFile
@@ -57,7 +58,8 @@ class FFmpegNormalize():
         extra_output_options=None,
         output_format=None,
         dry_run=False,
-        debug=False
+        debug=False,
+        progress=False,
     ):
         self.ffmpeg_exe = get_ffmpeg_exe()
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
@@ -118,6 +120,7 @@ class FFmpegNormalize():
         self.output_format = output_format
         self.dry_run = dry_run
         self.debug = debug
+        self.progress = progress
 
         if self.output_format and (self.audio_codec is None or 'pcm' in self.audio_codec) and \
             self.output_format in PCM_INCOMPATIBLE_FORMATS:
@@ -171,10 +174,15 @@ class FFmpegNormalize():
         """
         Run the normalization procedures
         """
-        for index, media_file in enumerate(self.media_files):
+        for index, media_file in enumerate(
+                tqdm(
+                    self.media_files,
+                    desc="File #",
+                    disable=not self.progress,
+                    position=0
+                )):
             logger.info("Normalizing file {} ({} of {})".format(media_file, index + 1, self.file_count))
 
             media_file.run_normalization()
 
             logger.info("Normalized file written to {}".format(media_file.output_file))
-

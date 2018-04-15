@@ -1,7 +1,45 @@
 import logging
 from platform import system
+import io
+from tqdm import tqdm
 
 loggers = {}
+
+# https://stackoverflow.com/questions/14897756/
+class TqdmToLogger(io.StringIO):
+    """
+    Output stream for TQDM which will output to logger module instead of
+    the StdOut.
+    """
+    logger = None
+    level = None
+    buf = ''
+
+    def __init__(self, logger):
+        super(TqdmToLogger, self).__init__()
+        self.logger = logger
+        self.level = logging.INFO
+
+    def write(self, buf):
+        self.buf = buf.strip('\r\n\t ')
+
+    def flush(self):
+        self.logger.log(self.level, self.buf)
+
+# https://stackoverflow.com/questions/38543506/
+class TqdmLoggingHandler (logging.Handler):
+    def __init__(self, level=logging.NOTSET):
+        super(self.__class__, self).__init__(level)
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.write(msg)
+            self.flush()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            self.handleError(record)
 
 def setup_custom_logger(name):
     """
@@ -16,7 +54,8 @@ def setup_custom_logger(name):
         fmt='%(levelname)s: %(message)s'
     )
 
-    handler = logging.StreamHandler()
+    # handler = logging.StreamHandler()
+    handler = TqdmLoggingHandler()
     handler.setFormatter(formatter)
 
     # \033[1;30m - black
