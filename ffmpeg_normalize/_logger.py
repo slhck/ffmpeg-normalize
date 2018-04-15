@@ -5,26 +5,6 @@ from tqdm import tqdm
 
 loggers = {}
 
-# https://stackoverflow.com/questions/14897756/
-class TqdmToLogger(io.StringIO):
-    """
-    Output stream for TQDM which will output to logger module instead of
-    the StdOut.
-    """
-    logger = None
-    level = None
-    buf = ''
-
-    def __init__(self, logger):
-        super(TqdmToLogger, self).__init__()
-        self.logger = logger
-        self.level = logging.INFO
-
-    def write(self, buf):
-        self.buf = buf.strip('\r\n\t ')
-
-    def flush(self):
-        self.logger.log(self.level, self.buf)
 
 # https://stackoverflow.com/questions/38543506/
 class TqdmLoggingHandler(logging.Handler):
