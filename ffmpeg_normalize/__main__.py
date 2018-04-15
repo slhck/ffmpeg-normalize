@@ -138,7 +138,7 @@ def create_parser():
     #     default=0.5
     # )
 
-    group_ebu = parser.add_argument_group("Ebu R128 Normalization")
+    group_ebu = parser.add_argument_group("EBU R128 Normalization")
     group_ebu.add_argument(
         '-lrt', '--loudness-range-target',
         type=float,
