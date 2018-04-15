@@ -9,6 +9,7 @@ before_install:
   - sudo cp ffmpeg/ffmpeg /usr/bin/
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install pathlib2; fi
+  - pip install -r requirements.txt
   - pip install .
 script:
   - python test/test.py
