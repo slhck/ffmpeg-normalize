@@ -1,5 +1,10 @@
 # History
 
+## next
+
+- Progress bar for files and streams
+- Minor documentation fixes
+
 ## 1.2.3 (2018-04-11)
 
 - Fix problems with metadata disabling, also allow to disable chapters

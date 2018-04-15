@@ -86,7 +86,7 @@ File Input/output:
 
     This folder will be used for input files that have no explicit output name specified.
 
-File Input/Output:
+General:
 
 - `-f, --force`: Force overwrite existing files
 
@@ -95,6 +95,8 @@ File Input/Output:
 - `-v, --verbose`: Print verbose output
 
 - `-n, --dry-run`: Do not run normalization, only print what would be done
+
+- `-pr`, `--progress`: Show progress bar for files and streams
 
 - `--version`: Print version and exit
 

@@ -86,7 +86,7 @@ def create_parser():
     group_general.add_argument(
         '-pr', '--progress',
         action='store_true',
-        help="Show progress bar"
+        help="Show progress bar for files and streams"
     )
     group_general.add_argument(
         '--version',
