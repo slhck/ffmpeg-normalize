@@ -1,5 +1,9 @@
 # History
 
+## 1.3.1 (2018-04-24)
+
+- Do not require main module in setup.py, fixes #68
+
 ## 1.3.0 (2018-04-15)
 
 - Progress bar for files and streams, fixes #56
