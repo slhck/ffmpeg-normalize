@@ -4,9 +4,12 @@ from setuptools import setup
 # To use a consistent encoding
 from codecs import open
 from os import path
-from ffmpeg_normalize import __version__ as version
 
 here = path.abspath(path.dirname(__file__))
+
+# read version string
+with open(path.join(here, 'ffmpeg_normalize', '_version.py')) as version_file:
+    version = eval(version_file.read().split("=")[1].strip())
 
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
