@@ -63,12 +63,12 @@ class CommandRunner():
             self.cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True
+            universal_newlines=False
         )
 
         # for stderr_line in iter(p.stderr):
         while True:
-            line = p.stderr.readline()
+            line = p.stderr.readline().decode("utf8", errors='replace')
             if line == '' and p.poll() is not None:
                 break
             stderr.append(line.strip())
