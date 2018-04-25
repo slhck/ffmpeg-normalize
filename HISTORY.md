@@ -1,5 +1,9 @@
 # History
 
+## 1.3.2 (2018-04-25)
+
+- Fix error when decoding Unicode chars
+
 ## 1.3.1 (2018-04-24)
 
 - Do not require main module in setup.py, fixes #68
