@@ -14,17 +14,22 @@ except ImportError:
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
 
-def ffmpeg_normalize_call(args, env=None):
-    cmd = [sys.executable, '-m', 'ffmpeg_normalize']
-    cmd.extend(args)
-    print()
-    print(" ".join(cmd))
+def ffmpeg_normalize_call(args, env=None, raw=False):
+    if not raw:
+        cmd = [sys.executable, '-m', 'ffmpeg_normalize']
+        cmd.extend(args)
+        print()
+        print(" ".join(cmd))
+    else:
+        cmd = sys.executable + ' -m ffmpeg_normalize ' + args
+        print(cmd)
     p = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         universal_newlines=True,
-        env=env
+        env=env,
+        shell=raw
     )
     stdout, stderr = p.communicate()
 
@@ -87,8 +92,12 @@ class TestFFmpegNormalize(unittest.TestCase):
         ffmpeg_normalize_call(['test/test.mp4', '-c:v', 'libx264'])
         self.assertTrue(os.path.isfile('normalized/test.mkv'))
 
-    def test_extra_options(self):
+    def test_extra_options_json(self):
         ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac', '-e', '[ "-vbr", "3" ]'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+
+    def test_extra_options_normal(self):
+        output, _ = ffmpeg_normalize_call('test/test.mp4 -c:a aac -e="-vbr 3"', raw=True)
         self.assertTrue(os.path.isfile('normalized/test.mkv'))
 
     def test_ofmt_fail(self):

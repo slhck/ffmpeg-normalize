@@ -2,6 +2,12 @@ import os
 import json
 from numbers import Number
 from tqdm import tqdm
+import shlex
+
+try:
+    from json.decoder import JSONDecodeError
+except ImportError:
+    JSONDecodeError = ValueError
 
 from ._cmd_utils import get_ffmpeg_exe, ffmpeg_has_loudnorm
 from ._media_file import MediaFile
@@ -107,7 +113,13 @@ class FFmpegNormalize():
         if extra_output_options:
             try:
                 if isinstance(extra_output_options, str):
-                    self.extra_output_options = [str(s) for s in json.loads(extra_output_options)]
+                    if extra_output_options.startswith('['):
+                        try:
+                            self.extra_output_options = [str(s) for s in json.loads(extra_output_options)]
+                        except JSONDecodeError as e:
+                            self.extra_output_options = shlex.split(extra_output_options)
+                    else:
+                        self.extra_output_options = shlex.split(extra_output_options)
                 elif isinstance(extra_output_options, list):
                     self.extra_output_options = extra_output_options
             except Exception as e:
