@@ -107,7 +107,7 @@ class FFmpegNormalize():
         if extra_output_options:
             try:
                 if isinstance(extra_output_options, str):
-                    self.extra_output_options = json.loads(extra_output_options)
+                    self.extra_output_options = [str(s) for s in json.loads(extra_output_options)]
                 elif isinstance(extra_output_options, list):
                     self.extra_output_options = extra_output_options
             except Exception as e:
