@@ -1,5 +1,9 @@
 # History
 
+## 1.3.4 (2018-05-05)
+
+- New way to specify extra options
+
 ## 1.3.3 (2018-05-05)
 
 - Decode extra option strings from unicode
