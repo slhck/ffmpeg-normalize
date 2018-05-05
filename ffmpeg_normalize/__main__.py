@@ -258,9 +258,9 @@ def create_parser():
         help=textwrap.dedent("""\
         Extra output options list.
 
-        Must be a list of ffmpeg command line arguments without leading
-        dashes. Wrap in quotes to prevent shell expansion and to preserve
-        literal quotes inside string.
+        A JSON-formatted list of ffmpeg command line arguments. Wrap in quotes
+        to prevent shell expansion and to preserve literal quotes inside
+        string.
 
         Example: `-e '[ "-vbr", "3" ]'`
         """)

@@ -67,7 +67,7 @@ You can (if you really need to!) also overwrite your input file. Warning, this w
 
 If you need some fancy extra options, such as setting `vbr` for the `libfdk_aac` encoder, pass them to the `-e`/`--extra-options` argument:
 
-    ffmpeg-normalize input.m4a -c:a libfdk_aac -e '["vbr": "3"]' -o output.m4a
+    ffmpeg-normalize input.m4a -c:a libfdk_aac -e '["-vbr": "3"]' -o output.m4a
 
 Further examples? Please submit a PR so I can collect them.
 
@@ -175,7 +175,7 @@ Output Format:
 
 - `-e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS`: Extra output options list.
 
-    Must be a list of ffmpeg command line arguments without leading dashes. Wrap in quotes to prevent shell expansion and to preserve literal quotes inside string.
+    A JSON-formatted list of ffmpeg command line arguments. Wrap in quotes to prevent shell expansion and to preserve literal quotes inside string.
 
     Example: `-e '[ "-vbr", "3" ]'`
 

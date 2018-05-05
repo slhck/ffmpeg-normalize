@@ -1,5 +1,10 @@
 # History
 
+## 1.3.3 (2018-05-05)
+
+- Decode extra option strings from unicode
+- Minor README improvements
+
 ## 1.3.2 (2018-04-25)
 
 - Fix error when decoding Unicode chars
