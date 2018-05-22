@@ -195,7 +195,7 @@ Output Format:
 
 The program additionally respects environment variables:
 
-- `TMP` / `TEMP` / `TEMPDIR`
+- `TMP` / `TEMP` / `TMPDIR`
 
     Sets the path to the temporary directory in which files are
     stored before being moved to the final output directory.
