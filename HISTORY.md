@@ -1,5 +1,9 @@
 # History
 
+## 1.3.5 (2018-06-12)
+
+- Minor README updates
+
 ## 1.3.4 (2018-05-05)
 
 - New way to specify extra options
