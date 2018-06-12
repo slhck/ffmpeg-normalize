@@ -227,6 +227,10 @@ If you have to use an outdated ffmpeg version, you can only use `rms` or `peak` 
 
 When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this on your precious music collection, unless you have a backup of the originals or accept potential quality reduction. If you just want to normalize the subjective volume of the files without changing the actual content, consider using [MP3Gain](http://mp3gain.sourceforge.net/) and [aacgain](http://aacgain.altosdesign.com/).
 
+### Why are my files MKV now?
+
+MKV was chosen as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.
+
 ### The conversion does not work and I get a cryptic ffmpeg error!
 
 One possible reason is that the input file contains some streams that cannot be mapped to the output file. Examples:
