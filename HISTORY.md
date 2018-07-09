@@ -1,5 +1,9 @@
 # History
 
+## 1.3.6 (2018-07-09)
+
+- Update README
+
 ## 1.3.5 (2018-06-12)
 
 - Minor README updates
