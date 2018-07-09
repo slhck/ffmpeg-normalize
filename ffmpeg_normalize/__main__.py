@@ -47,7 +47,8 @@ def create_parser():
         Output file names. Will be applied per input file.
 
         If no output file name is specified for an input file, the output files
-        will be written to the default output folder with the name `<input>.wav`.
+        will be written to the default output folder with the name `<input>.<ext>`,
+        where `<ext>` is the output extension (see `-ext` option).
         """)
     )
     group_io.add_argument(

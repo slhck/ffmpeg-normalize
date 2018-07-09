@@ -52,6 +52,10 @@ Normalize a number of videos in the current folder and write them to a folder ca
 
     ffmpeg-normalize *.mkv -c:a aac -b:a 192k
 
+For Windows, the above would be written as a loop:
+
+    for %%f in ("*.mkv") do ffmpeg-normalize "%%f" -c:a aac -b:a 192k
+
 Normalize an MP3 file and write an MP3 file (you have to explicitly specify the encoder):
 
     ffmpeg-normalize input.mp3 -c:a libmp3lame -b:a 320k -o output.mp3
@@ -82,7 +86,7 @@ File Input/output:
     Will be applied per input file.
 
     If no output file name is specified for an input file, the output files
-    will be written to the default output folder with the name `<input>.wav`.
+    will be written to the default output folder with the name `<input>.<ext>`, where `<ext>` is the output extension (see `-ext` option).
 
 - `-of OUTPUT_FOLDER, --output-folder OUTPUT_FOLDER`: Output folder (default: `normalized`)
 
