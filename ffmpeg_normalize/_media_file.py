@@ -186,6 +186,13 @@ class MediaFile():
         """
         logger.info("Running second pass for {}".format(self.input_file))
 
+        # get the target output stream types depending on the options
+        output_stream_types = ['audio']
+        if not self.ffmpeg_normalize.video_disable:
+            output_stream_types.append('video')
+        if not self.ffmpeg_normalize.subtitle_disable:
+            output_stream_types.append('subtitle')
+
         # get complex filter command
         audio_filter_cmd, output_labels = self._get_audio_filter_cmd()
 
@@ -195,11 +202,22 @@ class MediaFile():
             '-filter_complex', audio_filter_cmd
         ]
 
-        # map metadata if needed
+        # map metadata, only if needed
         if self.ffmpeg_normalize.metadata_disable:
             cmd.extend(['-map_metadata', '-1'])
         else:
+            # map global metadata
             cmd.extend(['-map_metadata', '0'])
+            # map per-stream metadata (e.g. language tags)
+            for stream_type in output_stream_types:
+                stream_key = stream_type[0]
+                if stream_type not in self.streams:
+                    continue
+                for idx, _ in enumerate(self.streams[stream_type].items()):
+                    cmd.extend([
+                        '-map_metadata:s:{}:{}'.format(stream_key, idx),
+                        '0:s:{}:{}'.format(stream_key, idx)
+                    ])
 
         # map chapters if needed
         if self.ffmpeg_normalize.chapters_disable:
@@ -207,14 +225,14 @@ class MediaFile():
         else:
             cmd.extend(['-map_chapters', '0'])
 
-        # collect all '-map' needed for output based on input video
+        # collect all '-map' and codecs needed for output video based on input video
         if not self.ffmpeg_normalize.video_disable:
             for s in self.streams['video'].keys():
                 cmd.extend(['-map', '0:{}'.format(s)])
             # set codec (copy by default)
             cmd.extend(['-c:v', self.ffmpeg_normalize.video_codec])
 
-        # ... and output normalization filters
+        # ... and map the output of the normalization filters
         for ol in output_labels:
             cmd.extend(['-map', ol])
 
@@ -222,9 +240,8 @@ class MediaFile():
         if self.ffmpeg_normalize.audio_codec:
             cmd.extend(['-c:a', self.ffmpeg_normalize.audio_codec])
         else:
-            map_offset = len(self.streams['video'])
             for index, (_, audio_stream) in enumerate(self.streams['audio'].items()):
-                cmd.extend(['-c:{}'.format(map_offset + index), audio_stream.get_pcm_codec()])
+                cmd.extend(['-c:a:{}'.format(index), audio_stream.get_pcm_codec()])
 
         # other audio options (if any)
         if self.ffmpeg_normalize.audio_bitrate:
