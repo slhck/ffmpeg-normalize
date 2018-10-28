@@ -1,5 +1,9 @@
 # History
 
+## 1.3.7 (2018-10-28)
+
+- Copy per-stream metadata
+
 ## 1.3.6 (2018-07-09)
 
 - Update README
