@@ -181,11 +181,9 @@ Output Format:
 
     A list of extra ffmpeg command line arguments.
 
-    You can either use a JSON-formatted list, or a simple string of space-
-    separated arguments. If JSON is used, you need to wrap the argument in
-    quotes to prevent shell expansion and to preserve literal quotes
-    inside the string. If a simple string is used, you need to specify the
-    argument with `-e=`.
+    You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.
+
+    If JSON is used, you need to wrap the whole argument in quotes to prevent shell expansion and to preserve literal quotes inside the string. If a simple string is used, you need to specify the argument with `-e=`.
 
     Examples: `-e '[ "-vbr", "3" ]'` or `-e="-vbr 3"`
 
