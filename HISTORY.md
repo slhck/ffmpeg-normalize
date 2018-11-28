@@ -1,5 +1,9 @@
 # History
 
+## 1.3.7 (2018-11-28)
+
+- Clarify extra options and move to main CLI entry point
+
 ## 1.3.7 (2018-10-28)
 
 - Copy per-stream metadata
