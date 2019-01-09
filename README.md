@@ -4,9 +4,21 @@
 
 A utility for batch-normalizing audio using ffmpeg.
 
-This program normalizes media files to a certain LUFS level using the EBU R128 loudness normalization procedure. It can also perform RMS-based normalization (where the mean is lifted or attenuated), or peak normalization to a certain target level.
+This program normalizes media files to a certain loudness level using the EBU R128 loudness normalization procedure. It can also perform RMS-based normalization (where the mean is lifted or attenuated), or peak normalization to a certain target level.
 
 Batch processing of several input files is possible, including video files.
+
+Contents:
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Description](#description)
+- [Examples](#examples)
+- [Detailed Options](#detailed-options)
+- [FAQ](#faq)
+
+-------------
 
 ## Requirements
 
@@ -36,11 +48,33 @@ For more information, run `ffmpeg-normalize -h`, or read on.
 
 ## Description
 
-The program takes a number of input files and, by default, writes them to a folder called `normalized`, using an `.mkv` container. You can specify an output file name for each input file with the `-o` option. In this case, the container format will be inferred from the file name extension.
+Please read this section for a high level introduction.
+
+**What does the program do?**
+
+The program takes one or more input files and, by default, writes them to a folder called `normalized`, using an `.mkv` container. All audio streams will be normalized so that they have the same (perceived) volume.
+
+**How do I specify the input?**
+
+Just give the program one or more input files as arguments. It works with most media files.
+
+**How do I specify the output?**
+
+You can specify one output file name for each input file with the `-o` option. In this case, the container format (e.g. `.wav`) will be inferred from the file name extension that you've given.
+
+If you don't specify the output file name for an input file, the container format will be MKV, and the output will be written to `normalized/<input>.mkv`.
+
+Using the `-ext` option, you can supply a different output extension common to all output files, e.g. `-ext m4a`.
+
+**What will get normalized?**
 
 By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently. The video and subtitle tracks will be copied over to the output file.
 
-**Important Note:** The default audio encoding method is uncompressed PCM to avoid introducing compression artifacts. This will result in a much higher bitrate than you might want, for example if your input files are MP3s. Some containers (like MP4) also cannot handle PCM audio. If you want to use such containers and/or keep the file size down, use `-c:a` and specify an audio codec (e.g., `-c:a aac` for ffmpeg's built-in AAC encoder).
+**What codec is chosen?**
+
+The default audio encoding method is uncompressed PCM (`pcm_s16le`) to avoid introducing compression artifacts. This will result in a much higher bitrate than you might want, for example if your input files are MP3s.
+
+Some containers (like MP4) also cannot handle PCM audio. If you want to use such containers and/or keep the file size down, use `-c:a` and specify an audio codec (e.g., `-c:a aac` for ffmpeg's built-in AAC encoder).
 
 ## Examples
 
@@ -59,6 +93,10 @@ For Windows, the above would be written as a loop:
 Normalize an MP3 file and write an MP3 file (you have to explicitly specify the encoder):
 
     ffmpeg-normalize input.mp3 -c:a libmp3lame -b:a 320k -o output.mp3
+
+Normalize many files, keeping PCM audio, but choosing a different container:
+
+    ffmpeg-normalize *.wav -c:a pcm_s16le -ext aif
 
 Instead of EBU R128, one might just want to use simple peak normalization to 0 dB:
 
