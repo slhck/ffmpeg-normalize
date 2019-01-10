@@ -1,5 +1,9 @@
 # History
 
+## 1.3.9 (2018-01-10)
+
+- Clarify documentation
+
 ## 1.3.7 (2018-11-28)
 
 - Clarify extra options and move to main CLI entry point
