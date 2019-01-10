@@ -2,6 +2,7 @@ import logging
 from platform import system
 import io
 from tqdm import tqdm
+from multiprocessing import Lock
 
 loggers = {}
 
@@ -14,6 +15,7 @@ class TqdmLoggingHandler(logging.Handler):
     def emit(self, record):
         try:
             msg = self.format(record)
+            tqdm.set_lock(Lock())
             tqdm.write(msg)
             self.flush()
         except (KeyboardInterrupt, SystemExit):
