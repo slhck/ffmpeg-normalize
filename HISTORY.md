@@ -1,6 +1,10 @@
 # History
 
-## 1.3.9 (2018-01-10)
+## 1.3.10 (2019-02-22)
+
+- Cap measured input loudness
+
+## 1.3.9 (2019-01-10)
 
 - Clarify documentation
 
