@@ -194,6 +194,11 @@ class AudioStream(MediaStream):
                 "First pass not run, you must call parse_loudnorm_stats first"
             )
 
+        input_i = float(self.loudness_statistics['ebu']["input_i"])
+        if input_i > 0:
+            logger.warn("Input file had measured input loudness greater than zero ({}), capping at 0".format("input_i"))
+            self.loudness_statistics['ebu']['input_i'] = 0
+
         opts = {
             'i': self.media_file.ffmpeg_normalize.target_level,
             'lra': self.media_file.ffmpeg_normalize.loudness_range_target,
