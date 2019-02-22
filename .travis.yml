@@ -3,7 +3,7 @@ python:
   - "2.7"
   - "3.6"
 before_install:
-  - sudo wget -O ffmpeg.tar.gz https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-64bit-static.tar.xz
+  - sudo wget -O ffmpeg.tar.gz https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz
   - sudo mkdir ffmpeg
   - sudo tar xvf ffmpeg.tar.gz -C ffmpeg --strip-components=1
   - sudo cp ffmpeg/ffmpeg /usr/bin/
