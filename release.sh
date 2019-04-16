@@ -47,13 +47,24 @@ if [ "$INPUT_STRING" = "" ]; then
 fi
 echo -e "${NOTICE_FLAG} Will set new version to be ${WHITE}$INPUT_STRING"
 
+# replace the python version
 perl -pi -e "s/\Q$BASE_STRING\E/$INPUT_STRING/" "$VERSION_FILE"
 
-auto-changelog
-
-echo -e "$PUSHING_MSG"
-git add CHANGELOG.md "$VERSION_FILE"
+# bump initially but to not push yet
 git commit -m "Bump version to ${INPUT_STRING}."
 git tag -a -m "Tag version ${INPUT_STRING}." "v$INPUT_STRING"
 
+# generate the changelog
+auto-changelog
+
+# add the changelog and amend it to the previous commit and tag
+git add CHANGELOG.md "$VERSION_FILE"
+git commit --amend --no-edit
+git tag -a -f -m "Tag version ${INPUT_STRING}." "v$INPUT_STRING"
+
+# push to remote
+echo -e "$PUSHING_MSG"
 git push && git push --tags
+
+# upload to PyPi
+python setup.py sdist upload
