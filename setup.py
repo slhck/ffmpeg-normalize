@@ -15,8 +15,8 @@ with open(path.join(here, 'ffmpeg_normalize', '_version.py')) as version_file:
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-# Get the history from the HISTORY file
-with open(path.join(here, 'HISTORY.md'), encoding='utf-8') as f:
+# Get the history from the CHANGELOG file
+with open(path.join(here, 'CHANGELOG.md'), encoding='utf-8') as f:
     history = f.read()
 
 try:
