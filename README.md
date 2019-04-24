@@ -17,6 +17,14 @@ Contents:
 - [Description](#description)
 - [Examples](#examples)
 - [Detailed Options](#detailed-options)
+    - [File Input/Output](#file-input-output)
+    - [General](#general)
+    - [Normalization](#normalization)
+    - [EBU R128 Normalization](#ebu-r128-normalization)
+    - [Audio Encoding](#audio-encoding)
+    - [Other Encoding Options](#other-encoding-options)
+    - [Output Format](#output-format)
+    - [Environment Variables](#environment-variables)
 - [FAQ](#faq)
 
 -------------
@@ -116,7 +124,7 @@ Further examples? Please submit a PR so I can collect them.
 
 ## Detailed Options
 
-File Input/output:
+### File Input/Output
 
 - `input`: Input media file(s)
 
@@ -131,7 +139,7 @@ File Input/output:
 
     This folder will be used for input files that have no explicit output name specified.
 
-General:
+### General
 
 - `-f, --force`: Force overwrite existing files
 
@@ -145,7 +153,7 @@ General:
 
 - `--version`: Print version and exit
 
-Normalization:
+### Normalization
 
 - `-nt {ebu,rms,peak}, --normalization-type {ebu,rms,peak}`: Normalization type (default: `ebu`).
 
@@ -163,7 +171,7 @@ Normalization:
 
 - `-p, --print-stats`: Print first pass loudness statistics formatted as JSON to stdout.
 
-Ebu R128 Normalization:
+### EBU R128 Normalization
 
 - `-lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET`: EBU Loudness Range Target in LUFS (default: 7.0).
 
@@ -182,7 +190,7 @@ Ebu R128 Normalization:
 
     If a mono file is intended for playback on a stereo system, its EBU R128 measurement will be perceptually incorrect. If set, this option will compensate for this effect. Multi-channel input files are not affected by this option.
 
-Audio Encoding:
+### Audio Encoding
 
 - `-c:a AUDIO_CODEC, --audio-codec AUDIO_CODEC`: Audio codec to use for output files.
 
@@ -200,7 +208,7 @@ Audio Encoding:
 
 - `-koa, --keep-original-audio`: Copy original, non-normalized audio streams to output file
 
-Other Encoding Options:
+### Other Encoding Options
 
 - `-vn, --video-disable`: Do not write video streams to output
 
@@ -216,7 +224,7 @@ Other Encoding Options:
 
 - `-cn, --chapters-disable`: Do not write metadata to output
 
-Output Format:
+### Output Format
 
 - `-e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS`: Extra output options list.
 
@@ -235,6 +243,8 @@ Output Format:
     If not specified, the format will be inferred by ffmpeg from the output file name. If the output file name is not explicitly specified, the extension will govern the format (see '--extension' option).
 
 - `-ext EXTENSION, --extension EXTENSION`: Output file extension to use for output files that were not explicitly specified. (Default: `mkv`)
+
+### Environment Variables
 
 The program additionally respects environment variables:
 
