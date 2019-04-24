@@ -50,6 +50,8 @@ echo -e "${NOTICE_FLAG} Will set new version to be ${WHITE}$INPUT_STRING"
 # replace the python version
 perl -pi -e "s/\Q$BASE_STRING\E/$INPUT_STRING/" "$VERSION_FILE"
 
+git add "$VERSION_FILE"
+
 # bump initially but to not push yet
 git commit -m "Bump version to ${INPUT_STRING}."
 git tag -a -m "Tag version ${INPUT_STRING}." "v$INPUT_STRING"
@@ -58,7 +60,7 @@ git tag -a -m "Tag version ${INPUT_STRING}." "v$INPUT_STRING"
 auto-changelog
 
 # add the changelog and amend it to the previous commit and tag
-git add CHANGELOG.md "$VERSION_FILE"
+git add CHANGELOG.md
 git commit --amend --no-edit
 git tag -a -f -m "Tag version ${INPUT_STRING}." "v$INPUT_STRING"
 
