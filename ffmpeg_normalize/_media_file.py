@@ -256,6 +256,12 @@ class MediaFile():
             # copy subtitles
             cmd.extend(['-c:s', 'copy'])
 
+        if self.ffmpeg_normalize.keep_original_audio:
+            highest_index = len(self.streams['audio'])
+            for index, (_, s) in enumerate(self.streams['audio'].items()):
+                cmd.extend(['-map', '0:a:{}'.format(index)])
+                cmd.extend(['-c:a:{}'.format(highest_index + index), 'copy'])
+
         # extra options (if any)
         if self.ffmpeg_normalize.extra_output_options:
             cmd.extend(self.ffmpeg_normalize.extra_output_options)

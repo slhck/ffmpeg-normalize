@@ -226,6 +226,11 @@ def create_parser():
         Will use input sample rate by default.
         """)
     )
+    group_acodec.add_argument(
+        '-koa', '--keep-original-audio',
+        action='store_true',
+        help="Copy original, non-normalized audio streams to output file"
+    )
 
     group_vcodec = parser.add_argument_group("Other Encoding Options")
     group_vcodec.add_argument(
@@ -341,6 +346,7 @@ def main():
         audio_codec=cli_args.audio_codec,
         audio_bitrate=cli_args.audio_bitrate,
         sample_rate=cli_args.sample_rate,
+        keep_original_audio=cli_args.keep_original_audio,
         video_codec=cli_args.video_codec,
         video_disable=cli_args.video_disable,
         subtitle_disable=cli_args.subtitle_disable,

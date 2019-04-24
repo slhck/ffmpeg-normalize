@@ -49,6 +49,7 @@ class FFmpegNormalize():
         audio_codec='pcm_s16le',
         audio_bitrate=None,
         sample_rate=None,
+        keep_original_audio=False,
         video_codec='copy',
         video_disable=False,
         subtitle_disable=False,
@@ -97,6 +98,7 @@ class FFmpegNormalize():
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
         self.sample_rate = int(sample_rate) if sample_rate is not None else None
+        self.keep_original_audio = keep_original_audio
         self.video_codec = video_codec
         self.video_disable = video_disable
         self.subtitle_disable = subtitle_disable

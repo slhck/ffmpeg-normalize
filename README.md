@@ -198,6 +198,8 @@ Audio Encoding:
 
     Will use input sample rate by default.
 
+- `-koa, --keep-original-audio`: Copy original, non-normalized audio streams to output file
+
 Other Encoding Options:
 
 - `-vn, --video-disable`: Do not write video streams to output
