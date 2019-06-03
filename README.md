@@ -222,7 +222,7 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-mn, --metadata-disable`: Do not write metadata to output
 
-- `-cn, --chapters-disable`: Do not write metadata to output
+- `-cn, --chapters-disable`: Do not write chapters to output
 
 ### Output Format
 
