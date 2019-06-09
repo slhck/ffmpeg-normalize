@@ -48,6 +48,7 @@ class FFmpegNormalize():
         dual_mono=False,
         audio_codec='pcm_s16le',
         audio_bitrate=None,
+        audio_quality=None,
         sample_rate=None,
         keep_original_audio=False,
         video_codec='copy',
@@ -96,7 +97,15 @@ class FFmpegNormalize():
 
         self.dual_mono = True if dual_mono in ['true', True] else False
         self.audio_codec = audio_codec
+
         self.audio_bitrate = audio_bitrate
+
+        if audio_quality is not None:
+            self.audio_quality = check_range(audio_quality, 0, 9, "audio_quality")
+
+        if self.audio_bitrate is not None and self.audio_quality is not None:
+            raise FFmpegNormalizeError("You can't set audio-bitrate and autio-quality at same time")
+
         self.sample_rate = int(sample_rate) if sample_rate is not None else None
         self.keep_original_audio = keep_original_audio
         self.video_codec = video_codec
@@ -113,7 +122,7 @@ class FFmpegNormalize():
         self.progress = progress
 
         if self.output_format and (self.audio_codec is None or 'pcm' in self.audio_codec) and \
-            self.output_format in PCM_INCOMPATIBLE_FORMATS:
+                self.output_format in PCM_INCOMPATIBLE_FORMATS:
             raise FFmpegNormalizeError(
                 "Output format {} does not support PCM audio. Please choose a suitable audio codec with the -c:a option.".format(self.output_format)
             )

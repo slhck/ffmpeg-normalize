@@ -17,22 +17,22 @@ Contents:
 - [Description](#description)
 - [Examples](#examples)
 - [Detailed Options](#detailed-options)
-    - [File Input/Output](#file-input-output)
-    - [General](#general)
-    - [Normalization](#normalization)
-    - [EBU R128 Normalization](#ebu-r128-normalization)
-    - [Audio Encoding](#audio-encoding)
-    - [Other Encoding Options](#other-encoding-options)
-    - [Output Format](#output-format)
-    - [Environment Variables](#environment-variables)
+  - [File Input/Output](#file-input-output)
+  - [General](#general)
+  - [Normalization](#normalization)
+  - [EBU R128 Normalization](#ebu-r128-normalization)
+  - [Audio Encoding](#audio-encoding)
+  - [Other Encoding Options](#other-encoding-options)
+  - [Output Format](#output-format)
+  - [Environment Variables](#environment-variables)
 - [FAQ](#faq)
 
--------------
+---
 
 ## Requirements
 
--   Python 2.7 or 3
--   ffmpeg v3.1 or above from <http://ffmpeg.org/> installed in your \$PATH
+- Python 2.7 or 3
+- ffmpeg v3.1 or above from <http://ffmpeg.org/> installed in your \$PATH
 
 ## Installation
 
@@ -47,7 +47,7 @@ Or download this repository, then run `pip install .`.
                     [-t TARGET_LEVEL] [-p]
                     [-lrt LOUDNESS_RANGE_TARGET]
                     [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
-                    [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE]
+                    [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE] [-q:a AUDIO_QUALITY]
                     [-ar SAMPLE_RATE] [-vn] [-c:v VIDEO_CODEC] [-sn] [-mn]
                     [-e EXTRA_OUTPUT_OPTIONS] [-ofmt OUTPUT_FORMAT]
                     [-ext EXTENSION]
@@ -130,14 +130,14 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-o OUTPUT [OUTPUT ...], --output OUTPUT [OUTPUT ...]`: Output file names.
 
-    Will be applied per input file.
+  Will be applied per input file.
 
-    If no output file name is specified for an input file, the output files
-    will be written to the default output folder with the name `<input>.<ext>`, where `<ext>` is the output extension (see `-ext` option).
+  If no output file name is specified for an input file, the output files
+  will be written to the default output folder with the name `<input>.<ext>`, where `<ext>` is the output extension (see `-ext` option).
 
 - `-of OUTPUT_FOLDER, --output-folder OUTPUT_FOLDER`: Output folder (default: `normalized`)
 
-    This folder will be used for input files that have no explicit output name specified.
+  This folder will be used for input files that have no explicit output name specified.
 
 ### General
 
@@ -157,17 +157,17 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-nt {ebu,rms,peak}, --normalization-type {ebu,rms,peak}`: Normalization type (default: `ebu`).
 
-    EBU normalization performs two passes and normalizes according to EBU R128.
+  EBU normalization performs two passes and normalizes according to EBU R128.
 
-    RMS-based normalization brings the input file to the specified RMS level.
+  RMS-based normalization brings the input file to the specified RMS level.
 
-    Peak normalization brings the signal to the specified peak level.
+  Peak normalization brings the signal to the specified peak level.
 
 - `-t TARGET_LEVEL, --target-level TARGET_LEVEL`: Normalization target level in dB/LUFS (default: -23).
 
-    For EBU normalization, it corresponds to Integrated Loudness Target in LUFS. The range is -70.0 - -5.0.
+  For EBU normalization, it corresponds to Integrated Loudness Target in LUFS. The range is -70.0 - -5.0.
 
-    Otherwise, the range is -99 to 0.
+  Otherwise, the range is -99 to 0.
 
 - `-p, --print-stats`: Print first pass loudness statistics formatted as JSON to stdout.
 
@@ -175,36 +175,36 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET`: EBU Loudness Range Target in LUFS (default: 7.0).
 
-    Range is 1.0 - 20.0.
+  Range is 1.0 - 20.0.
 
 - `-tp TRUE_PEAK, --true-peak TRUE_PEAK`: EBU Maximum True Peak in dBTP (default: -2.0).
 
-    Range is -9.0 - +0.0.
+  Range is -9.0 - +0.0.
 
 - `--offset OFFSET`: EBU Offset Gain (default: 0.0).
 
-    The gain is applied before the true-peak limiter.
-    Range is -99.0 - +99.0.
+  The gain is applied before the true-peak limiter.
+  Range is -99.0 - +99.0.
 
 - `--dual-mono`: Treat mono input files as "dual-mono".
 
-    If a mono file is intended for playback on a stereo system, its EBU R128 measurement will be perceptually incorrect. If set, this option will compensate for this effect. Multi-channel input files are not affected by this option.
+  If a mono file is intended for playback on a stereo system, its EBU R128 measurement will be perceptually incorrect. If set, this option will compensate for this effect. Multi-channel input files are not affected by this option.
 
 ### Audio Encoding
 
 - `-c:a AUDIO_CODEC, --audio-codec AUDIO_CODEC`: Audio codec to use for output files.
 
-    See `ffmpeg -encoders` for a list.
+  See `ffmpeg -encoders` for a list.
 
-    Will use PCM audio with input stream bit depth by default.
+  Will use PCM audio with input stream bit depth by default.
 
 - `-b:a AUDIO_BITRATE, --audio-bitrate AUDIO_BITRATE`: Audio bitrate in bits/s, or with K suffix.
 
-    If not specified, will use codec default.
+  If not specified, will use codec default.
 
 - `-ar SAMPLE_RATE, --sample-rate SAMPLE_RATE`: Audio sample rate to use for output files in Hz.
 
-    Will use input sample rate by default.
+  Will use input sample rate by default.
 
 - `-koa, --keep-original-audio`: Copy original, non-normalized audio streams to output file
 
@@ -214,9 +214,9 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-c:v VIDEO_CODEC, --video-codec VIDEO_CODEC`: Video codec to use for output files (default: 'copy').
 
-    See `ffmpeg -encoders` for a list.
+  See `ffmpeg -encoders` for a list.
 
-    Will attempt to copy video codec by default.
+  Will attempt to copy video codec by default.
 
 - `-sn, --subtitle-disable`: Do not write subtitle streams to output
 
@@ -228,19 +228,19 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS`: Extra output options list.
 
-    A list of extra ffmpeg command line arguments.
+  A list of extra ffmpeg command line arguments.
 
-    You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.
+  You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.
 
-    If JSON is used, you need to wrap the whole argument in quotes to prevent shell expansion and to preserve literal quotes inside the string. If a simple string is used, you need to specify the argument with `-e=`.
+  If JSON is used, you need to wrap the whole argument in quotes to prevent shell expansion and to preserve literal quotes inside the string. If a simple string is used, you need to specify the argument with `-e=`.
 
-    Examples: `-e '[ "-vbr", "3" ]'` or `-e="-vbr 3"`
+  Examples: `-e '[ "-vbr", "3" ]'` or `-e="-vbr 3"`
 
 - `-ofmt OUTPUT_FORMAT, --output-format OUTPUT_FORMAT`: Media format to use for output file(s).
 
-    See `ffmpeg -formats` for a list.
+  See `ffmpeg -formats` for a list.
 
-    If not specified, the format will be inferred by ffmpeg from the output file name. If the output file name is not explicitly specified, the extension will govern the format (see '--extension' option).
+  If not specified, the format will be inferred by ffmpeg from the output file name. If the output file name is not explicitly specified, the extension will govern the format (see '--extension' option).
 
 - `-ext EXTENSION, --extension EXTENSION`: Output file extension to use for output files that were not explicitly specified. (Default: `mkv`)
 
@@ -250,21 +250,20 @@ The program additionally respects environment variables:
 
 - `TMP` / `TEMP` / `TMPDIR`
 
-    Sets the path to the temporary directory in which files are
-    stored before being moved to the final output directory.
-    Note: You need to use full paths.
+  Sets the path to the temporary directory in which files are
+  stored before being moved to the final output directory.
+  Note: You need to use full paths.
 
 - `FFMPEG_PATH`
 
-    Sets the full path to an `ffmpeg` executable other than
-    the system default.
-
+  Sets the full path to an `ffmpeg` executable other than
+  the system default.
 
 ## FAQ
 
 ### After updating, this program does not work as expected anymore!
 
-You are probably using a 0.x version of this program. There are significant changes to the command line arguments and inner workings of this program, so please  adapt your scripts to the new one. Those changes were necessary to address a few issues that kept piling up; leaving the program as-is would have made it hard to extend it. You can continue using the old version (find it under *Releases* on GitHub or request the specific version from PyPi), but it will not be supported anymore.
+You are probably using a 0.x version of this program. There are significant changes to the command line arguments and inner workings of this program, so please adapt your scripts to the new one. Those changes were necessary to address a few issues that kept piling up; leaving the program as-is would have made it hard to extend it. You can continue using the old version (find it under _Releases_ on GitHub or request the specific version from PyPi), but it will not be supported anymore.
 
 ### The program doesn't work because the "loudnorm" filter can't be found
 

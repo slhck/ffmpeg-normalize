@@ -246,6 +246,8 @@ class MediaFile():
         # other audio options (if any)
         if self.ffmpeg_normalize.audio_bitrate:
             cmd.extend(['-b:a', str(self.ffmpeg_normalize.audio_bitrate)])
+        if self.ffmpeg_normalize.audio_quality:
+            cmd.extend(['-q:a', str(self.ffmpeg_normalize.audio_quality)])
         if self.ffmpeg_normalize.sample_rate:
             cmd.extend(['-ar', str(self.ffmpeg_normalize.sample_rate)])
 

@@ -217,6 +217,11 @@ def create_parser():
         If not specified, will use codec default.
         """),
     )
+    group_acodec.add_argument('-q:a', '--audio-quality', type=int, help="""\
+        Audio quality for VBR Encoding (only supported by libmp3lame codec).
+        
+        The range is 0-9 where a lower value is a higher quality. 0-3 will normally produce transparent results, 4 (default) should be close to perceptual transparency, and 6 produces an "acceptable" quality.
+        """)
     group_acodec.add_argument(
         '-ar', '--sample-rate',
         type=str,
@@ -345,6 +350,7 @@ def main():
         dual_mono=cli_args.dual_mono,
         audio_codec=cli_args.audio_codec,
         audio_bitrate=cli_args.audio_bitrate,
+        audio_quality=cli_args.audio_quality,
         sample_rate=cli_args.sample_rate,
         keep_original_audio=cli_args.keep_original_audio,
         video_codec=cli_args.video_codec,
