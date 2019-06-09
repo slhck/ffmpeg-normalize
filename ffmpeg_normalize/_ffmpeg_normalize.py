@@ -100,7 +100,9 @@ class FFmpegNormalize():
 
         self.audio_bitrate = audio_bitrate
 
-        if audio_quality is not None:
+        if audio_quality is None:
+            self.audio_quality = None
+        else:
             self.audio_quality = check_range(audio_quality, 0, 9, "audio_quality")
 
         if self.audio_bitrate is not None and self.audio_quality is not None:
