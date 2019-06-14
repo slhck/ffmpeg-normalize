@@ -138,6 +138,7 @@ class TestFFmpegNormalize(unittest.TestCase):
 
     def test_progress(self):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-pr'])
+        self.assertTrue("100" in output)
         self.assertTrue(os.path.isfile('normalized/test.mkv'))
 
     def tearDown(self):

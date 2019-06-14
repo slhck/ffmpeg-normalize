@@ -36,7 +36,7 @@ def to_ms(s=None, des=None, **kwargs):
 
 class CommandRunner():
     DUR_REGEX = re.compile(r'Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
-    TIME_REGEX = re.compile(r'\stime=(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
+    TIME_REGEX = re.compile(r'out_time=(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
 
     def __init__(self, cmd, dry=False):
         self.cmd = cmd
@@ -57,18 +57,20 @@ class CommandRunner():
 
         total_dur = None
 
+        cmd_with_progress =  [self.cmd[0]] + ["-progress", "-", "-nostats"] + self.cmd[1:]
+
         stderr = []
 
         p = subprocess.Popen(
-            self.cmd,
+            cmd_with_progress,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             universal_newlines=False
         )
 
-        # for stderr_line in iter(p.stderr):
+        # for line in iter(p.stderr):
         while True:
-            line = p.stderr.readline().decode("utf8", errors='replace')
+            line = p.stdout.readline().decode("utf8", errors='replace').strip()
             if line == '' and p.poll() is not None:
                 break
             stderr.append(line.strip())
