@@ -177,7 +177,7 @@ class MediaFile():
             else:
                 normalization_filter = audio_stream.get_second_pass_opts_peakrms()
 
-            input_label = '[a{}]'.format(audio_stream.stream_id)
+            input_label = '[0:{}]'.format(audio_stream.stream_id)
             output_label = '[norm{}]'.format(audio_stream.stream_id)
             output_labels.append(output_label)
 
