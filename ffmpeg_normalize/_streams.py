@@ -33,7 +33,7 @@ class SubtitleStream(MediaStream):
         super(SubtitleStream, self).__init__(media_file, 'subtitle', stream_id)
 
 class AudioStream(MediaStream):
-    def __init__(self, media_file, stream_id, sample_rate=None, bit_depth=None):
+    def __init__(self, media_file, stream_id, sample_rate=None, bit_depth=None, duration=None):
         super(AudioStream, self).__init__(media_file, 'audio', stream_id)
 
         self.loudness_statistics = {
@@ -44,6 +44,14 @@ class AudioStream(MediaStream):
 
         self.sample_rate = sample_rate
         self.bit_depth = bit_depth
+        self.duration = duration
+
+        if self.duration and self.duration <= 3:
+            logger.warn(
+                "Audio stream has a duration of less than 3 seconds. "
+                "Normalization may not work. "
+                "See https://github.com/slhck/ffmpeg-normalize/issues/87 for more info."
+            )
 
     def __repr__(self):
         return "<{}, audio stream {}>".format(

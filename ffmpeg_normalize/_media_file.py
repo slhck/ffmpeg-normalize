@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from ._streams import AudioStream, VideoStream, SubtitleStream
 from ._errors import FFmpegNormalizeError
-from ._cmd_utils import NUL, CommandRunner
+from ._cmd_utils import NUL, CommandRunner, DUR_REGEX, to_ms
 from ._logger import setup_custom_logger
 logger = setup_custom_logger('ffmpeg_normalize')
 
@@ -69,7 +69,13 @@ class MediaFile():
 
         output_lines = [line.strip() for line in output.split('\n')]
 
+        duration = None
         for line in output_lines:
+
+            if 'Duration' in line:
+                duration = DUR_REGEX.search(line).groupdict()
+                duration = to_ms(**duration) / 1000
+                logger.debug("Found duration: " + str(duration) + " s")
 
             if not line.startswith('Stream'):
                 continue
@@ -82,13 +88,14 @@ class MediaFile():
             else:
                 continue
 
+
             if 'Audio' in line:
                 logger.debug("Found audio stream at index {}".format(stream_id))
                 sample_rate_match = re.search(r'(\d+) Hz', line)
                 sample_rate = int(sample_rate_match.group(1)) if sample_rate_match else None
                 bit_depth_match = re.search(r's(\d+)p?,', line)
                 bit_depth = int(bit_depth_match.group(1)) if bit_depth_match else None
-                self.streams['audio'][stream_id] = AudioStream(self, stream_id, sample_rate, bit_depth)
+                self.streams['audio'][stream_id] = AudioStream(self, stream_id, sample_rate, bit_depth, duration)
 
             elif 'Video' in line:
                 logger.debug("Found video stream at index {}".format(stream_id))
