@@ -38,120 +38,120 @@ def ffmpeg_normalize_call(args, env=None, raw=False):
 
 class TestFFmpegNormalize(unittest.TestCase):
     def test_output_filename_and_folder(self):
-        ffmpeg_normalize_call(['test/test.mp4'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_no_overwrite(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-v'])
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-v'])
-        self.assertTrue("exists" in output)
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-v'])
+        self.assertTrue("exists" in output, msg=output)
 
     def test_dry(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-n'])
-        self.assertFalse(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-n'])
+        self.assertFalse(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_output(self):
         Path('normalized').mkdir(exist_ok=True)
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-o', 'normalized/test.wav', '-v'])
-        self.assertTrue("Output file only supports one stream." in output)
+        self.assertTrue("Output file only supports one stream." in output, msg=output)
 
     def test_peak(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-nt', 'peak', '-t', '0'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-nt', 'peak', '-t', '0'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_rms(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-nt', 'rms', '-t', '-16'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-nt', 'rms', '-t', '-16'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_lrt(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-lrt', '1'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-lrt', '1'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_tp(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-tp', '-3'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-tp', '-3'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_offset(self):
-        ffmpeg_normalize_call(['test/test.mp4', '--offset', '10'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '--offset', '10'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_acodec(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_abr(self):
         Path('normalized').mkdir(exist_ok=True)
-        ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac', '-b:a', '192k', '-o', 'normalized/test.aac'])
-        self.assertTrue(os.path.isfile('normalized/test.aac'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac', '-b:a', '192k', '-o', 'normalized/test.aac'])
+        self.assertTrue(os.path.isfile('normalized/test.aac'), msg=output)
 
     def test_ar(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-ar', '48000'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ar', '48000'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_vcodec(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-c:v', 'libx264'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-c:v', 'libx264'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_extra_options_json(self):
-        ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac', '-e', '[ "-vbr", "3" ]'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac', '-e', '[ "-vbr", "3" ]'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_extra_options_normal(self):
         output, _ = ffmpeg_normalize_call('test/test.mp4 -c:a aac -e="-vbr 3"', raw=True)
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_ofmt_fail(self):
         Path('normalized').mkdir(exist_ok=True)
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ofmt', 'mp3', '-o', 'normalized/test.mp3', '-vn', '-sn'])
-        self.assertTrue("does not support" in output)
+        self.assertTrue("does not support" in output, msg=output)
 
     def test_ofmt_mp3(self):
         Path('normalized').mkdir(exist_ok=True)
-        ffmpeg_normalize_call(['test/test.mp4', '-ofmt', 'mp3', '-o', 'normalized/test.mp3', '-c:a', 'libmp3lame', '-vn', '-sn'])
-        self.assertTrue(os.path.isfile('normalized/test.mp3'))
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ofmt', 'mp3', '-o', 'normalized/test.mp3', '-c:a', 'libmp3lame', '-vn', '-sn'])
+        self.assertTrue(os.path.isfile('normalized/test.mp3'), msg=output)
 
     def test_ext_fail(self):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ext', 'mp3'])
-        self.assertTrue("does not support" in output)
+        self.assertTrue("does not support" in output, msg=output)
 
     def test_ext_mp3(self):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ext', 'mp3', '-c:a', 'libmp3lame'])
-        self.assertTrue(os.path.isfile('normalized/test.mp3'))
+        self.assertTrue(os.path.isfile('normalized/test.mp3'), msg=output)
 
     def test_metadata_disable(self):
         Path('normalized').mkdir(exist_ok=True)
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-mn', '-c:a', 'aac', '-o', 'normalized/test.mp4'])
-        self.assertTrue(os.path.isfile('normalized/test.mp4'))
+        self.assertTrue(os.path.isfile('normalized/test.mp4'), msg=output)
 
     def test_chapters_disable(self):
         Path('normalized').mkdir(exist_ok=True)
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-cn', '-c:a', 'aac', '-o', 'normalized/test.mp4'])
-        self.assertTrue(os.path.isfile('normalized/test.mp4'))
+        self.assertTrue(os.path.isfile('normalized/test.mp4'), msg=output)
 
     def test_version(self):
         output, _ = ffmpeg_normalize_call(['--version'])
-        self.assertTrue("ffmpeg-normalize v" in output)
+        self.assertTrue("ffmpeg-normalize v" in output, msg=output)
 
     def test_stats(self):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '--print-stats'])
-        self.assertTrue('"ebu": {' in output)
+        self.assertTrue('"ebu": {' in output, msg=output)
 
     def test_progress(self):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-pr'])
-        self.assertTrue("100" in output)
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        self.assertTrue("100" in output, msg=output)
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_duration(self):
         output, _ = ffmpeg_normalize_call(['test/test.wav', '--debug'])
-        self.assertTrue("Found duration: " in output)
+        self.assertTrue("Found duration: " in output, msg=output)
 
     def test_pre_filters(self):
         output, _ = ffmpeg_normalize_call(['test/test.wav', '-prf', 'volume=0,volume=0'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def test_post_filters(self):
         output, _ = ffmpeg_normalize_call(['test/test.wav', '-pof', 'volume=0,volume=0'])
-        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
     def tearDown(self):
         for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac', 'test.mp4']:
