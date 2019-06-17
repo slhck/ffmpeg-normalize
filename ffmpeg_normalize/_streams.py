@@ -34,6 +34,12 @@ class SubtitleStream(MediaStream):
 
 class AudioStream(MediaStream):
     def __init__(self, media_file, stream_id, sample_rate=None, bit_depth=None, duration=None):
+        """
+        Arguments:
+            sample_rate {int} -- in Hz
+            bit_depth {int}
+            duration {int} -- duration in seconds
+        """
         super(AudioStream, self).__init__(media_file, 'audio', stream_id)
 
         self.loudness_statistics = {
