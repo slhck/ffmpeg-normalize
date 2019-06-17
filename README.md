@@ -208,6 +208,18 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-koa, --keep-original-audio`: Copy original, non-normalized audio streams to output file
 
+- `-prf PRE_FILTER, --pre-filter PRE_FILTER`: Add an audio filter chain before applying normalization.
+
+    Multiple filters can be specified by comma-separating them.
+
+    For EBU, the filter will be applied during the second pass.
+
+- `-pof POST_FILTER, --post-filter POST_FILTER`: Add an audio filter chain after applying normalization.
+
+    Multiple filters can be specified by comma-separating them.
+
+    For EBU, the filter will be applied during the second pass.
+
 ### Other Encoding Options
 
 - `-vn, --video-disable`: Do not write video streams to output
@@ -223,6 +235,7 @@ Further examples? Please submit a PR so I can collect them.
 - `-mn, --metadata-disable`: Do not write metadata to output
 
 - `-cn, --chapters-disable`: Do not write chapters to output
+
 
 ### Output Format
 

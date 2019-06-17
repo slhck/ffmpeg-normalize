@@ -50,6 +50,8 @@ class FFmpegNormalize():
         audio_bitrate=None,
         sample_rate=None,
         keep_original_audio=False,
+        pre_filter=None,
+        post_filter=None,
         video_codec='copy',
         video_disable=False,
         subtitle_disable=False,
@@ -106,6 +108,8 @@ class FFmpegNormalize():
         self.chapters_disable = chapters_disable
 
         self.extra_output_options = extra_output_options
+        self.pre_filter = pre_filter
+        self.post_filter = post_filter
 
         self.output_format = output_format
         self.dry_run = dry_run

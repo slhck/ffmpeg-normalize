@@ -231,6 +231,26 @@ def create_parser():
         action='store_true',
         help="Copy original, non-normalized audio streams to output file"
     )
+    group_acodec.add_argument(
+        '-prf', '--pre-filter',
+        type=str,
+        help=textwrap.dedent("""\
+        Add an audio filter chain before applying normalization.
+        Multiple filters can be specified by comma-separating them.
+
+        For EBU, the filter will be applied during the second pass.
+        """)
+    )
+    group_acodec.add_argument(
+        '-pof', '--post-filter',
+        type=str,
+        help=textwrap.dedent("""\
+        Add an audio filter chain after applying normalization.
+        Multiple filters can be specified by comma-separating them.
+
+        For EBU, the filter will be applied during the second pass.
+        """)
+    )
 
     group_vcodec = parser.add_argument_group("Other Encoding Options")
     group_vcodec.add_argument(
@@ -265,7 +285,7 @@ def create_parser():
         help="Do not write chapters to output"
     )
 
-    group_format = parser.add_argument_group("Output Format")
+    group_format = parser.add_argument_group("Output options")
     group_format.add_argument(
         '-e', '--extra-output-options',
         type=str,
@@ -347,6 +367,8 @@ def main():
         audio_bitrate=cli_args.audio_bitrate,
         sample_rate=cli_args.sample_rate,
         keep_original_audio=cli_args.keep_original_audio,
+        pre_filter=cli_args.pre_filter,
+        post_filter=cli_args.post_filter,
         video_codec=cli_args.video_codec,
         video_disable=cli_args.video_disable,
         subtitle_disable=cli_args.subtitle_disable,

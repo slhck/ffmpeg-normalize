@@ -145,6 +145,14 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = ffmpeg_normalize_call(['test/test.wav', '--debug'])
         self.assertTrue("Found duration: " in output)
 
+    def test_pre_filters(self):
+        output, _ = ffmpeg_normalize_call(['test/test.wav', '-prf', 'volume=0,volume=0'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+
+    def test_post_filters(self):
+        output, _ = ffmpeg_normalize_call(['test/test.wav', '-pof', 'volume=0,volume=0'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'))
+
     def tearDown(self):
         for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac', 'test.mp4']:
             if os.path.isfile('normalized/' + file):

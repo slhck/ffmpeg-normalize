@@ -168,20 +168,34 @@ class MediaFile():
         """
         Return filter_complex command and output labels needed
         """
-        all_filters = []
+        filter_chains = []
         output_labels = []
 
         for audio_stream in self.streams['audio'].values():
             if self.ffmpeg_normalize.normalization_type == 'ebu':
-                stream_filter = audio_stream.get_second_pass_opts_ebu()
+                normalization_filter = audio_stream.get_second_pass_opts_ebu()
             else:
-                stream_filter = audio_stream.get_second_pass_opts_peakrms()
-            input_label = '[0:{}]'.format(audio_stream.stream_id)
+                normalization_filter = audio_stream.get_second_pass_opts_peakrms()
+
+            input_label = '[a{}]'.format(audio_stream.stream_id)
             output_label = '[norm{}]'.format(audio_stream.stream_id)
             output_labels.append(output_label)
-            all_filters.append(input_label + stream_filter + output_label)
 
-        filter_complex_cmd = ';'.join(all_filters)
+            filter_chain = []
+
+            if self.ffmpeg_normalize.pre_filter:
+                filter_chain.append(self.ffmpeg_normalize.pre_filter)
+
+            filter_chain.append(normalization_filter)
+
+            if self.ffmpeg_normalize.post_filter:
+                filter_chain.append(self.ffmpeg_normalize.post_filter)
+
+            filter_chains.append(
+                input_label + ",".join(filter_chain) + output_label
+            )
+
+        filter_complex_cmd = ';'.join(filter_chains)
 
         return filter_complex_cmd, output_labels
 
