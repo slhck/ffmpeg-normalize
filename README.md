@@ -43,15 +43,15 @@ Or download this repository, then run `pip install .`.
 ## Usage
 
     ffmpeg-normalize [-h] [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER] [-f]
-                    [-d] [-v] [-n] [--version] [-nt {ebu,rms,peak}]
-                    [-t TARGET_LEVEL] [-p]
-                    [-lrt LOUDNESS_RANGE_TARGET]
-                    [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
-                    [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE]
-                    [-ar SAMPLE_RATE] [-vn] [-c:v VIDEO_CODEC] [-sn] [-mn]
-                    [-e EXTRA_OUTPUT_OPTIONS] [-ofmt OUTPUT_FORMAT]
-                    [-ext EXTENSION]
-                    input [input ...]
+                        [-d] [-v] [-n] [-pr] [--version] [-nt {ebu,rms,peak}]
+                        [-t TARGET_LEVEL] [-p] [-lrt LOUDNESS_RANGE_TARGET]
+                        [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
+                        [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE]
+                        [-ar SAMPLE_RATE] [-koa] [-prf PRE_FILTER]
+                        [-pof POST_FILTER] [-vn] [-c:v VIDEO_CODEC] [-sn]
+                        [-mn] [-cn] [-e EXTRA_OUTPUT_OPTIONS]
+                        [-ofmt OUTPUT_FORMAT] [-ext EXTENSION]
+                        input [input ...]
 
 For more information, run `ffmpeg-normalize -h`, or read on.
 
@@ -78,6 +78,10 @@ Using the `-ext` option, you can supply a different output extension common to a
 **What will get normalized?**
 
 By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently. The video and subtitle tracks will be copied over to the output file.
+
+**How will the normalization be done?**
+
+The normalization will be performed with the [`loudnorm` filter](http://ffmpeg.org/ffmpeg-filters.html#loudnorm) from FFmpeg, which was [originally written by Kyle Swanson](https://k.ylo.ph/2016/04/04/loudnorm.html). It will bring the audio to a specified target level. This ensures that multiple files normalized with this filter will have the same perceived loudness.
 
 **What codec is chosen?**
 
@@ -275,10 +279,6 @@ The program additionally respects environment variables:
 
 ## FAQ
 
-### After updating, this program does not work as expected anymore!
-
-You are probably using a 0.x version of this program. There are significant changes to the command line arguments and inner workings of this program, so please  adapt your scripts to the new one. Those changes were necessary to address a few issues that kept piling up; leaving the program as-is would have made it hard to extend it. You can continue using the old version (find it under *Releases* on GitHub or request the specific version from PyPi), but it will not be supported anymore.
-
 ### The program doesn't work because the "loudnorm" filter can't be found
 
 Make sure you run ffmpeg v3.1 or higher and that `loudnorm` is part of the output when you run `ffmpeg -filters`. Many distributions package outdated ffmpeg 2.x versions, or (even worse), Libav's `ffmpeg` disguising as a real `ffmpeg` from the FFmpeg project.
@@ -293,9 +293,9 @@ If you have to use an outdated ffmpeg version, you can only use `rms` or `peak` 
 
 When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this on your precious music collection, unless you have a backup of the originals or accept potential quality reduction. If you just want to normalize the subjective volume of the files without changing the actual content, consider using [MP3Gain](http://mp3gain.sourceforge.net/) and [aacgain](http://aacgain.altosdesign.com/).
 
-### Why are my files MKV now?
+### Why are my output files MKV?
 
-MKV was chosen as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.
+I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.
 
 ### The conversion does not work and I get a cryptic ffmpeg error!
 
@@ -320,6 +320,10 @@ Also, if there is some other broken metadata, you can try to disable copying ove
 ### Couldn't I just run `loudnorm` with ffmpeg?
 
 You absolutely can. However, you can get better accuracy and linear normalization with two passes of the filter. Since ffmpeg does not allow you to automatically run these two passes, you have to do it yourself and parse the output values from the first run. If this program is too over-engineered for you, you could also use an approach such as featured [in this Ruby script](https://gist.github.com/kylophone/84ba07f6205895e65c9634a956bf6d54) that performs the two `loudnorm` passes.
+
+### After updating, this program does not work as expected anymore!
+
+You are probably using a 0.x version of this program. There are significant changes to the command line arguments and inner workings of this program, so please  adapt your scripts to the new one. Those changes were necessary to address a few issues that kept piling up; leaving the program as-is would have made it hard to extend it. You can continue using the old version (find it under *Releases* on GitHub or request the specific version from PyPi), but it will not be supported anymore.
 
 ### Can I buy you a beer / coffee / random drink?
 
