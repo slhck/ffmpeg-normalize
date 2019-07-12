@@ -73,9 +73,13 @@ class MediaFile():
         for line in output_lines:
 
             if 'Duration' in line:
-                duration = DUR_REGEX.search(line).groupdict()
-                duration = to_ms(**duration) / 1000
-                logger.debug("Found duration: " + str(duration) + " s")
+                duration_search = DUR_REGEX.search(line)
+                if not duration_search:
+                    logger.warning("Could not extract duration from input file!")
+                else:
+                    duration = duration_search.groupdict()
+                    duration = to_ms(**duration) / 1000
+                    logger.debug("Found duration: " + str(duration) + " s")
 
             if not line.startswith('Stream'):
                 continue
