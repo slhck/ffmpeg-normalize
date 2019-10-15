@@ -114,7 +114,10 @@ class MediaFile():
                 "Input file {} does not contain any audio streams"
                 .format(self.input_file))
 
-        if os.path.splitext(self.output_file)[1].lower() in ['.wav', '.mp3', '.aac']:
+        if (
+            os.path.splitext(self.output_file)[1].lower() in ['.wav', '.mp3', '.aac'] and
+            len(self.streams['audio'].values()) > 1
+        ):
             logger.warning(
                 "Output file only supports one stream. "
                 "Keeping only first audio stream."
