@@ -5,6 +5,10 @@
 # Based on:
 # - https://gist.github.com/pete-otaqui/4188238
 # - https://gist.github.com/mareksuscak/1f206fbc3bb9d97dec9c
+#
+# Requirements:
+# - `npm i -g auto-changelog`
+# - `pip3 install wheel twine`
 
 command -v auto-changelog >/dev/null 2>&1 || { echo >&2 "auto-changelog is not installed. Install via npm!"; exit 1; }
 
