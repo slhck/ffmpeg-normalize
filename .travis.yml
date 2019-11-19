@@ -1,7 +1,7 @@
 language: python
 python:
   - "2.7"
-  - "3.6"
+  - "3.7"
 before_install:
   - sudo wget -O ffmpeg.tar.gz https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz
   - sudo mkdir ffmpeg
