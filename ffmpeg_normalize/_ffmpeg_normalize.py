@@ -177,6 +177,14 @@ class FFmpegNormalize():
                 )):
             logger.info("Normalizing file {} ({} of {})".format(media_file, index + 1, self.file_count))
 
-            media_file.run_normalization()
+            try:
+                media_file.run_normalization()
+            except Exception as e:
+                if len(self.media_files) > 1:
+                    # simply warn and do not die
+                    logger.warn("Error processing input file {}, will continue batch-processing".format(media_file))
+                else:
+                    # raise the error so the program will exit
+                    raise e
 
             logger.info("Normalized file written to {}".format(media_file.output_file))
