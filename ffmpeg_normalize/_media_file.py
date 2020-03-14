@@ -99,15 +99,15 @@ class MediaFile():
                 sample_rate = int(sample_rate_match.group(1)) if sample_rate_match else None
                 bit_depth_match = re.search(r's(\d+)p?,', line)
                 bit_depth = int(bit_depth_match.group(1)) if bit_depth_match else None
-                self.streams['audio'][stream_id] = AudioStream(self, stream_id, sample_rate, bit_depth, duration)
+                self.streams['audio'][stream_id] = AudioStream(self, self.ffmpeg_normalize, stream_id, sample_rate, bit_depth, duration)
 
             elif 'Video' in line:
                 logger.debug("Found video stream at index {}".format(stream_id))
-                self.streams['video'][stream_id] = VideoStream(self, stream_id)
+                self.streams['video'][stream_id] = VideoStream(self, self.ffmpeg_normalize, stream_id)
 
             elif 'Subtitle' in line:
                 logger.debug("Found subtitle stream at index {}".format(stream_id))
-                self.streams['subtitle'][stream_id] = SubtitleStream(self, stream_id)
+                self.streams['subtitle'][stream_id] = SubtitleStream(self, self.ffmpeg_normalize, stream_id)
 
         if not self.streams['audio']:
             raise FFmpegNormalizeError(

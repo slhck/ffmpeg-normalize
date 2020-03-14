@@ -8,13 +8,14 @@ from ._logger import setup_custom_logger
 logger = setup_custom_logger('ffmpeg_normalize')
 
 class MediaStream(object):
-    def __init__(self, media_file, stream_type, stream_id):
+    def __init__(self, ffmpeg_normalize, media_file, stream_type, stream_id):
         """
         Arguments:
             media_file {MediaFile} -- parent media file
             stream_type {str} -- stream type
             stream_id {int} -- Audio stream id
         """
+        self.ffmpeg_normalize = ffmpeg_normalize
         self.media_file = media_file
         self.stream_type = stream_type
         self.stream_id = stream_id
@@ -25,22 +26,22 @@ class MediaStream(object):
         )
 
 class VideoStream(MediaStream):
-    def __init__(self, media_file, stream_id):
-        super(VideoStream, self).__init__(media_file, 'video', stream_id)
+    def __init__(self, ffmpeg_normalize, media_file, stream_id):
+        super(VideoStream, self).__init__(media_file, ffmpeg_normalize, 'video', stream_id)
 
 class SubtitleStream(MediaStream):
-    def __init__(self, media_file, stream_id):
-        super(SubtitleStream, self).__init__(media_file, 'subtitle', stream_id)
+    def __init__(self, ffmpeg_normalize, media_file, stream_id):
+        super(SubtitleStream, self).__init__(media_file, ffmpeg_normalize, 'subtitle', stream_id)
 
 class AudioStream(MediaStream):
-    def __init__(self, media_file, stream_id, sample_rate=None, bit_depth=None, duration=None):
+    def __init__(self, ffmpeg_normalize, media_file, stream_id, sample_rate=None, bit_depth=None, duration=None):
         """
         Arguments:
             sample_rate {int} -- in Hz
             bit_depth {int}
             duration {int} -- duration in seconds
         """
-        super(AudioStream, self).__init__(media_file, 'audio', stream_id)
+        super(AudioStream, self).__init__(media_file, ffmpeg_normalize, 'audio', stream_id)
 
         self.loudness_statistics = {
             'ebu': None,
@@ -52,7 +53,11 @@ class AudioStream(MediaStream):
         self.bit_depth = bit_depth
         self.duration = duration
 
-        if self.duration and self.duration <= 3:
+        if (
+            self.ffmpeg_normalize.normalization_type == "ebu" and
+            self.duration and
+            self.duration <= 3
+        ):
             logger.warn(
                 "Audio stream has a duration of less than 3 seconds. "
                 "Normalization may not work. "
