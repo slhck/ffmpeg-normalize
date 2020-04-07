@@ -67,7 +67,7 @@ git commit -m "Bump version to ${INPUT_STRING}."
 git tag -a -m "Tag version ${INPUT_STRING}." "v$INPUT_STRING"
 
 # generate the changelog
-auto-changelog
+auto-changelog --commit-limit false
 
 # add the changelog and amend it to the previous commit and tag
 git add CHANGELOG.md
