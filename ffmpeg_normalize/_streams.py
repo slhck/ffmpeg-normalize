@@ -155,7 +155,7 @@ class AudioStream(MediaStream):
             opts['dual_mono'] = 'true'
 
         filter_str = '[0:{}]'.format(self.stream_id) + \
-            'loudnorm=' + dict_to_filter_opts(opts)
+            self.ffmpeg_normalize.pre_filter + ',' + 'loudnorm=' + dict_to_filter_opts(opts)
 
         cmd = [
             self.media_file.ffmpeg_normalize.ffmpeg_exe, '-nostdin', '-y',
