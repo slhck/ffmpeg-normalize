@@ -88,6 +88,11 @@ def create_parser():
         help="Print verbose output"
     )
     group_general.add_argument(
+        '-q', '--quiet',
+        action='store_true',
+        help="Only print errors in output"
+    )
+    group_general.add_argument(
         '-n', '--dry-run',
         action='store_true',
         help="Do not run normalization, only print what would be done"
@@ -333,7 +338,9 @@ def create_parser():
 def main():
     cli_args = create_parser().parse_args()
 
-    if cli_args.debug:
+    if cli_args.quiet:
+        logger.setLevel(logging.ERROR)
+    elif cli_args.debug:
         logger.setLevel(logging.DEBUG)
     elif cli_args.verbose:
         logger.setLevel(logging.INFO)
@@ -397,7 +404,7 @@ def main():
                 os.makedirs(cli_args.output_folder)
 
         if os.path.exists(output_file) and not cli_args.force:
-            logger.warning(
+            logger.error(
                 "Output file {} already exists, skipping. Use -f to force overwriting.".format(output_file)
             )
         else:

@@ -185,7 +185,7 @@ def ffmpeg_has_loudnorm():
     if 'loudnorm' in output:
         return True
     else:
-        logger.warning(
+        logger.error(
             "Your ffmpeg version does not support the 'loudnorm' filter. "
             "Please make sure you are running ffmpeg v3.1 or above."
         )

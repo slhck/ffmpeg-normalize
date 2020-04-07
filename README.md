@@ -151,6 +151,8 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-v, --verbose`: Print verbose output
 
+- `-q, --quiet`: Only print errors
+
 - `-n, --dry-run`: Do not run normalization, only print what would be done
 
 - `-pr`, `--progress`: Show progress bar for files and streams

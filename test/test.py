@@ -153,6 +153,10 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = ffmpeg_normalize_call(['test/test.wav', '-pof', 'volume=0,volume=0'])
         self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
+    def test_quiet(self):
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ext', 'wav', '-vn', '-f', 'q'])
+        self.assertTrue("only supports one stream" not in output, msg=output)
+
     def tearDown(self):
         for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac', 'test.mp4']:
             if os.path.isfile('normalized/' + file):
