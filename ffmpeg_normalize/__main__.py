@@ -242,8 +242,6 @@ def create_parser():
         help=textwrap.dedent("""\
         Add an audio filter chain before applying normalization.
         Multiple filters can be specified by comma-separating them.
-
-        For EBU, the filter will be applied during the second pass.
         """)
     )
     group_acodec.add_argument(

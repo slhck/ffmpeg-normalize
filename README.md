@@ -218,8 +218,6 @@ Further examples? Please submit a PR so I can collect them.
 
     Multiple filters can be specified by comma-separating them.
 
-    For EBU, the filter will be applied during the second pass.
-
 - `-pof POST_FILTER, --post-filter POST_FILTER`: Add an audio filter chain after applying normalization.
 
     Multiple filters can be specified by comma-separating them.

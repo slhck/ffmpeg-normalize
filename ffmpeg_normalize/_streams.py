@@ -94,6 +94,19 @@ class AudioStream(MediaStream):
             )
             return 'pcm_s16le'
 
+    def _get_filter_str_with_pre_filter(self, current_filter):
+        """
+        Get a filter string for current_filter, with the pre-filter
+        added before. Applies the input label before.
+        """
+        input_label = '[0:{}]'.format(self.stream_id)
+        filter_chain = []
+        if self.media_file.ffmpeg_normalize.pre_filter:
+            filter_chain.append(self.media_file.ffmpeg_normalize.pre_filter)
+        filter_chain.append(current_filter)
+        filter_str = input_label + ",".join(filter_chain)
+        return filter_str
+
     def parse_volumedetect_stats(self):
         """
         Use ffmpeg with volumedetect filter to get the mean volume of the input file.
@@ -102,7 +115,7 @@ class AudioStream(MediaStream):
             "Running first pass volumedetect filter for stream {}".format(self.stream_id)
         )
 
-        filter_str = '[0:{}]volumedetect'.format(self.stream_id)
+        filter_str = self._get_filter_str_with_pre_filter("volumedetect")
 
         cmd = [
             self.media_file.ffmpeg_normalize.ffmpeg_exe, '-nostdin', '-y',
@@ -154,8 +167,9 @@ class AudioStream(MediaStream):
         if self.media_file.ffmpeg_normalize.dual_mono:
             opts['dual_mono'] = 'true'
 
-        filter_str = '[0:{}]'.format(self.stream_id) + \
+        filter_str = self._get_filter_str_with_pre_filter(
             'loudnorm=' + dict_to_filter_opts(opts)
+        )
 
         cmd = [
             self.media_file.ffmpeg_normalize.ffmpeg_exe, '-nostdin', '-y',
