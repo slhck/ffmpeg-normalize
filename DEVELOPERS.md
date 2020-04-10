@@ -6,20 +6,14 @@ See `test/test.py`.
 
 ## Making Releases
 
-Install `auto-changelog` via:
+Install the Python packages:
 
 ```
-npm i -g auto-changelog
-```
-
-Install Wheel and Twine:
-
-```
-pip3 install wheel twine
+pip3 install wheel twine pystache pypandoc gitchangelog
 ```
 
 Release with:
 
 ```
-release.sh
+./release.sh
 ```
