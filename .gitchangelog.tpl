@@ -8,7 +8,7 @@
 
 {{#sections}}
 {{#commits}}
-* {{{subject}}} [{{{author}}}]
+* {{{subject}}}
 {{#body}}
 
 {{{body_indented}}}
