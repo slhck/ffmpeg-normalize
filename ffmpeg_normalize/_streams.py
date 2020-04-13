@@ -236,7 +236,7 @@ class AudioStream(MediaStream):
             'i': self.media_file.ffmpeg_normalize.target_level,
             'lra': self.media_file.ffmpeg_normalize.loudness_range_target,
             'tp': self.media_file.ffmpeg_normalize.true_peak,
-            'offset': self.media_file.ffmpeg_normalize.offset,
+            'offset': float(self.loudness_statistics['ebu']['target_offset']),
             'measured_i': float(self.loudness_statistics['ebu']['input_i']),
             'measured_lra': float(self.loudness_statistics['ebu']['input_lra']),
             'measured_tp': float(self.loudness_statistics['ebu']['input_tp']),
