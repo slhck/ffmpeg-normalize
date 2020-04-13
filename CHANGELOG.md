@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.18.0 (2020-04-13)
+
+* Bump version to 1.18.0.
+
+* Use measured offset in second pass, fixes #119.
+
+* Update release instructions.
+
+* Remove author names from changelog.
+
+
 ## v1.17.0 (2020-04-10)
 
 * Bump version to 1.17.0.
