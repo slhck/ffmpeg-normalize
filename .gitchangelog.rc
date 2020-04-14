@@ -7,3 +7,7 @@ section_regexps = [
 subject_process = (strip | ucfirst | final_dot)
 
 tag_filter_regexp = r'^v[0-9]+\.[0-9]+(\.[0-9]+)?$'
+
+ignore_regexps = [
+    r'^Bump version to'
+]
