@@ -189,7 +189,8 @@ Further examples? Please submit a PR so I can collect them.
 
 - `--offset OFFSET`: EBU Offset Gain (default: 0.0).
 
-    The gain is applied before the true-peak limiter.
+    The gain is applied before the true-peak limiter in the first pass only. The offset for the second pass will be automatically determined based on the first pass statistics.
+
     Range is -99.0 - +99.0.
 
 - `--dual-mono`: Treat mono input files as "dual-mono".

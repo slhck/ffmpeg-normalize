@@ -183,7 +183,7 @@ def create_parser():
         type=float,
         help=textwrap.dedent("""\
         EBU Offset Gain (default: 0.0).
-        The gain is applied before the true-peak limiter.
+        The gain is applied before the true-peak limiter in the first pass only. The offset for the second pass will be automatically determined based on the first pass statistics.
         Range is -99.0 - +99.0.
         """),
         default=0.0
