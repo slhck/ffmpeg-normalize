@@ -37,6 +37,12 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = ffmpeg_normalize_call(['test/test.mp4'])
         self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
+    def test_multiple_output(self):
+        os.makedirs("normalized", exist_ok=True)
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', 'test/test.mp4', '-o', 'normalized/test1.mkv', 'normalized/test2.mkv'])
+        self.assertTrue(os.path.isfile('normalized/test1.mkv'), msg=output)
+        self.assertTrue(os.path.isfile('normalized/test2.mkv'), msg=output)
+
     def test_no_overwrite(self):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-v'])
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-v'])
@@ -153,8 +159,11 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-ext', 'wav', '-vn', '-f', 'q'])
         self.assertTrue("only supports one stream" not in output, msg=output)
 
+    def setUp(self):
+        os.system("rm -rf normalized")
+
     def tearDown(self):
-        for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac', 'test.mp4']:
+        for file in ['test.mkv', 'test.wav', 'test.mp3', 'test.aac', 'test.mp4', 'test1.mkv', 'test2.mkv']:
             if os.path.isfile('normalized/' + file):
                 os.remove('normalized/' + file)
         if os.path.isdir('normalized'):
