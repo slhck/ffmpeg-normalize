@@ -182,7 +182,7 @@ class FFmpegNormalize():
             except Exception as e:
                 if len(self.media_files) > 1:
                     # simply warn and do not die
-                    logger.error("Error processing input file {}, will continue batch-processing".format(media_file))
+                    logger.error("Error processing input file {}, will continue batch-processing. Error was: {}".format(media_file, e))
                 else:
                     # raise the error so the program will exit
                     raise e

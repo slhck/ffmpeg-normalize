@@ -4,6 +4,7 @@ import tempfile
 import shutil
 import json
 from tqdm import tqdm
+import shlex
 
 from ._streams import AudioStream, VideoStream, SubtitleStream
 from ._errors import FFmpegNormalizeError
@@ -318,17 +319,19 @@ class MediaFile():
         # run the actual command
         try:
             cmd_runner = CommandRunner(cmd)
-            for progress in cmd_runner.run_ffmpeg_command():
-                yield progress
-
-            # move file from TMP to output file
-            logger.debug(
-                "Moving temporary file from {} to {}"
-                .format(temp_file_name, self.output_file)
-            )
-            shutil.move(temp_file_name, self.output_file)
+            try:
+                for progress in cmd_runner.run_ffmpeg_command():
+                    yield progress
+            except Exception as e:
+                logger.error("Error while running command {}! Error: {}".format(" ".join([shlex.quote(c) for c in cmd])), e)
+            else:
+                # move file from TMP to output file
+                logger.debug(
+                    "Moving temporary file from {} to {}"
+                    .format(temp_file_name, self.output_file)
+                )
+                shutil.move(temp_file_name, self.output_file)
         except Exception as e:
-            logger.error("Error while running command {}!".format(cmd))
             # remove dangling temporary file
             if os.path.isfile(temp_file_name):
                 os.remove(temp_file_name)
