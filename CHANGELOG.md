@@ -1,9 +1,20 @@
 # Changelog
 
 
-## v1.18.0 (2020-04-13)
+## v1.18.1 (2020-04-16)
 
-* Bump version to 1.18.0.
+* Fix unit tests.
+
+* Improve handling of output file folder and errors.
+
+* Clarify usage of output options, add warning.
+
+* Improve documentation, fixes #120.
+
+* Do not include bump messages in changelog.
+
+
+## v1.18.0 (2020-04-13)
 
 * Use measured offset in second pass, fixes #119.
 
@@ -14,8 +25,6 @@
 
 ## v1.17.0 (2020-04-10)
 
-* Bump version to 1.17.0.
-
 * Update release script and changelog template.
 
 * Apply pre-filters in all first passes, fixes #118.
@@ -25,8 +34,6 @@
 
 
 ## v1.16.0 (2020-04-07)
-
-* Bump version to 1.16.0.
 
 * Add all commits to changelog.
 
@@ -41,8 +48,6 @@
 
 ## v1.15.8 (2020-03-15)
 
-* Bump version to 1.15.8.
-
 * Improve release script.
 
 * Python 3.8.
@@ -50,14 +55,10 @@
 
 ## v1.15.7 (2020-03-14)
 
-* Bump version to 1.15.7.
-
 * Only print length warning for non-EBU type normalization.
 
 
 ## v1.15.6 (2019-12-04)
-
-* Bump version to 1.15.6.
 
 * Remove build and dist folder on release.
 
@@ -68,16 +69,12 @@
 
 ## v1.15.5 (2019-11-19)
 
-* Bump version to 1.15.5.
-
 * Use minimal dependency for tqdm.
 
 * Remove specific python version requirement.
 
 
 ## v1.15.4 (2019-11-19)
-
-* Bump version to 1.15.4.
 
 * Freeze tqdm version.
 
@@ -88,16 +85,12 @@
 
 ## v1.15.3 (2019-10-15)
 
-* Bump version to 1.15.3.
-
 * Do not print stream warning when there is only one stream.
 
 * Remove previous dist versions before release.
 
 
 ## v1.15.2 (2019-07-12)
-
-* Bump version to 1.15.2.
 
 * Warn when duration cannot be read, fixes #105.
 
@@ -108,16 +101,12 @@
 
 ## v1.15.1 (2019-06-17)
 
-* Bump version to 1.15.1.
-
 * Add output to unit test failures.
 
 * Fix input label for audio stream.
 
 
 ## v1.15.0 (2019-06-17)
-
-* Bump version to 1.15.0.
 
 * Add pre-and post-filter hooks, fixes #67.
 
@@ -134,8 +123,6 @@
 
 ## v1.14.1 (2019-06-14)
 
-* Bump version to 1.14.1.
-
 * Handle progress output from ffmpeg, fixes #10.
 
 * Merge pull request #99 from Nottt/patch-1.
@@ -149,8 +136,6 @@
 
 ## v1.14.0 (2019-04-24)
 
-* Bump version to 1.14.0.
-
 * Add version file in release script before committing.
 
 * Add option to keep original audio, fixes #83.
@@ -159,12 +144,8 @@
 
 * Allow release script to add changelog for future version; upload to pypi.
 
-* Bump version to 1.13.11.
-
 
 ## v1.13.11 (2019-04-16)
-
-* Bump version to 1.13.11.
 
 * Add release script.
 
