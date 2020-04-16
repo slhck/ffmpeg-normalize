@@ -71,6 +71,12 @@ Just give the program one or more input files as arguments. It works with most m
 
 You can specify one output file name for each input file with the `-o` option. In this case, the container format (e.g. `.wav`) will be inferred from the file name extension that you've given.
 
+Example:
+
+```
+ffmpeg-normalize 1.wav 2.wav -o 1n.wav 2n.wav
+```
+
 If you don't specify the output file name for an input file, the container format will be MKV, and the output will be written to `normalized/<input>.mkv`.
 
 Using the `-ext` option, you can supply a different output extension common to all output files, e.g. `-ext m4a`.
@@ -93,7 +99,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 Normalize two WAV files and write them to the specified output files with uncompressed PCM WAV as audio codec:
 
-    ffmpeg-normalize file1.wav file2.wav -o file1-normalized.wav -o file2-normalized.wav
+    ffmpeg-normalize file1.wav file2.wav -o file1-normalized.wav file2-normalized.wav
 
 Normalize a number of videos in the current folder and write them to a folder called `normalized`, converting all audio streams to AAC with 192 kBit/s.
 
@@ -138,6 +144,8 @@ Further examples? Please submit a PR so I can collect them.
 
     If no output file name is specified for an input file, the output files
     will be written to the default output folder with the name `<input>.<ext>`, where `<ext>` is the output extension (see `-ext` option).
+
+    Example: `ffmpeg-normalize 1.wav 2.wav -o 1n.wav 2n.wav`
 
 - `-of OUTPUT_FOLDER, --output-folder OUTPUT_FOLDER`: Output folder (default: `normalized`)
 

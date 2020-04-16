@@ -57,6 +57,8 @@ def create_parser():
         If no output file name is specified for an input file, the output files
         will be written to the default output folder with the name `<input>.<ext>`,
         where `<ext>` is the output extension (see `-ext` option).
+
+        Example: ffmpeg-normalize 1.wav 2.wav -o 1n.wav 2n.wav
         """)
     )
     group_io.add_argument(
@@ -385,9 +387,19 @@ def main():
         progress=cli_args.progress,
     )
 
+    if cli_args.output is not None and len(cli_args.output) > 0 and len(cli_args.input) > len(cli_args.output):
+        logger.warning(
+            "There are more input files than output file names given. "
+            "Please specify one output file name per input file using -o <output1> <output2> ... "
+            "Will apply default file naming for the remaining ones."
+        )
+
     for index, input_file in enumerate(cli_args.input):
         if cli_args.output is not None and index < len(cli_args.output):
             output_file = cli_args.output[index]
+            output_dir = os.path.dirname(output_file)
+            if not os.path.isdir(output_dir):
+                raise FFmpegNormalizeError("Output file path {} does not exist".format(output_dir))
         else:
             output_file = os.path.join(
                 cli_args.output_folder,
