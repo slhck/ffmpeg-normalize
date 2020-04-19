@@ -248,7 +248,19 @@ class AudioStream(MediaStream):
         if self.media_file.ffmpeg_normalize.dual_mono:
             opts['dual_mono'] = 'true'
 
-        return 'loudnorm=' + dict_to_filter_opts(opts)
+        filters = [
+            'loudnorm=' + dict_to_filter_opts(opts),
+        ]
+
+        if self.sample_rate and not self.media_file.ffmpeg_normalize.sample_rate:
+            logger.info(
+                "Automatically resampling stream {} to its original sample rate of {} Hz.".format(self, self.sample_rate)
+            )
+            filters.append('aresample=' + str(self.sample_rate))
+        else:
+            logger.warn("Could not detect sample rate of input stream {}, output sample rate might not match input")
+
+        return ','.join(filters)
 
     def get_second_pass_opts_peakrms(self):
         """
