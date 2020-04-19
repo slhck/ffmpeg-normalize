@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.18.2 (2020-04-19)
+
+* Add warning for automatic sample rate conversion, addresses #122.
+
+* Ignore vscode folder.
+
+* Fix printing of errors in conversion.
+
+
 ## v1.18.1 (2020-04-16)
 
 * Fix unit tests.
