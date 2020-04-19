@@ -219,7 +219,7 @@ Further examples? Please submit a PR so I can collect them.
 
 - `-ar SAMPLE_RATE, --sample-rate SAMPLE_RATE`: Audio sample rate to use for output files in Hz.
 
-    Will use input sample rate by default.
+    Will use input sample rate by default, except for EBU normalization, which will change the input sample rate to 192 kHz.
 
 - `-koa, --keep-original-audio`: Copy original, non-normalized audio streams to output file
 

@@ -230,7 +230,8 @@ def create_parser():
         help=textwrap.dedent("""\
         Audio sample rate to use for output files in Hz.
 
-        Will use input sample rate by default.
+        Will use input sample rate by default, except for EBU normalization, 
+        which will change the input sample rate to 192 kHz.
         """)
     )
     group_acodec.add_argument(
