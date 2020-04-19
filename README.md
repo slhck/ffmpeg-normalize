@@ -17,7 +17,7 @@ Contents:
 - [Description](#description)
 - [Examples](#examples)
 - [Detailed Options](#detailed-options)
-    - [File Input/Output](#file-input-output)
+    - [File Input/Output](#file-inputoutput)
     - [General](#general)
     - [Normalization](#normalization)
     - [EBU R128 Normalization](#ebu-r128-normalization)
