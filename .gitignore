@@ -51,3 +51,5 @@ docs/_build
 
 # Output folder
 normalized
+
+.vscode
