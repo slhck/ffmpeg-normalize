@@ -323,7 +323,12 @@ class MediaFile():
                 for progress in cmd_runner.run_ffmpeg_command():
                     yield progress
             except Exception as e:
-                logger.error("Error while running command {}! Error: {}".format(" ".join([shlex.quote(c) for c in cmd])), e)
+                logger.error(
+                    "Error while running command {}! Error: {}".format(
+                        " ".join([shlex.quote(c) for c in cmd]),
+                        e
+                    )
+                )
             else:
                 # move file from TMP to output file
                 logger.debug(
