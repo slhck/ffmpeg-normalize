@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.19.0 (2020-05-02)
+
+* Fix issue with output folder, fixes #126.
+
+* Fix typo in README's table of contents link to "File Input/Output". (#124)
+
+* Clarify readme, fixes #122.
+
+
 ## v1.18.2 (2020-04-19)
 
 * Add warning for automatic sample rate conversion, addresses #122.
