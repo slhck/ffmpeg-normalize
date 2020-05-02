@@ -397,9 +397,11 @@ def main():
 
     for index, input_file in enumerate(cli_args.input):
         if cli_args.output is not None and index < len(cli_args.output):
+            if cli_args.output_folder:
+                logger.warning("Output folder {} is ignored for input file {}".format(cli_args.output_folder, input_file))
             output_file = cli_args.output[index]
             output_dir = os.path.dirname(output_file)
-            if not os.path.isdir(output_dir):
+            if output_dir != '' and not os.path.isdir(output_dir):
                 raise FFmpegNormalizeError("Output file path {} does not exist".format(output_dir))
         else:
             output_file = os.path.join(
