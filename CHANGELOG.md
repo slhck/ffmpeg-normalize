@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.19.1 (2020-06-25)
+
+* Add colorama to requirements, fixes #131.
+
+* Fix warning that is printed with default options.
+
+
 ## v1.19.0 (2020-05-02)
 
 * Fix issue with output folder, fixes #126.
