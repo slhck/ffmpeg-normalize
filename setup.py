@@ -30,7 +30,7 @@ setup(
     url='https://github.com/slhck/ffmpeg-normalize',
     packages=['ffmpeg_normalize'],
     include_package_data=True,
-    install_requires=['tqdm>=4.38.0'],
+    install_requires=['tqdm>=4.38.0', 'colorama>=0.4.3'],
     license="MIT",
     zip_safe=False,
     keywords='ffmpeg, normalize, audio',
