@@ -397,7 +397,7 @@ def main():
 
     for index, input_file in enumerate(cli_args.input):
         if cli_args.output is not None and index < len(cli_args.output):
-            if cli_args.output_folder:
+            if cli_args.output_folder and cli_args.output_folder != 'normalized':
                 logger.warning("Output folder {} is ignored for input file {}".format(cli_args.output_folder, input_file))
             output_file = cli_args.output[index]
             output_dir = os.path.dirname(output_file)
