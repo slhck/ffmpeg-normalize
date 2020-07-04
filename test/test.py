@@ -94,11 +94,19 @@ class TestFFmpegNormalize(unittest.TestCase):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-c:v', 'libx264'])
         self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
-    def test_extra_options_json(self):
+    def test_extra_input_options_json(self):
+        output, _ = ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac', '-ei', '[ "-f", "mp4" ]'])
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
+
+    def test_extra_input_options_normal(self):
+        output, _ = ffmpeg_normalize_call('test/test.mp4 -c:a aac -ei="-f mp4"', raw=True)
+        self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
+
+    def test_extra_output_options_json(self):
         output, _ = ffmpeg_normalize_call(['test/test.mp4', '-c:a', 'aac', '-e', '[ "-vbr", "3" ]'])
         self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 
-    def test_extra_options_normal(self):
+    def test_extra_output_options_normal(self):
         output, _ = ffmpeg_normalize_call('test/test.mp4 -c:a aac -e="-vbr 3"', raw=True)
         self.assertTrue(os.path.isfile('normalized/test.mkv'), msg=output)
 

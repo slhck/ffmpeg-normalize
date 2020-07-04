@@ -250,11 +250,21 @@ Further examples? Please submit a PR so I can collect them.
 - `-cn, --chapters-disable`: Do not write chapters to output
 
 
-### Output Format
+### Input/Output Format
+
+- `-ei EXTRA_INPUT_OPTIONS, --extra-input-options EXTRA_INPUT_OPTIONS`: Extra input options list.
+
+    A list of extra ffmpeg command line arguments valid for the input, applied before ffmpeg's `-i`.
+
+    You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.
+
+    If JSON is used, you need to wrap the whole argument in quotes to prevent shell expansion and to preserve literal quotes inside the string. If a simple string is used, you need to specify the argument with `-e=`.
+
+    Examples: `-e '[ "-f", "mpegts" ]'` or `-e="-f mpegts"`
 
 - `-e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS`: Extra output options list.
 
-    A list of extra ffmpeg command line arguments.
+    A list of extra ffmpeg command line arguments valid for the output.
 
     You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.
 

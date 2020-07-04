@@ -291,7 +291,28 @@ def create_parser():
         help="Do not write chapters to output"
     )
 
-    group_format = parser.add_argument_group("Output options")
+    group_format = parser.add_argument_group("Input/Output options")
+    group_format.add_argument(
+        '-ei', '--extra-input-options',
+        type=str,
+        help=textwrap.dedent("""\
+        Extra input options list.
+
+        A list of extra ffmpeg command line arguments valid for the input,
+        applied before ffmpeg's `-i`.
+
+        You can either use a JSON-formatted list (i.e., a list of
+        comma-separated, quoted elements within square brackets), or a simple
+        string of space-separated arguments.
+
+        If JSON is used, you need to wrap the whole argument in quotes to
+        prevent shell expansion and to preserve literal quotes inside the
+        string. If a simple string is used, you need to specify the argument
+        with `-e=`.
+
+        Examples: `-e '[ "-f", "mpegts" ]'` or `-e="-f mpegts"`
+        """)
+    )
     group_format.add_argument(
         '-e', '--extra-output-options',
         type=str,
@@ -335,6 +356,25 @@ def create_parser():
     )
     return parser
 
+def _split_options(opts):
+    """
+    Parse extra options (input or output) into a list
+    """
+    if not opts:
+        return []
+    try:
+        if opts.startswith('['):
+            try:
+                ret = [str(s) for s in json.loads(opts)]
+            except JSONDecodeError as e:
+                ret = shlex.split(opts)
+        else:
+            ret = shlex.split(opts)
+    except Exception as e:
+        raise FFmpegNormalizeError(
+            "Could not parse extra_options: {}".format(e)
+        )
+    return ret
 
 def main():
     cli_args = create_parser().parse_args()
@@ -347,20 +387,8 @@ def main():
         logger.setLevel(logging.INFO)
 
     # parse extra options
-    extra_output_options = []
-    if cli_args.extra_output_options:
-        try:
-            if cli_args.extra_output_options.startswith('['):
-                try:
-                    extra_output_options = [str(s) for s in json.loads(cli_args.extra_output_options)]
-                except JSONDecodeError as e:
-                    extra_output_options = shlex.split(cli_args.extra_output_options)
-            else:
-                extra_output_options = shlex.split(cli_args.extra_output_options)
-        except Exception as e:
-            raise FFmpegNormalizeError(
-                "Could not parse extra_options: {}".format(e)
-            )
+    extra_input_options = _split_options(cli_args.extra_input_options)
+    extra_output_options = _split_options(cli_args.extra_output_options)
 
     ffmpeg_normalize = FFmpegNormalize(
         normalization_type=cli_args.normalization_type,
@@ -382,6 +410,7 @@ def main():
         subtitle_disable=cli_args.subtitle_disable,
         metadata_disable=cli_args.metadata_disable,
         chapters_disable=cli_args.chapters_disable,
+        extra_input_options=extra_input_options,
         extra_output_options=extra_output_options,
         output_format=cli_args.output_format,
         dry_run=cli_args.dry_run,

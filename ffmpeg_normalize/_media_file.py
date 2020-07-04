@@ -222,14 +222,22 @@ class MediaFile():
         if not self.ffmpeg_normalize.subtitle_disable:
             output_stream_types.append('subtitle')
 
+        # base command, here we will add all other options
+        cmd = [
+            self.ffmpeg_normalize.ffmpeg_exe, '-y', '-nostdin'
+        ]
+
+        # extra options (if any)
+        if self.ffmpeg_normalize.extra_input_options:
+            cmd.extend(self.ffmpeg_normalize.extra_input_options)
+
         # get complex filter command
         audio_filter_cmd, output_labels = self._get_audio_filter_cmd()
 
-        # base command, here we will add all other options
-        cmd = [
-            self.ffmpeg_normalize.ffmpeg_exe, '-y', '-nostdin', '-i', self.input_file,
-            '-filter_complex', audio_filter_cmd
-        ]
+        # add input file and basic filter
+        cmd.extend([
+            '-i', self.input_file, '-filter_complex', audio_filter_cmd
+        ])
 
         # map metadata, only if needed
         if self.ffmpeg_normalize.metadata_disable:

@@ -57,6 +57,7 @@ class FFmpegNormalize():
         subtitle_disable=False,
         metadata_disable=False,
         chapters_disable=False,
+        extra_input_options=None,
         extra_output_options=None,
         output_format=None,
         dry_run=False,
@@ -107,6 +108,7 @@ class FFmpegNormalize():
         self.metadata_disable = metadata_disable
         self.chapters_disable = chapters_disable
 
+        self.extra_input_options = extra_input_options
         self.extra_output_options = extra_output_options
         self.pre_filter = pre_filter
         self.post_filter = post_filter
