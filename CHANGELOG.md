@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.20.0 (2020-07-04)
+
+* Add extra input options.
+
+
 ## v1.19.1 (2020-06-25)
 
 * Add colorama to requirements, fixes #131.
