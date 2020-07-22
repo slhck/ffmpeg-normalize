@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.20.1 (2020-07-22)
+
+* Manually specify usage string, fixes #132.
+
+* Fix local import for tests.
+
+
 ## v1.20.0 (2020-07-04)
 
 * Add extra input options.
@@ -173,9 +180,6 @@
 * Add pypi badge.
 
 * Allow release script to add changelog for future version; upload to pypi.
-
-
-## v1.13.11 (2019-04-16)
 
 * Add release script.
 
