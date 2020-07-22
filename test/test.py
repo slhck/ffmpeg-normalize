@@ -8,7 +8,7 @@ import unittest
 import subprocess
 from pathlib import Path
 
-sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/../'))
 
 def ffmpeg_normalize_call(args, env=None, raw=False):
     if not raw:
