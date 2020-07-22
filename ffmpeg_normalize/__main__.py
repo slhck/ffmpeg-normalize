@@ -22,6 +22,22 @@ def create_parser():
         description=textwrap.dedent("""\
             ffmpeg-normalize v{} -- command line tool for normalizing audio files
             """.format(__version__)),
+        usage=textwrap.dedent("""\
+            ffmpeg-normalize input [input ...]
+                [-h]
+                [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER]
+                [-f] [-d] [-v] [-q] [-n] [-pr]
+                [--version]
+                [-nt {ebu,rms,peak}] [-t TARGET_LEVEL] [-p]
+                [-lrt LOUDNESS_RANGE_TARGET] [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
+                [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE] [-ar SAMPLE_RATE] [-koa]
+                [-prf PRE_FILTER] [-pof POST_FILTER]
+                [-vn] [-c:v VIDEO_CODEC]
+                [-sn] [-mn] [-cn]
+                [-ei EXTRA_INPUT_OPTIONS] [-e EXTRA_OUTPUT_OPTIONS]
+                [-ofmt OUTPUT_FORMAT]
+                [-ext EXTENSION]
+        """),
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=textwrap.dedent("""\
             The program additionally respects environment variables:
