@@ -42,16 +42,20 @@ Or download this repository, then run `pip install .`.
 
 ## Usage
 
-    ffmpeg-normalize [-h] [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER] [-f]
-                        [-d] [-v] [-n] [-pr] [--version] [-nt {ebu,rms,peak}]
-                        [-t TARGET_LEVEL] [-p] [-lrt LOUDNESS_RANGE_TARGET]
-                        [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
-                        [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE]
-                        [-ar SAMPLE_RATE] [-koa] [-prf PRE_FILTER]
-                        [-pof POST_FILTER] [-vn] [-c:v VIDEO_CODEC] [-sn]
-                        [-mn] [-cn] [-e EXTRA_OUTPUT_OPTIONS]
-                        [-ofmt OUTPUT_FORMAT] [-ext EXTENSION]
-                        input [input ...]
+    ffmpeg-normalize input [input ...]
+                [-h]
+                [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER]
+                [-f] [-d] [-v] [-q] [-n] [-pr]
+                [--version]
+                [-nt {ebu,rms,peak}] [-t TARGET_LEVEL] [-p]
+                [-lrt LOUDNESS_RANGE_TARGET] [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
+                [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE] [-ar SAMPLE_RATE] [-koa]
+                [-prf PRE_FILTER] [-pof POST_FILTER]
+                [-vn] [-c:v VIDEO_CODEC]
+                [-sn] [-mn] [-cn]
+                [-ei EXTRA_INPUT_OPTIONS] [-e EXTRA_OUTPUT_OPTIONS]
+                [-ofmt OUTPUT_FORMAT]
+                [-ext EXTENSION]
 
 For more information, run `ffmpeg-normalize -h`, or read on.
 
