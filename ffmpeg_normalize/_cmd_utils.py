@@ -62,6 +62,7 @@ class CommandRunner():
 
         p = subprocess.Popen(
             cmd_with_progress,
+            stdin=subprocess.PIPE,    # Apply stdin isolation by creating separate pipe.
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             universal_newlines=False
@@ -99,6 +100,7 @@ class CommandRunner():
 
         p = subprocess.Popen(
             self.cmd,
+            stdin=subprocess.PIPE,    # Apply stdin isolation by creating separate pipe.
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=False
