@@ -4,6 +4,8 @@ about: Create a report to help us improve
 
 ---
 
+**:warning: Please read this carefully! If you do not fill out this information, your bug report may be closed.**
+
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
@@ -27,5 +29,3 @@ Any output you get when running the command with the `--debug` flag:
 - [ ] Your operating system
 - [ ] Your Python version / distribution (`python --version`)
 - [ ] Your ffmpeg version (`ffmpeg -version`)
-
-If you do not fill out this information, your bug report may be closed.
