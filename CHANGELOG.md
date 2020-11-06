@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.20.2 (2020-11-06)
+
+* Fixing stdin corruption caused by new subprocess (#138)
+
+* Update issue template.
+
+* Create FUNDING.yml.
+
+* Fix usage, addresses #132.
+
+
 ## v1.20.1 (2020-07-22)
 
 * Manually specify usage string, fixes #132.
@@ -180,6 +191,9 @@
 * Add pypi badge.
 
 * Allow release script to add changelog for future version; upload to pypi.
+
+
+## v1.13.11 (2019-04-16)
 
 * Add release script.
 
