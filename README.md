@@ -134,7 +134,32 @@ If you need some fancy extra options, such as setting `vbr` for the `libfdk_aac`
 
     ffmpeg-normalize input.m4a -c:a libfdk_aac -e='-vbr 3' -o output.m4a
 
-Further examples? Please submit a PR so I can collect them.
+You can check the statistics of a file to verify the levels — pass `-n` to avoid running the normalization:
+
+    ffmpeg-normalize input.wav -p -n -f
+    [
+        {
+            "input_file": "input.wav",
+            "output_file": "normalized/input.mkv",
+            "stream_id": 0,
+            "ebu": {
+                "input_i": "-6.74",
+                "input_tp": "0.45",
+                "input_lra": "6.30",
+                "input_thresh": "-16.98",
+                "output_i": "-22.20",
+                "output_tp": "-11.27",
+                "output_lra": "5.60",
+                "output_thresh": "-32.34",
+                "normalization_type": "dynamic",
+                "target_offset": "-0.80"
+            },
+            "mean": null,
+            "max": null
+        }
+    ]
+
+Further examples? [Add them to the wiki.](https://github.com/slhck/ffmpeg-normalize/wiki/examples)
 
 ## Detailed Options
 
