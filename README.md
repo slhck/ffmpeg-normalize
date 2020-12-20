@@ -134,13 +134,13 @@ If you need some fancy extra options, such as setting `vbr` for the `libfdk_aac`
 
     ffmpeg-normalize input.m4a -c:a libfdk_aac -e='-vbr 3' -o output.m4a
 
-When you run normalization with EBU R128, it'll normalize according to Loudness Units, so the output of volumedetect (RMS) is irrelevant.  Check the statistics with ffmpeg-normalize instead:
+You can check the statistics of a file to verify the levels — pass `-n` to avoid running the normalization:
 
-    ffmpeg-normalize ~/Downloads/Wild_Things.mp3 -p -n
+    ffmpeg-normalize input.wav -p -n -f
     [
         {
-            "input_file": "/Users/werner/Downloads/Wild_Things.mp3",
-            "output_file": "normalized/Wild_Things.mkv",
+            "input_file": "input.wav",
+            "output_file": "normalized/input.mkv",
             "stream_id": 0,
             "ebu": {
                 "input_i": "-6.74",
@@ -159,37 +159,7 @@ When you run normalization with EBU R128, it'll normalize according to Loudness 
         }
     ]
 
-If you then normalize it with a LUFS target of -16, you'll get the correct result:
-
-
-    ➜ python3 -m ffmpeg_normalize ~/Downloads/Wild_Things.mp3 --target-level -16
-
-    …
-
-    ➜ python3 -m ffmpeg_normalize ./normalized/Wild_Things.mkv -p -n -f
-    [
-        {
-            "input_file": "./normalized/Wild_Things.mkv",
-            "output_file": "normalized/Wild_Things.mkv",
-            "stream_id": 1,
-            "ebu": {
-                "input_i": "-16.01",
-                "input_tp": "-8.81",
-                "input_lra": "6.20",
-                "input_thresh": "-26.24",
-                "output_i": "-22.20",
-                "output_tp": "-11.27",
-                "output_lra": "5.60",
-                "output_thresh": "-32.34",
-                "normalization_type": "dynamic",
-                "target_offset": "-0.80"
-            },
-            "mean": null,
-            "max": null
-        }
-    ]
-
-Further examples? Please submit a PR so I can collect them.
+Further examples? [Add them to the wiki.](https://github.com/slhck/ffmpeg-normalize/wiki/examples)
 
 ## Detailed Options
 
