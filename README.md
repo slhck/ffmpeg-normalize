@@ -1,7 +1,7 @@
 # ffmpeg-normalize
 
 [![Build Status](https://travis-ci.org/slhck/ffmpeg-normalize.svg?branch=master)](https://travis-ci.org/slhck/ffmpeg-normalize)
-[![PyPI version](https://badge.fury.io/py/ffmpeg-normalize.svg)](https://badge.fury.io/py/ffmpeg-normalize)
+[![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://img.shields.io/pypi/v/ffmpeg-normalize)
 
 A utility for batch-normalizing audio using ffmpeg.
 
