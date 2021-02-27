@@ -1,6 +1,27 @@
 # Changelog
 
 
+## v1.21.0 (2021-02-27)
+
+* Fix JSON output for multiple files.
+
+* Update badge URL.
+
+* Update README.md (#142)
+
+  * Update README.md
+
+  Added example of verifying levels
+
+  Fixes #141
+
+  * shorten example, add link to wiki page
+
+* Error if no ffmpeg exec exists.
+
+* Add stalebot.
+
+
 ## v1.20.2 (2020-11-06)
 
 * Fixing stdin corruption caused by new subprocess (#138)
