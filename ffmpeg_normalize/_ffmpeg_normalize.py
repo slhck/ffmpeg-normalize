@@ -1,4 +1,5 @@
 import os
+import json
 from numbers import Number
 from tqdm import tqdm
 
@@ -118,6 +119,8 @@ class FFmpegNormalize():
         self.debug = debug
         self.progress = progress
 
+        self.stats = []
+
         if self.output_format and (self.audio_codec is None or 'pcm' in self.audio_codec) and \
             self.output_format in PCM_INCOMPATIBLE_FORMATS:
             raise FFmpegNormalizeError(
@@ -190,3 +193,6 @@ class FFmpegNormalize():
                     raise e
 
             logger.info("Normalized file written to {}".format(media_file.output_file))
+
+        if self.print_stats and self.stats:
+            print(json.dumps(self.stats, indent=4))

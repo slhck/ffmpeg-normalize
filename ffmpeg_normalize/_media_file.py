@@ -2,7 +2,6 @@ import os
 import re
 import tempfile
 import shutil
-import json
 from tqdm import tqdm
 import shlex
 
@@ -170,7 +169,7 @@ class MediaFile():
 
         if self.ffmpeg_normalize.print_stats:
             stats = [audio_stream.get_stats() for audio_stream in self.streams['audio'].values()]
-            print(json.dumps(stats, indent=4))
+            self.ffmpeg_normalize.stats.extend(stats)
 
     def _get_audio_filter_cmd(self):
         """
