@@ -169,7 +169,9 @@ def get_ffmpeg_exe():
             ffmpeg_exe = which(ffmpeg_path)
             if not ffmpeg_exe:
                 raise FFmpegNormalizeError(
-                    "Could not find '%s' in your $PATH or $FFMPEG_PATH." % ffmpeg_path
+                    "Could not find '{}' in your $PATH or $FFMPEG_PATH.".format(
+                        ffmpeg_path
+                    )
                 )
     else:
         ffmpeg_exe = which('ffmpeg')
