@@ -322,7 +322,7 @@ The program additionally respects environment variables:
 - `FFMPEG_PATH`
 
     Sets the full path to an `ffmpeg` executable other than
-    the system default.
+    the system default or you can provide a file name available on $PATH
 
 
 ## FAQ
