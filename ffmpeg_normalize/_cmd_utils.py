@@ -159,7 +159,7 @@ def get_ffmpeg_exe():
     """
     if 'FFMPEG_PATH' in os.environ:
         ffmpeg_exe = os.environ['FFMPEG_PATH']
-        if not os.path.isfile(ffmpeg_exe):
+        if os.sep in ffmpeg_exe and not os.path.isfile(ffmpeg_exe):
             raise FFmpegNormalizeError(
                 "No file exists at {}".format(ffmpeg_exe)
             )
