@@ -157,12 +157,18 @@ def get_ffmpeg_exe():
     """
     Return path to ffmpeg executable
     """
-    if 'FFMPEG_PATH' in os.environ:
-        ffmpeg_exe = os.environ['FFMPEG_PATH']
-        if not os.path.isfile(ffmpeg_exe):
-            raise FFmpegNormalizeError(
-                "No file exists at {}".format(ffmpeg_exe)
-            )
+    ffmpeg_path = os.getenv('FFMPEG_PATH')
+    if ffmpeg_path:
+        if os.sep in ffmpeg_path:
+            ffmpeg_exe = ffmpeg_path
+            if not os.path.isfile(ffmpeg_exe):
+                raise FFmpegNormalizeError(
+                    "No file exists at {}".format(ffmpeg_exe)
+                )
+        else:
+            ffmpeg_exe = which(ffmpeg_path)
+            if not ffmpeg_exe:
+                raise FFmpegNormalizeError("Could not find '{}' in your $PATH.".format(ffmpeg_path))
     else:
         ffmpeg_exe = which('ffmpeg')
 
