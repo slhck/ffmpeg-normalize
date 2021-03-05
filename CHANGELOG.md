@@ -1,6 +1,21 @@
 # Changelog
 
 
+## v1.21.1 (2021-03-05)
+
+* Adjusted handling of FFMPEG_PATH for binaries available via $PATH (#149)
+
+  * adjusted handling of FFMPEG_PATH for binaries available via $PATH
+
+  fixes #147
+
+  * adjusted use of %s to {} to match style
+
+  * documented the feature
+
+  * condensed error message as other lines are longer
+
+
 ## v1.21.0 (2021-02-27)
 
 * Fix JSON output for multiple files.
