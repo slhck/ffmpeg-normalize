@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.21.2 (2021-03-06)
+
+* Format setup.py.
+
+* Switch progress to external lib.
+
+* Remove support for older versions.
+
+
 ## v1.21.1 (2021-03-05)
 
 * Adjusted handling of FFMPEG_PATH for binaries available via $PATH (#149)
