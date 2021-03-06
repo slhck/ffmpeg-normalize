@@ -4,6 +4,7 @@ import sys
 import subprocess
 from platform import system as _current_os
 import re
+from ffmpeg_progress_yield import FfmpegProgress
 
 from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
@@ -16,7 +17,6 @@ IS_NIX = (not IS_WIN) and any(
     ['CYGWIN', 'MSYS', 'Linux', 'Darwin', 'SunOS', 'FreeBSD', 'NetBSD'])
 NUL = 'NUL' if IS_WIN else '/dev/null'
 DUR_REGEX = re.compile(r'Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
-TIME_REGEX = re.compile(r'out_time=(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
 
 # https://gist.github.com/Hellowlol/5f8545e999259b4371c91ac223409209
 def to_ms(s=None, des=None, **kwargs):
@@ -43,53 +43,12 @@ class CommandRunner():
         self.output = None
 
     def run_ffmpeg_command(self):
-        """
-        Run an ffmpeg command, trying to capture the process output and calculate
-        the duration / progress.
-        Yields the progress in percent.
-        """
-        logger.debug("Running ffmpeg command: {}".format(self.cmd))
+        # wrapper for 'ffmpeg-progress-yield'
+        ff = FfmpegProgress(self.cmd, dry_run=self.dry)
+        for progress in ff.run_command_with_progress():
+            yield progress
 
-        if self.dry:
-            logger.debug("Dry mode specified, not actually running command")
-            return
-
-        total_dur = None
-
-        cmd_with_progress =  [self.cmd[0]] + ["-progress", "-", "-nostats"] + self.cmd[1:]
-
-        stderr = []
-
-        p = subprocess.Popen(
-            cmd_with_progress,
-            stdin=subprocess.PIPE,    # Apply stdin isolation by creating separate pipe.
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=False
-        )
-
-        # for line in iter(p.stderr):
-        while True:
-            line = p.stdout.readline().decode("utf8", errors='replace').strip()
-            if line == '' and p.poll() is not None:
-                break
-            stderr.append(line.strip())
-            self.output = "\n".join(stderr)
-
-            if not total_dur and DUR_REGEX.search(line):
-                total_dur = DUR_REGEX.search(line).groupdict()
-                total_dur = to_ms(**total_dur)
-                continue
-            if total_dur:
-                result = TIME_REGEX.search(line)
-                if result:
-                    elapsed_time = to_ms(**result.groupdict())
-                    yield int(elapsed_time / total_dur * 100)
-
-        if p.returncode != 0:
-            raise RuntimeError("Error running command {}: {}".format(self.cmd, str("\n".join(stderr))))
-
-        yield 100
+        self.output = ff.stderr
 
     def run_command(self):
         logger.debug("Running command: {}".format(self.cmd))
