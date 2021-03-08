@@ -3,20 +3,21 @@ from platform import system
 import io
 from tqdm import tqdm
 from multiprocessing import Lock
+import sys
 
 loggers = {}
 
 
 # https://stackoverflow.com/questions/38543506/
-class TqdmLoggingHandler(logging.Handler):
-    def __init__(self, level=logging.NOTSET):
-        super(TqdmLoggingHandler, self).__init__(level)
+class TqdmLoggingHandler(logging.StreamHandler):
+    def __init__(self):
+        super().__init__(sys.stderr)
 
     def emit(self, record):
         try:
             msg = self.format(record)
             tqdm.set_lock(Lock())
-            tqdm.write(msg)
+            tqdm.write(msg, file=sys.stderr)
             self.flush()
         except (KeyboardInterrupt, SystemExit):
             raise
