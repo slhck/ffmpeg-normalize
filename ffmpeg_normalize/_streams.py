@@ -187,6 +187,19 @@ class AudioStream(MediaStream):
         logger.debug(output)
 
         output_lines = [line.strip() for line in output.split('\n')]
+
+        self.loudness_statistics['ebu'] = AudioStream._parse_loudnorm_output(output_lines)
+        for key, val in self.loudness_statistics['ebu'].items():
+            if key == 'normalization_type':
+                continue
+            # FIXME: drop Python 2 support and just use math.inf
+            if float(val) == -float("inf"):
+                self.loudness_statistics['ebu'][key] = -99
+            elif float(val) == float("inf"):
+                self.loudness_statistics['ebu'][key] = 0
+
+    @staticmethod
+    def _parse_loudnorm_output(output_lines):
         loudnorm_start = False
         loudnorm_end = False
         for index, line in enumerate(output_lines):
@@ -202,20 +215,12 @@ class AudioStream(MediaStream):
 
         try:
             loudnorm_stats = json.loads('\n'.join(output_lines[loudnorm_start:loudnorm_end]))
+
+            logger.debug("Loudnorm stats parsed: {}".format(json.dumps(loudnorm_stats)))
+
+            return loudnorm_stats
         except Exception as e:
             raise FFmpegNormalizeError("Could not parse loudnorm stats; wrong JSON format in string: {}".format(e))
-
-        logger.debug("Loudnorm stats parsed: {}".format(json.dumps(loudnorm_stats)))
-
-        self.loudness_statistics['ebu'] = loudnorm_stats
-        for key, val in self.loudness_statistics['ebu'].items():
-            if key == 'normalization_type':
-                continue
-            # FIXME: drop Python 2 support and just use math.inf
-            if float(val) == -float("inf"):
-                self.loudness_statistics['ebu'][key] = -99
-            elif float(val) == float("inf"):
-                self.loudness_statistics['ebu'][key] = 0
 
     def get_second_pass_opts_ebu(self):
         """
