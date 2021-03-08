@@ -23,6 +23,7 @@ class TqdmLoggingHandler(logging.StreamHandler):
         except Exception:
             self.handleError(record)
 
+
 def setup_custom_logger(name):
     """
     Create a logger with a certain name and level
@@ -32,9 +33,7 @@ def setup_custom_logger(name):
     if loggers.get(name):
         return loggers.get(name)
 
-    formatter = logging.Formatter(
-        fmt='%(levelname)s: %(message)s'
-    )
+    formatter = logging.Formatter(fmt="%(levelname)s: %(message)s")
 
     # handler = logging.StreamHandler()
     handler = TqdmLoggingHandler()
@@ -49,11 +48,20 @@ def setup_custom_logger(name):
     # \033[1;36m - cyan
     # \033[1;37m - white
 
-    if system() not in ['Windows', 'cli']:
-        logging.addLevelName(logging.ERROR, "\033[1;31m%s\033[1;0m" % logging.getLevelName(logging.ERROR))
-        logging.addLevelName(logging.WARNING, "\033[1;33m%s\033[1;0m" % logging.getLevelName(logging.WARNING))
-        logging.addLevelName(logging.INFO, "\033[1;34m%s\033[1;0m" % logging.getLevelName(logging.INFO))
-        logging.addLevelName(logging.DEBUG, "\033[1;35m%s\033[1;0m" % logging.getLevelName(logging.DEBUG))
+    if system() not in ["Windows", "cli"]:
+        logging.addLevelName(
+            logging.ERROR, "\033[1;31m%s\033[1;0m" % logging.getLevelName(logging.ERROR)
+        )
+        logging.addLevelName(
+            logging.WARNING,
+            "\033[1;33m%s\033[1;0m" % logging.getLevelName(logging.WARNING),
+        )
+        logging.addLevelName(
+            logging.INFO, "\033[1;34m%s\033[1;0m" % logging.getLevelName(logging.INFO)
+        )
+        logging.addLevelName(
+            logging.DEBUG, "\033[1;35m%s\033[1;0m" % logging.getLevelName(logging.DEBUG)
+        )
 
     logger = logging.getLogger(name)
     logger.setLevel(logging.WARNING)

@@ -8,11 +8,12 @@ from ._media_file import MediaFile
 from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
 
-logger = setup_custom_logger('ffmpeg_normalize')
+logger = setup_custom_logger("ffmpeg_normalize")
 
-NORMALIZATION_TYPES = ['ebu', 'rms', 'peak']
-PCM_INCOMPATIBLE_FORMATS = ['mp4', 'mp3', 'ogg', 'webm']
-PCM_INCOMPATIBLE_EXTS = ['mp4', 'm4a', 'mp3', 'ogg', 'webm']
+NORMALIZATION_TYPES = ["ebu", "rms", "peak"]
+PCM_INCOMPATIBLE_FORMATS = ["mp4", "mp3", "ogg", "webm"]
+PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm"]
+
 
 def check_range(number, min_r, max_r, name=""):
     """
@@ -22,9 +23,7 @@ def check_range(number, min_r, max_r, name=""):
         number = float(number)
         if number < min_r or number > max_r:
             raise FFmpegNormalizeError(
-                "{} must be within [{},{}]".format(
-                    name, min_r, max_r
-                )
+                "{} must be within [{},{}]".format(name, min_r, max_r)
             )
         return number
         pass
@@ -32,14 +31,14 @@ def check_range(number, min_r, max_r, name=""):
         raise e
 
 
-class FFmpegNormalize():
+class FFmpegNormalize:
     """
     ffmpeg-normalize class.
     """
 
     def __init__(
         self,
-        normalization_type='ebu',
+        normalization_type="ebu",
         target_level=-23.0,
         print_stats=False,
         # threshold=0.5,
@@ -47,13 +46,13 @@ class FFmpegNormalize():
         true_peak=-2.0,
         offset=0.0,
         dual_mono=False,
-        audio_codec='pcm_s16le',
+        audio_codec="pcm_s16le",
         audio_bitrate=None,
         sample_rate=None,
         keep_original_audio=False,
         pre_filter=None,
         post_filter=None,
-        video_codec='copy',
+        video_codec="copy",
         video_disable=False,
         subtitle_disable=False,
         metadata_disable=False,
@@ -69,36 +68,28 @@ class FFmpegNormalize():
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
 
         self.normalization_type = normalization_type
-        if not self.has_loudnorm_capabilities and self.normalization_type == 'ebu':
+        if not self.has_loudnorm_capabilities and self.normalization_type == "ebu":
             raise FFmpegNormalizeError(
                 "Your ffmpeg version does not support the 'loudnorm' EBU R128 filter. "
                 "Please install ffmpeg v3.1 or above, or choose another normalization type."
             )
 
-        if self.normalization_type == 'ebu':
-            self.target_level = check_range(
-                target_level, -70, -5, name='target_level'
-            )
+        if self.normalization_type == "ebu":
+            self.target_level = check_range(target_level, -70, -5, name="target_level")
         else:
-            self.target_level = check_range(
-                target_level, -99, 0, name='target_level'
-            )
+            self.target_level = check_range(target_level, -99, 0, name="target_level")
 
         self.print_stats = print_stats
 
         # self.threshold = float(threshold)
 
         self.loudness_range_target = check_range(
-            loudness_range_target, 1, 20, name='loudness_range_target'
+            loudness_range_target, 1, 20, name="loudness_range_target"
         )
-        self.true_peak = check_range(
-            true_peak, -9, 0, name='true_peak'
-        )
-        self.offset = check_range(
-            offset, -99, 99, name='offset'
-        )
+        self.true_peak = check_range(true_peak, -9, 0, name="true_peak")
+        self.offset = check_range(offset, -99, 99, name="offset")
 
-        self.dual_mono = True if dual_mono in ['true', True] else False
+        self.dual_mono = True if dual_mono in ["true", True] else False
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
         self.sample_rate = int(sample_rate) if sample_rate is not None else None
@@ -122,11 +113,15 @@ class FFmpegNormalize():
         self.stats = []
 
         if (
-            self.output_format and (self.audio_codec is None or 'pcm' in self.audio_codec)
+            self.output_format
+            and (self.audio_codec is None or "pcm" in self.audio_codec)
             and self.output_format in PCM_INCOMPATIBLE_FORMATS
         ):
             raise FFmpegNormalizeError(
-                "Output format {} does not support PCM audio. Please choose a suitable audio codec with the -c:a option.".format(self.output_format)
+                "Output format {} does not support PCM audio. ".format(
+                    self.output_format
+                )
+                + "Please choose a suitable audio codec with the -c:a option."
             )
 
         if normalization_type not in NORMALIZATION_TYPES:
@@ -137,7 +132,9 @@ class FFmpegNormalize():
         if self.target_level and not isinstance(self.target_level, Number):
             raise FFmpegNormalizeError("target_level must be a number")
 
-        if self.loudness_range_target and not isinstance(self.loudness_range_target, Number):
+        if self.loudness_range_target and not isinstance(
+            self.loudness_range_target, Number
+        ):
             raise FFmpegNormalizeError("loudness_range_target must be a number")
 
         if self.true_peak and not isinstance(self.true_peak, Number):
@@ -161,9 +158,14 @@ class FFmpegNormalize():
             raise FFmpegNormalizeError("file " + input_file + " does not exist")
 
         ext = os.path.splitext(output_file)[1][1:]
-        if (self.audio_codec is None or 'pcm' in self.audio_codec) and ext in PCM_INCOMPATIBLE_EXTS:
+        if (
+            self.audio_codec is None or "pcm" in self.audio_codec
+        ) and ext in PCM_INCOMPATIBLE_EXTS:
             raise FFmpegNormalizeError(
-                "Output extension {} does not support PCM audio. Please choose a suitable audio codec with the -c:a option.".format(ext)
+                "Output extension {} does not support PCM audio. ".format(
+                    ext
+                ) +
+                "Please choose a suitable audio codec with the -c:a option."
             )
 
         mf = MediaFile(self, input_file, output_file)
@@ -176,20 +178,24 @@ class FFmpegNormalize():
         Run the normalization procedures
         """
         for index, media_file in enumerate(
-                tqdm(
-                    self.media_files,
-                    desc="File",
-                    disable=not self.progress,
-                    position=0
-                )):
-            logger.info("Normalizing file {} ({} of {})".format(media_file, index + 1, self.file_count))
+            tqdm(self.media_files, desc="File", disable=not self.progress, position=0)
+        ):
+            logger.info(
+                "Normalizing file {} ({} of {})".format(
+                    media_file, index + 1, self.file_count
+                )
+            )
 
             try:
                 media_file.run_normalization()
             except Exception as e:
                 if len(self.media_files) > 1:
                     # simply warn and do not die
-                    logger.error("Error processing input file {}, will continue batch-processing. Error was: {}".format(media_file, e))
+                    logger.error(
+                        "Error processing input file {}, will continue batch-processing. Error was: {}".format(
+                            media_file, e
+                        )
+                    )
                 else:
                     # raise the error so the program will exit
                     raise e

@@ -8,15 +8,20 @@ from ffmpeg_progress_yield import FfmpegProgress
 
 from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
-logger = setup_custom_logger('ffmpeg_normalize')
+
+logger = setup_custom_logger("ffmpeg_normalize")
 
 CUR_OS = _current_os()
-IS_WIN = CUR_OS in ['Windows', 'cli']
+IS_WIN = CUR_OS in ["Windows", "cli"]
 IS_NIX = (not IS_WIN) and any(
-    CUR_OS.startswith(i) for i in
-    ['CYGWIN', 'MSYS', 'Linux', 'Darwin', 'SunOS', 'FreeBSD', 'NetBSD'])
-NUL = 'NUL' if IS_WIN else '/dev/null'
-DUR_REGEX = re.compile(r'Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})')
+    CUR_OS.startswith(i)
+    for i in ["CYGWIN", "MSYS", "Linux", "Darwin", "SunOS", "FreeBSD", "NetBSD"]
+)
+NUL = "NUL" if IS_WIN else "/dev/null"
+DUR_REGEX = re.compile(
+    r"Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})"
+)
+
 
 # https://gist.github.com/Hellowlol/5f8545e999259b4371c91ac223409209
 def to_ms(s=None, des=None, **kwargs):
@@ -26,17 +31,18 @@ def to_ms(s=None, des=None, **kwargs):
         sec = int(s[6:8])
         ms = int(s[10:11])
     else:
-        hour = int(kwargs.get('hour', 0))
-        minute = int(kwargs.get('min', 0))
-        sec = int(kwargs.get('sec', 0))
-        ms = int(kwargs.get('ms'))
+        hour = int(kwargs.get("hour", 0))
+        minute = int(kwargs.get("min", 0))
+        sec = int(kwargs.get("sec", 0))
+        ms = int(kwargs.get("ms"))
 
     result = (hour * 60 * 60 * 1000) + (minute * 60 * 1000) + (sec * 1000) + ms
     if des and isinstance(des, int):
         return round(result, des)
     return result
 
-class CommandRunner():
+
+class CommandRunner:
     def __init__(self, cmd, dry=False):
         self.cmd = cmd
         self.dry = dry
@@ -59,34 +65,38 @@ class CommandRunner():
 
         p = subprocess.Popen(
             self.cmd,
-            stdin=subprocess.PIPE,    # Apply stdin isolation by creating separate pipe.
+            stdin=subprocess.PIPE,  # Apply stdin isolation by creating separate pipe.
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=False
+            universal_newlines=False,
         )
 
         # simple running of command
         stdout, stderr = p.communicate()
 
-        stdout = stdout.decode("utf8", errors='replace')
-        stderr = stderr.decode("utf8", errors='replace')
+        stdout = stdout.decode("utf8", errors="replace")
+        stderr = stderr.decode("utf8", errors="replace")
 
         if p.returncode == 0:
-            self.output = (stdout + stderr)
+            self.output = stdout + stderr
         else:
-            raise RuntimeError("Error running command {}: {}".format(self.cmd, str(stderr)))
+            raise RuntimeError(
+                "Error running command {}: {}".format(self.cmd, str(stderr))
+            )
 
     def get_output(self):
         return self.output
+
 
 def which(program):
     """
     Find a program in PATH and return path
     From: http://stackoverflow.com/q/377017/
     """
+
     def is_exe(fpath):
         found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-        if not found and sys.platform == 'win32':
+        if not found and sys.platform == "win32":
             fpath = fpath + ".exe"
             found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
         return found
@@ -106,33 +116,35 @@ def which(program):
 
     return None
 
+
 def dict_to_filter_opts(opts):
     filter_opts = []
     for k, v in opts.items():
         filter_opts.append("{}={}".format(k, v))
     return ":".join(filter_opts)
 
+
 def get_ffmpeg_exe():
     """
     Return path to ffmpeg executable
     """
-    ffmpeg_path = os.getenv('FFMPEG_PATH')
+    ffmpeg_path = os.getenv("FFMPEG_PATH")
     if ffmpeg_path:
         if os.sep in ffmpeg_path:
             ffmpeg_exe = ffmpeg_path
             if not os.path.isfile(ffmpeg_exe):
-                raise FFmpegNormalizeError(
-                    "No file exists at {}".format(ffmpeg_exe)
-                )
+                raise FFmpegNormalizeError("No file exists at {}".format(ffmpeg_exe))
         else:
             ffmpeg_exe = which(ffmpeg_path)
             if not ffmpeg_exe:
-                raise FFmpegNormalizeError("Could not find '{}' in your $PATH.".format(ffmpeg_path))
+                raise FFmpegNormalizeError(
+                    "Could not find '{}' in your $PATH.".format(ffmpeg_path)
+                )
     else:
-        ffmpeg_exe = which('ffmpeg')
+        ffmpeg_exe = which("ffmpeg")
 
     if not ffmpeg_exe:
-        if which('avconv'):
+        if which("avconv"):
             raise FFmpegNormalizeError(
                 "avconv is not supported. "
                 "Please install ffmpeg from http://ffmpeg.org instead."
@@ -145,15 +157,16 @@ def get_ffmpeg_exe():
 
     return ffmpeg_exe
 
+
 def ffmpeg_has_loudnorm():
     """
     Run feature detection on ffmpeg, returns True if ffmpeg supports
     the loudnorm filter
     """
-    cmd_runner = CommandRunner([get_ffmpeg_exe(), '-filters'])
+    cmd_runner = CommandRunner([get_ffmpeg_exe(), "-filters"])
     cmd_runner.run_command()
     output = cmd_runner.get_output()
-    if 'loudnorm' in output:
+    if "loudnorm" in output:
         return True
     else:
         logger.error(
