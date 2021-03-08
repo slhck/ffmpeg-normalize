@@ -14,7 +14,7 @@ def ffmpeg_normalize_call(args):
 
     try:
         p = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
         )
         stdout, stderr = p.communicate()
         return stdout, stderr
@@ -44,8 +44,73 @@ def _get_stream_info(input_file):
         "-show_streams",
     ]
     return json.loads(
-        subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
     )["streams"]
+
+
+def fuzzy_equal(d1, d2, precision=0.1):
+    """
+    Compare two objects recursively (just as standard '==' except floating point
+    values are compared within given precision.
+
+    Based on https://gist.github.com/durden/4236551, modified to handle lists
+    """
+
+    if len(d1) != len(d2):
+        print("Length of objects does not match {}, {}".format(d1, d2))
+        return False
+
+    if isinstance(d1, list):
+        ret = []
+        for v1, v2 in zip(d1, d2):
+            if isinstance(v1, dict):
+                ret.append(fuzzy_equal(v1, v2, precision))
+            else:
+                if not abs(v1 - v2) < precision:
+                    print("Values do not match: Got {}, expected {}".format(v1, v2))
+                    return False
+                else:
+                    ret.append(True)
+        return all(ret)
+    elif isinstance(d1, dict):
+        errors = []
+        for k, v in d1.items():
+            # Make sure all the keys are equal
+            if k not in d2:
+                print("Object does not contain: {}, {}".format(k, d2))
+                return False
+
+            # Fuzzy float comparison
+            if isinstance(v, float) and isinstance(d2[k], float):
+                if not abs(v - d2[k]) < precision:
+                    errors.append(
+                        "Values for {} do not match: Got {}, expected {}".format(
+                            k, v, d2[k]
+                        )
+                    )
+
+            # Recursive compare if there are nested dicts
+            elif isinstance(v, dict):
+                if not fuzzy_equal(v, d2[k], precision):
+                    return False
+
+            # Fall back to default
+            elif v != d2[k]:
+                errors.append(
+                    "Values for {} do not match: Got {}, expected {}".format(
+                        k, v, d2[k]
+                    )
+                )
+
+        if len(errors):
+            print("Errors:\n" + "\n".join(errors))
+            return False
+    else:
+        if not abs(d1 - d2) < precision:
+            print("Values do not match: Got {}, expected {}".format(d2, d2))
+            return False
+
+    return True
 
 
 class TestFFmpegNormalize:
@@ -73,7 +138,9 @@ class TestFFmpegNormalize:
         assert os.path.isfile("normalized/test.mkv")
 
     def test_default_warnings(self):
-        _, stderr = ffmpeg_normalize_call(["test/test.mp4", "-o", "normalized/test2.wav"])
+        _, stderr = ffmpeg_normalize_call(
+            ["test/test.mp4", "-o", "normalized/test2.wav"]
+        )
         assert "The sample rate will automatically be set" in stderr
 
     def test_multiple_outputs(self):
@@ -109,90 +176,99 @@ class TestFFmpegNormalize:
     def test_peak(self):
         ffmpeg_normalize_call(["test/test.mp4", "-nt", "peak", "-t", "0"])
         assert os.path.isfile("normalized/test.mkv")
-        assert _get_stats("normalized/test.mkv", "peak") == [
-            {
-                "input_file": "normalized/test.mkv",
-                "output_file": "normalized/test.mkv",
-                "stream_id": 1,
-                "ebu": None,
-                "mean": -14.8,
-                "max": -0.0,
-            },
-            {
-                "input_file": "normalized/test.mkv",
-                "output_file": "normalized/test.mkv",
-                "stream_id": 2,
-                "ebu": None,
-                "mean": -19.3,
-                "max": -0.0,
-            },
-        ]
+        assert fuzzy_equal(
+            _get_stats("normalized/test.mkv", "peak"),
+            [
+                {
+                    "input_file": "normalized/test.mkv",
+                    "output_file": "normalized/test.mkv",
+                    "stream_id": 1,
+                    "ebu": None,
+                    "mean": -14.8,
+                    "max": -0.0,
+                },
+                {
+                    "input_file": "normalized/test.mkv",
+                    "output_file": "normalized/test.mkv",
+                    "stream_id": 2,
+                    "ebu": None,
+                    "mean": -19.3,
+                    "max": -0.0,
+                },
+            ],
+        )
 
     def test_rms(self):
         ffmpeg_normalize_call(["test/test.mp4", "-nt", "rms", "-t", "-15"])
         assert os.path.isfile("normalized/test.mkv")
-        assert _get_stats("normalized/test.mkv", "rms") == [
-            {
-                "input_file": "normalized/test.mkv",
-                "output_file": "normalized/test.mkv",
-                "stream_id": 1,
-                "ebu": None,
-                "mean": -15.0,
-                "max": -0.2,
-            },
-            {
-                "input_file": "normalized/test.mkv",
-                "output_file": "normalized/test.mkv",
-                "stream_id": 2,
-                "ebu": None,
-                "mean": -15.1,
-                "max": 0.0,
-            },
-        ]
+        assert fuzzy_equal(
+            _get_stats("normalized/test.mkv", "rms"),
+            [
+                {
+                    "input_file": "normalized/test.mkv",
+                    "output_file": "normalized/test.mkv",
+                    "stream_id": 1,
+                    "ebu": None,
+                    "mean": -15.0,
+                    "max": -0.2,
+                },
+                {
+                    "input_file": "normalized/test.mkv",
+                    "output_file": "normalized/test.mkv",
+                    "stream_id": 2,
+                    "ebu": None,
+                    "mean": -15.1,
+                    "max": 0.0,
+                },
+            ],
+        )
 
     def test_ebu(self):
         ffmpeg_normalize_call(["test/test.mp4", "-nt", "ebu"])
         assert os.path.isfile("normalized/test.mkv")
-        assert _get_stats("normalized/test.mkv", "ebu") == [
-            {
-                "input_file": "normalized/test.mkv",
-                "output_file": "normalized/test.mkv",
-                "stream_id": 1,
-                "ebu": {
-                    "input_i": -23.00,
-                    "input_tp": -10.32,
-                    "input_lra": 2.40,
-                    "input_thresh": -33.06,
-                    "output_i": -22.03,
-                    "output_tp": -8.89,
-                    "output_lra": 2.30,
-                    "output_thresh": -32.12,
-                    "normalization_type": "dynamic",
-                    "target_offset": -0.97,
+        assert fuzzy_equal(
+            _get_stats("normalized/test.mkv", "ebu"),
+            [
+                {
+                    "input_file": "normalized/test.mkv",
+                    "output_file": "normalized/test.mkv",
+                    "stream_id": 1,
+                    "ebu": {
+                        "input_i": -23.00,
+                        "input_tp": -10.32,
+                        "input_lra": 2.40,
+                        "input_thresh": -33.06,
+                        "output_i": -22.03,
+                        "output_tp": -8.89,
+                        "output_lra": 2.30,
+                        "output_thresh": -32.12,
+                        "normalization_type": "dynamic",
+                        "target_offset": -0.97,
+                    },
+                    "mean": None,
+                    "max": None,
                 },
-                "mean": None,
-                "max": None,
-            },
-            {
-                "input_file": "normalized/test.mkv",
-                "output_file": "normalized/test.mkv",
-                "stream_id": 2,
-                "ebu": {
-                    "input_i": -22.98,
-                    "input_tp": -10.72,
-                    "input_lra": 2.10,
-                    "input_thresh": -33.03,
-                    "output_i": -22.16,
-                    "output_tp": -9.46,
-                    "output_lra": 2.10,
-                    "output_thresh": -32.25,
-                    "normalization_type": "dynamic",
-                    "target_offset": -0.84,
+                {
+                    "input_file": "normalized/test.mkv",
+                    "output_file": "normalized/test.mkv",
+                    "stream_id": 2,
+                    "ebu": {
+                        "input_i": -22.98,
+                        "input_tp": -10.72,
+                        "input_lra": 2.10,
+                        "input_thresh": -33.03,
+                        "output_i": -22.16,
+                        "output_tp": -9.46,
+                        "output_lra": 2.10,
+                        "output_thresh": -32.25,
+                        "normalization_type": "dynamic",
+                        "target_offset": -0.84,
+                    },
+                    "mean": None,
+                    "max": None,
                 },
-                "mean": None,
-                "max": None,
-            },
-        ]
+            ],
+        )
 
     def test_acodec(self):
         ffmpeg_normalize_call(["test/test.mp4", "-c:a", "aac"])
@@ -207,14 +283,14 @@ class TestFFmpegNormalize:
                 "-c:a",
                 "aac",
                 "-b:a",
-                "192k",
+                "320k",
                 "-o",
                 "normalized/test.aac",
             ]
         )
         assert os.path.isfile("normalized/test.aac")
         assert _get_stream_info("normalized/test.aac")[0]["codec_name"] == "aac"
-        assert _get_stream_info("normalized/test.aac")[0]["bit_rate"] == "189000"
+        assert abs(133000 - float(_get_stream_info("normalized/test.aac")[0]["bit_rate"])) > 10000
 
     def test_ar(self):
         ffmpeg_normalize_call(["test/test.mp4", "-ar", "48000"])
@@ -292,27 +368,30 @@ class TestFFmpegNormalize:
             ]
         )
         assert os.path.isfile("normalized/test2.wav")
-        assert _get_stats("normalized/test2.wav", "ebu") == [
-            {
-                "input_file": "normalized/test2.wav",
-                "output_file": "normalized/test2.mkv",
-                "stream_id": 0,
-                "ebu": {
-                    "input_i": -23.01,
-                    "input_tp": -10.75,
-                    "input_lra": 2.20,
-                    "input_thresh": -33.06,
-                    "output_i": -22.16,
-                    "output_tp": -9.46,
-                    "output_lra": 2.10,
-                    "output_thresh": -32.25,
-                    "normalization_type": "dynamic",
-                    "target_offset": -0.84,
-                },
-                "mean": None,
-                "max": None,
-            }
-        ]
+        assert fuzzy_equal(
+            _get_stats("normalized/test2.wav", "ebu"),
+            [
+                {
+                    "input_file": "normalized/test2.wav",
+                    "output_file": "normalized/test2.mkv",
+                    "stream_id": 0,
+                    "ebu": {
+                        "input_i": -23.01,
+                        "input_tp": -10.75,
+                        "input_lra": 2.20,
+                        "input_thresh": -33.06,
+                        "output_i": -22.16,
+                        "output_tp": -9.46,
+                        "output_lra": 2.10,
+                        "output_thresh": -32.25,
+                        "normalization_type": "dynamic",
+                        "target_offset": -0.84,
+                    },
+                    "mean": None,
+                    "max": None,
+                }
+            ],
+        )
 
     def test_post_filters(self):
         ffmpeg_normalize_call(
@@ -325,27 +404,30 @@ class TestFFmpegNormalize:
             ]
         )
         assert os.path.isfile("normalized/test2.wav")
-        assert _get_stats("normalized/test2.wav", "ebu") == [
-            {
-                "input_file": "normalized/test2.wav",
-                "output_file": "normalized/test2.mkv",
-                "stream_id": 0,
-                "ebu": {
-                    "input_i": -35.02,
-                    "input_tp": -22.76,
-                    "input_lra": 2.20,
-                    "input_thresh": -45.07,
-                    "output_i": -22.16,
-                    "output_tp": -9.46,
-                    "output_lra": 2.10,
-                    "output_thresh": -32.24,
-                    "normalization_type": "dynamic",
-                    "target_offset": -0.84,
-                },
-                "mean": None,
-                "max": None,
-            }
-        ]
+        assert fuzzy_equal(
+            _get_stats("normalized/test2.wav", "ebu"),
+            [
+                {
+                    "input_file": "normalized/test2.wav",
+                    "output_file": "normalized/test2.mkv",
+                    "stream_id": 0,
+                    "ebu": {
+                        "input_i": -35.02,
+                        "input_tp": -22.76,
+                        "input_lra": 2.20,
+                        "input_thresh": -45.07,
+                        "output_i": -22.16,
+                        "output_tp": -9.46,
+                        "output_lra": 2.10,
+                        "output_thresh": -32.24,
+                        "normalization_type": "dynamic",
+                        "target_offset": -0.84,
+                    },
+                    "mean": None,
+                    "max": None,
+                }
+            ],
+        )
 
     def test_quiet(self):
         _, stderr = ffmpeg_normalize_call(
