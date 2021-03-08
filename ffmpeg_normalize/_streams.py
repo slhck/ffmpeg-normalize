@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import math
 
 from ._errors import FFmpegNormalizeError
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
@@ -177,9 +178,7 @@ class AudioStream(MediaStream):
         """
         Run a first pass loudnorm filter to get measured data.
         """
-        logger.info(
-            f"Running first pass loudnorm filter for stream {self.stream_id}"
-        )
+        logger.info(f"Running first pass loudnorm filter for stream {self.stream_id}")
 
         opts = {
             "i": self.media_file.ffmpeg_normalize.target_level,
@@ -224,14 +223,6 @@ class AudioStream(MediaStream):
         self.loudness_statistics["ebu"] = AudioStream._parse_loudnorm_output(
             output_lines
         )
-        for key, val in self.loudness_statistics["ebu"].items():
-            if key == "normalization_type":
-                continue
-            # FIXME: drop Python 2 support and just use math.inf
-            if float(val) == -float("inf"):
-                self.loudness_statistics["ebu"][key] = -99
-            elif float(val) == float("inf"):
-                self.loudness_statistics["ebu"][key] = 0
 
     @staticmethod
     def _parse_loudnorm_output(output_lines):
@@ -256,6 +247,26 @@ class AudioStream(MediaStream):
             )
 
             logger.debug(f"Loudnorm stats parsed: {json.dumps(loudnorm_stats)}")
+
+            for key in [
+                "input_i",
+                "input_tp",
+                "input_lra",
+                "input_thresh",
+                "output_i",
+                "output_tp",
+                "output_lra",
+                "output_thresh",
+                "target_offset",
+            ]:
+                # handle infinite values
+                if float(loudnorm_stats[key]) == -float("inf"):
+                    loudnorm_stats[key] = -99
+                elif float(loudnorm_stats[key]) == float("inf"):
+                    loudnorm_stats[key] = 0
+                else:
+                    # convert to floats
+                    loudnorm_stats[key] = float(loudnorm_stats[key])
 
             return loudnorm_stats
         except Exception as e:
