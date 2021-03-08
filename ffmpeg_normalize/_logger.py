@@ -50,17 +50,17 @@ def setup_custom_logger(name):
 
     if system() not in ["Windows", "cli"]:
         logging.addLevelName(
-            logging.ERROR, "\033[1;31m%s\033[1;0m" % logging.getLevelName(logging.ERROR)
+            logging.ERROR, f"[1;31m{logging.getLevelName(logging.ERROR)}[1;0m"
         )
         logging.addLevelName(
             logging.WARNING,
-            "\033[1;33m%s\033[1;0m" % logging.getLevelName(logging.WARNING),
+            f"[1;33m{logging.getLevelName(logging.WARNING)}[1;0m",
         )
         logging.addLevelName(
-            logging.INFO, "\033[1;34m%s\033[1;0m" % logging.getLevelName(logging.INFO)
+            logging.INFO, f"[1;34m{logging.getLevelName(logging.INFO)}[1;0m"
         )
         logging.addLevelName(
-            logging.DEBUG, "\033[1;35m%s\033[1;0m" % logging.getLevelName(logging.DEBUG)
+            logging.DEBUG, f"[1;35m{logging.getLevelName(logging.DEBUG)}[1;0m"
         )
 
     logger = logging.getLogger(name)

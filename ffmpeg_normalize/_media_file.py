@@ -51,7 +51,7 @@ class MediaFile:
         """
         Try to parse all input streams from file
         """
-        logger.debug("Parsing streams of {}".format(self.input_file))
+        logger.debug(f"Parsing streams of {self.input_file}")
 
         cmd = [
             self.ffmpeg_normalize.ffmpeg_exe,
@@ -101,7 +101,7 @@ class MediaFile:
                 continue
 
             if "Audio" in line:
-                logger.debug("Found audio stream at index {}".format(stream_id))
+                logger.debug(f"Found audio stream at index {stream_id}")
                 sample_rate_match = re.search(r"(\d+) Hz", line)
                 sample_rate = (
                     int(sample_rate_match.group(1)) if sample_rate_match else None
@@ -118,22 +118,20 @@ class MediaFile:
                 )
 
             elif "Video" in line:
-                logger.debug("Found video stream at index {}".format(stream_id))
+                logger.debug(f"Found video stream at index {stream_id}")
                 self.streams["video"][stream_id] = VideoStream(
                     self, self.ffmpeg_normalize, stream_id
                 )
 
             elif "Subtitle" in line:
-                logger.debug("Found subtitle stream at index {}".format(stream_id))
+                logger.debug(f"Found subtitle stream at index {stream_id}")
                 self.streams["subtitle"][stream_id] = SubtitleStream(
                     self, self.ffmpeg_normalize, stream_id
                 )
 
         if not self.streams["audio"]:
             raise FFmpegNormalizeError(
-                "Input file {} does not contain any audio streams".format(
-                    self.input_file
-                )
+                f"Input file {self.input_file} does not contain any audio streams"
             )
 
         if (
@@ -150,7 +148,7 @@ class MediaFile:
             self.streams["subtitle"] = {}
 
     def run_normalization(self):
-        logger.debug("Running normalization for {}".format(self.input_file))
+        logger.debug(f"Running normalization for {self.input_file}")
 
         # run the first pass to get loudness stats
         self._first_pass()
@@ -165,7 +163,7 @@ class MediaFile:
                 pass
 
     def _first_pass(self):
-        logger.debug("Parsing normalization info for {}".format(self.input_file))
+        logger.debug(f"Parsing normalization info for {self.input_file}")
 
         for index, audio_stream in enumerate(self.streams["audio"].values()):
             if self.ffmpeg_normalize.normalization_type == "ebu":
@@ -177,9 +175,7 @@ class MediaFile:
                 with tqdm(
                     total=100,
                     position=1,
-                    desc="Stream {}/{}".format(
-                        index + 1, len(self.streams["audio"].values())
-                    ),
+                    desc=f"Stream {index + 1}/{len(self.streams['audio'].values())}",
                 ) as pbar:
                     for progress in fun():
                         pbar.update(progress - pbar.n)
@@ -207,8 +203,8 @@ class MediaFile:
             else:
                 normalization_filter = audio_stream.get_second_pass_opts_peakrms()
 
-            input_label = "[0:{}]".format(audio_stream.stream_id)
-            output_label = "[norm{}]".format(audio_stream.stream_id)
+            input_label = f"[0:{audio_stream.stream_id}]"
+            output_label = f"[norm{audio_stream.stream_id}]"
             output_labels.append(output_label)
 
             filter_chain = []
@@ -233,7 +229,7 @@ class MediaFile:
 
         FIXME: make this method simpler
         """
-        logger.info("Running second pass for {}".format(self.input_file))
+        logger.info(f"Running second pass for {self.input_file}")
 
         # get the target output stream types depending on the options
         output_stream_types = ["audio"]
@@ -269,8 +265,8 @@ class MediaFile:
                 for idx, _ in enumerate(self.streams[stream_type].items()):
                     cmd.extend(
                         [
-                            "-map_metadata:s:{}:{}".format(stream_key, idx),
-                            "0:s:{}:{}".format(stream_key, idx),
+                            f"-map_metadata:s:{stream_key}:{idx}",
+                            f"0:s:{stream_key}:{idx}",
                         ]
                     )
 
@@ -283,7 +279,7 @@ class MediaFile:
         # collect all '-map' and codecs needed for output video based on input video
         if not self.ffmpeg_normalize.video_disable:
             for s in self.streams["video"].keys():
-                cmd.extend(["-map", "0:{}".format(s)])
+                cmd.extend(["-map", f"0:{s}"])
             # set codec (copy by default)
             cmd.extend(["-c:v", self.ffmpeg_normalize.video_codec])
 
@@ -296,7 +292,7 @@ class MediaFile:
             cmd.extend(["-c:a", self.ffmpeg_normalize.audio_codec])
         else:
             for index, (_, audio_stream) in enumerate(self.streams["audio"].items()):
-                cmd.extend(["-c:a:{}".format(index), audio_stream.get_pcm_codec()])
+                cmd.extend([f"-c:a:{index}", audio_stream.get_pcm_codec()])
 
         # other audio options (if any)
         if self.ffmpeg_normalize.audio_bitrate:
@@ -313,15 +309,15 @@ class MediaFile:
         # ... and subtitles
         if not self.ffmpeg_normalize.subtitle_disable:
             for s in self.streams["subtitle"].keys():
-                cmd.extend(["-map", "0:{}".format(s)])
+                cmd.extend(["-map", f"0:{s}"])
             # copy subtitles
             cmd.extend(["-c:s", "copy"])
 
         if self.ffmpeg_normalize.keep_original_audio:
             highest_index = len(self.streams["audio"])
             for index, (_, s) in enumerate(self.streams["audio"].items()):
-                cmd.extend(["-map", "0:a:{}".format(index)])
-                cmd.extend(["-c:a:{}".format(highest_index + index), "copy"])
+                cmd.extend(["-map", f"0:a:{index}"])
+                cmd.extend([f"-c:a:{highest_index + index}", "copy"])
 
         # extra options (if any)
         if self.ffmpeg_normalize.extra_output_options:
@@ -362,9 +358,7 @@ class MediaFile:
             else:
                 # move file from TMP to output file
                 logger.debug(
-                    "Moving temporary file from {} to {}".format(
-                        temp_file_name, self.output_file
-                    )
+                    f"Moving temporary file from {temp_file_name} to {self.output_file}"
                 )
                 shutil.move(temp_file_name, self.output_file)
         except Exception as e:

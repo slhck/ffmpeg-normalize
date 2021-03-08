@@ -57,7 +57,7 @@ class CommandRunner:
         self.output = ff.stderr
 
     def run_command(self):
-        logger.debug("Running command: {}".format(self.cmd))
+        logger.debug(f"Running command: {self.cmd}")
 
         if self.dry:
             logger.debug("Dry mode specified, not actually running command")
@@ -81,7 +81,7 @@ class CommandRunner:
             self.output = stdout + stderr
         else:
             raise RuntimeError(
-                "Error running command {}: {}".format(self.cmd, str(stderr))
+                f"Error running command {self.cmd}: {str(stderr)}"
             )
 
     def get_output(self):
@@ -120,7 +120,7 @@ def which(program):
 def dict_to_filter_opts(opts):
     filter_opts = []
     for k, v in opts.items():
-        filter_opts.append("{}={}".format(k, v))
+        filter_opts.append(f"{k}={v}")
     return ":".join(filter_opts)
 
 
@@ -133,12 +133,12 @@ def get_ffmpeg_exe():
         if os.sep in ffmpeg_path:
             ffmpeg_exe = ffmpeg_path
             if not os.path.isfile(ffmpeg_exe):
-                raise FFmpegNormalizeError("No file exists at {}".format(ffmpeg_exe))
+                raise FFmpegNormalizeError(f"No file exists at {ffmpeg_exe}")
         else:
             ffmpeg_exe = which(ffmpeg_path)
             if not ffmpeg_exe:
                 raise FFmpegNormalizeError(
-                    "Could not find '{}' in your $PATH.".format(ffmpeg_path)
+                    f"Could not find '{ffmpeg_path}' in your $PATH."
                 )
     else:
         ffmpeg_exe = which("ffmpeg")

@@ -23,7 +23,7 @@ def check_range(number, min_r, max_r, name=""):
         number = float(number)
         if number < min_r or number > max_r:
             raise FFmpegNormalizeError(
-                "{} must be within [{},{}]".format(name, min_r, max_r)
+                f"{name} must be within [{min_r},{max_r}]"
             )
         return number
         pass
@@ -118,15 +118,13 @@ class FFmpegNormalize:
             and self.output_format in PCM_INCOMPATIBLE_FORMATS
         ):
             raise FFmpegNormalizeError(
-                "Output format {} does not support PCM audio. ".format(
-                    self.output_format
-                )
+                f"Output format {self.output_format} does not support PCM audio. "
                 + "Please choose a suitable audio codec with the -c:a option."
             )
 
         if normalization_type not in NORMALIZATION_TYPES:
             raise FFmpegNormalizeError(
-                "Normalization type must be one of {}".format(NORMALIZATION_TYPES)
+                f"Normalization type must be one of {NORMALIZATION_TYPES}"
             )
 
         if self.target_level and not isinstance(self.target_level, Number):
@@ -162,9 +160,7 @@ class FFmpegNormalize:
             self.audio_codec is None or "pcm" in self.audio_codec
         ) and ext in PCM_INCOMPATIBLE_EXTS:
             raise FFmpegNormalizeError(
-                "Output extension {} does not support PCM audio. ".format(
-                    ext
-                ) +
+                f"Output extension {ext} does not support PCM audio. " +
                 "Please choose a suitable audio codec with the -c:a option."
             )
 
@@ -181,9 +177,7 @@ class FFmpegNormalize:
             tqdm(self.media_files, desc="File", disable=not self.progress, position=0)
         ):
             logger.info(
-                "Normalizing file {} ({} of {})".format(
-                    media_file, index + 1, self.file_count
-                )
+                f"Normalizing file {media_file} ({index + 1} of {self.file_count})"
             )
 
             try:
@@ -200,7 +194,7 @@ class FFmpegNormalize:
                     # raise the error so the program will exit
                     raise e
 
-            logger.info("Normalized file written to {}".format(media_file.output_file))
+            logger.info(f"Normalized file written to {media_file.output_file}")
 
         if self.print_stats and self.stats:
             print(json.dumps(self.stats, indent=4))

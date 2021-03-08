@@ -129,7 +129,7 @@ def create_parser():
     group_general.add_argument(
         "--version",
         action="version",
-        version="%(prog)s v{}".format(__version__),
+        version=f"%(prog)s v{__version__}",
         help="Print version and exit",
     )
 
@@ -447,7 +447,7 @@ def _split_options(opts):
         else:
             ret = shlex.split(opts)
     except Exception as e:
-        raise FFmpegNormalizeError("Could not parse extra_options: {}".format(e))
+        raise FFmpegNormalizeError(f"Could not parse extra_options: {e}")
     return ret
 
 
@@ -515,7 +515,7 @@ def main():
             output_dir = os.path.dirname(output_file)
             if output_dir != "" and not os.path.isdir(output_dir):
                 raise FFmpegNormalizeError(
-                    "Output file path {} does not exist".format(output_dir)
+                    f"Output file path {output_dir} does not exist"
                 )
         else:
             output_file = os.path.join(

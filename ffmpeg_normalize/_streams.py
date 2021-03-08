@@ -104,12 +104,10 @@ class AudioStream(MediaStream):
         elif self.bit_depth <= 8:
             return "pcm_s8"
         elif self.bit_depth in [16, 24, 32, 64]:
-            return "pcm_s{}le".format(self.bit_depth)
+            return f"pcm_s{self.bit_depth}le"
         else:
             logger.warning(
-                "Unsupported bit depth {}, falling back to pcm_s16le".format(
-                    self.bit_depth
-                )
+                f"Unsupported bit depth {self.bit_depth}, falling back to pcm_s16le"
             )
             return "pcm_s16le"
 
@@ -118,7 +116,7 @@ class AudioStream(MediaStream):
         Get a filter string for current_filter, with the pre-filter
         added before. Applies the input label before.
         """
-        input_label = "[0:{}]".format(self.stream_id)
+        input_label = f"[0:{self.stream_id}]"
         filter_chain = []
         if self.media_file.ffmpeg_normalize.pre_filter:
             filter_chain.append(self.media_file.ffmpeg_normalize.pre_filter)
@@ -131,9 +129,7 @@ class AudioStream(MediaStream):
         Use ffmpeg with volumedetect filter to get the mean volume of the input file.
         """
         logger.info(
-            "Running first pass volumedetect filter for stream {}".format(
-                self.stream_id
-            )
+            f"Running first pass volumedetect filter for stream {self.stream_id}"
         )
 
         filter_str = self._get_filter_str_with_pre_filter("volumedetect")
@@ -166,7 +162,7 @@ class AudioStream(MediaStream):
             self.loudness_statistics["mean"] = float(mean_volume_matches[0])
         else:
             raise FFmpegNormalizeError(
-                "Could not get mean volume for {}".format(self.media_file.input_file)
+                f"Could not get mean volume for {self.media_file.input_file}"
             )
 
         max_volume_matches = re.findall(r"max_volume: ([\-\d\.]+) dB", output)
@@ -174,7 +170,7 @@ class AudioStream(MediaStream):
             self.loudness_statistics["max"] = float(max_volume_matches[0])
         else:
             raise FFmpegNormalizeError(
-                "Could not get max volume for {}".format(self.media_file.input_file)
+                f"Could not get max volume for {self.media_file.input_file}"
             )
 
     def parse_loudnorm_stats(self):
@@ -182,7 +178,7 @@ class AudioStream(MediaStream):
         Run a first pass loudnorm filter to get measured data.
         """
         logger.info(
-            "Running first pass loudnorm filter for stream {}".format(self.stream_id)
+            f"Running first pass loudnorm filter for stream {self.stream_id}"
         )
 
         opts = {
@@ -259,14 +255,12 @@ class AudioStream(MediaStream):
                 "\n".join(output_lines[loudnorm_start:loudnorm_end])
             )
 
-            logger.debug("Loudnorm stats parsed: {}".format(json.dumps(loudnorm_stats)))
+            logger.debug(f"Loudnorm stats parsed: {json.dumps(loudnorm_stats)}")
 
             return loudnorm_stats
         except Exception as e:
             raise FFmpegNormalizeError(
-                "Could not parse loudnorm stats; wrong JSON format in string: {}".format(
-                    e
-                )
+                f"Could not parse loudnorm stats; wrong JSON format in string: {e}"
             )
 
     def get_second_pass_opts_ebu(self):
@@ -336,4 +330,4 @@ class AudioStream(MediaStream):
                 )
             )
 
-        return "volume={}dB".format(adjustment)
+        return f"volume={adjustment}dB"

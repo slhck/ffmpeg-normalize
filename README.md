@@ -31,7 +31,7 @@ Contents:
 
 ## Requirements
 
--   Python 3.x
+-   Python 3.6 or higher
 -   ffmpeg v3.1 or above from <http://ffmpeg.org/> installed in your \$PATH
 
 ## Installation
