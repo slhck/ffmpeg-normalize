@@ -1,6 +1,5 @@
 import logging
 from platform import system
-import io
 from tqdm import tqdm
 from multiprocessing import Lock
 import sys
@@ -21,7 +20,7 @@ class TqdmLoggingHandler(logging.StreamHandler):
             self.flush()
         except (KeyboardInterrupt, SystemExit):
             raise
-        except:
+        except Exception:
             self.handleError(record)
 
 def setup_custom_logger(name):

@@ -121,8 +121,10 @@ class FFmpegNormalize():
 
         self.stats = []
 
-        if self.output_format and (self.audio_codec is None or 'pcm' in self.audio_codec) and \
-            self.output_format in PCM_INCOMPATIBLE_FORMATS:
+        if (
+            self.output_format and (self.audio_codec is None or 'pcm' in self.audio_codec)
+            and self.output_format in PCM_INCOMPATIBLE_FORMATS
+        ):
             raise FFmpegNormalizeError(
                 "Output format {} does not support PCM audio. Please choose a suitable audio codec with the -c:a option.".format(self.output_format)
             )
