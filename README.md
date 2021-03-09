@@ -1,6 +1,6 @@
 # ffmpeg-normalize
 
-[![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://img.shields.io/pypi/v/ffmpeg-normalize)
+[![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://img.shields.io/pypi/v/ffmpeg-normalize) [![Python package](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml/badge.svg)](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml)
 
 A utility for batch-normalizing audio using ffmpeg.
 
