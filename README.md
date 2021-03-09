@@ -8,7 +8,16 @@ This program normalizes media files to a certain loudness level using the EBU R1
 
 Batch processing of several input files is possible, including video files.
 
-Contents:
+**A very quick how-to:**
+
+1. Install ffmpeg
+2. Run `pip3 install ffmpeg-normalize`
+3. Run `ffmpeg-normalize /path/to/your/file.mp4`
+4. Done! 🎧
+
+Read on for more info.
+
+**Contents:**
 
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -133,30 +142,32 @@ If you need some fancy extra options, such as setting `vbr` for the `libfdk_aac`
 
     ffmpeg-normalize input.m4a -c:a libfdk_aac -e='-vbr 3' -o output.m4a
 
-You can check the statistics of a file to verify the levels — pass `-n` to avoid running the normalization:
+You can check the statistics of a file to verify the levels with `-p`. Pass `-n` to avoid running the normalization:
 
-    ffmpeg-normalize input.wav -p -n -f
-    [
-        {
-            "input_file": "input.wav",
-            "output_file": "normalized/input.mkv",
-            "stream_id": 0,
-            "ebu": {
-                "input_i": "-6.74",
-                "input_tp": "0.45",
-                "input_lra": "6.30",
-                "input_thresh": "-16.98",
-                "output_i": "-22.20",
-                "output_tp": "-11.27",
-                "output_lra": "5.60",
-                "output_thresh": "-32.34",
-                "normalization_type": "dynamic",
-                "target_offset": "-0.80"
-            },
-            "mean": null,
-            "max": null
-        }
-    ]
+```
+$ ffmpeg-normalize test/test.wav -p -n -f
+[
+{
+    "input_file": "test/test.wav",
+    "output_file": "normalized/test.mkv",
+    "stream_id": 0,
+    "ebu": {
+        "input_i": -39.77,
+        "input_tp": -27.49,
+        "input_lra": 2.1,
+        "input_thresh": -49.82,
+        "output_i": -22.15,
+        "output_tp": -9.46,
+        "output_lra": 2.1,
+        "output_thresh": -32.24,
+        "normalization_type": "dynamic",
+        "target_offset": -0.85
+    },
+    "mean": null,
+    "max": null
+}
+]
+```
 
 Further examples? [Add them to the wiki.](https://github.com/slhck/ffmpeg-normalize/wiki/examples)
 
