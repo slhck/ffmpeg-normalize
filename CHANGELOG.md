@@ -1,6 +1,31 @@
 # Changelog
 
 
+## v1.22.0 (2021-03-09)
+
+* Improve README.
+
+* Add GitHub actions badge.
+
+* Add GitHub actions tests.
+
+* Properly convert EBU JSON values to float.
+
+* Switch to f strings, remove Python 3.5 support.
+
+* Format code with black.
+
+* Fix flake8 errors.
+
+* Factor out method.
+
+* WIP: new tests.
+
+* Log to stderr by default to enable JSON parsing.
+
+* Remove release script.
+
+
 ## v1.21.2 (2021-03-06)
 
 * Format setup.py.
