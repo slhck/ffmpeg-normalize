@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.22.1 (2021-03-10)
+
+* Add python_requires to setup.py.
+
+
 ## v1.22.0 (2021-03-09)
 
 * Improve README.
