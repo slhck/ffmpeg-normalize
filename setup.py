@@ -53,6 +53,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
     ],
+    python_requires=">=3.6",
     entry_points={
         "console_scripts": ["ffmpeg-normalize = ffmpeg_normalize.__main__:main"]
     },
