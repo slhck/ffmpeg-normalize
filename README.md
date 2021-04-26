@@ -109,67 +109,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 ## Examples
 
-Normalize two WAV files and write them to the specified output files with uncompressed PCM WAV as audio codec:
-
-    ffmpeg-normalize file1.wav file2.wav -o file1-normalized.wav file2-normalized.wav
-
-Normalize a number of videos in the current folder and write them to a folder called `normalized`, converting all audio streams to AAC with 192 kBit/s.
-
-    ffmpeg-normalize *.mkv -c:a aac -b:a 192k
-
-For Windows, the above would be written as a loop:
-
-    for %%f in ("*.mkv") do ffmpeg-normalize "%%f" -c:a aac -b:a 192k
-
-Normalize an MP3 file and write an MP3 file (you have to explicitly specify the encoder):
-
-    ffmpeg-normalize input.mp3 -c:a libmp3lame -b:a 320k -o output.mp3
-
-Normalize many files, keeping PCM audio, but choosing a different container:
-
-    ffmpeg-normalize *.wav -c:a pcm_s16le -ext aif
-
-Instead of EBU R128, one might just want to use simple peak normalization to 0 dB:
-
-    ffmpeg-normalize test.wav --normalization-type peak --target-level 0 --output normalized.wav
-    ffmpeg-normalize test.wav -nt peak -t 0 -o normalized.wav
-
-You can (if you really need to!) also overwrite your input file. Warning, this will destroy data:
-
-    ffmpeg-normalize input.mp4 -o input.mp4 -f
-
-If you need some fancy extra options, such as setting `vbr` for the `libfdk_aac` encoder, pass them to the `-e`/`--extra-options` argument:
-
-    ffmpeg-normalize input.m4a -c:a libfdk_aac -e='-vbr 3' -o output.m4a
-
-You can check the statistics of a file to verify the levels with `-p`. Pass `-n` to avoid running the normalization:
-
-```
-$ ffmpeg-normalize test/test.wav -p -n -f
-[
-{
-    "input_file": "test/test.wav",
-    "output_file": "normalized/test.mkv",
-    "stream_id": 0,
-    "ebu": {
-        "input_i": -39.77,
-        "input_tp": -27.49,
-        "input_lra": 2.1,
-        "input_thresh": -49.82,
-        "output_i": -22.15,
-        "output_tp": -9.46,
-        "output_lra": 2.1,
-        "output_thresh": -32.24,
-        "normalization_type": "dynamic",
-        "target_offset": -0.85
-    },
-    "mean": null,
-    "max": null
-}
-]
-```
-
-Further examples? [Add them to the wiki.](https://github.com/slhck/ffmpeg-normalize/wiki/examples)
+[Read the examples on the the wiki.](https://github.com/slhck/ffmpeg-normalize/wiki/examples)
 
 ## Detailed Options
 
