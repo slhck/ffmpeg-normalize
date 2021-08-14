@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.22.2 (2021-08-14)
+
+* Bump requirements, should fix #155.
+
+* Move all examples to Wiki.
+
+* Update badge link.
+
+
 ## v1.22.1 (2021-03-10)
 
 * Add python_requires to setup.py.
