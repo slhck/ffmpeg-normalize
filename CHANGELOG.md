@@ -1,6 +1,24 @@
 # Changelog
 
 
+## v1.22.3 (2021-08-31)
+
+* Set tqdm lock for logging only when multiprocessing is available.
+
+  Multiprocessing is not available in all environments, for example
+  on AWS lambda python run time lacks /dev/shm, so trying to acquire
+  a multiprocessing Lock throws an OSError. The module could also be
+  missing in some cases (ex. Jython, although this library doesn't support
+  Jython anyway).
+
+  The solution to this is to only try to set the lock when multiprocessing
+  is available. The tqdm library solves this in the same manner.
+
+  For more details: https://github.com/slhck/ffmpeg-normalize/issues/156
+
+* Add instructions on how to run tests.
+
+
 ## v1.22.2 (2021-08-14)
 
 * Bump requirements, should fix #155.
