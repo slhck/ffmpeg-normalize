@@ -1,7 +1,6 @@
 import logging
 from platform import system
 from tqdm import tqdm
-from multiprocessing import Lock
 import sys
 
 loggers = {}
@@ -15,7 +14,7 @@ class TqdmLoggingHandler(logging.StreamHandler):
     def emit(self, record):
         try:
             msg = self.format(record)
-            tqdm.set_lock(Lock())
+            set_mp_lock()
             tqdm.write(msg, file=sys.stderr)
             self.flush()
         except (KeyboardInterrupt, SystemExit):
@@ -23,6 +22,14 @@ class TqdmLoggingHandler(logging.StreamHandler):
         except Exception:
             self.handleError(record)
 
+def set_mp_lock():
+    try:
+        from multiprocessing import Lock
+        tqdm.set_lock(Lock())
+    except (ImportError, OSError):
+        # Some python environments do not support multiprocessing
+        # See: https://github.com/slhck/ffmpeg-normalize/issues/156
+        pass
 
 def setup_custom_logger(name):
     """
