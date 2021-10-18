@@ -355,6 +355,7 @@ class MediaFile:
                         " ".join([shlex.quote(c) for c in cmd]), e
                     )
                 )
+                raise e
             else:
                 # move file from TMP to output file
                 logger.debug(
