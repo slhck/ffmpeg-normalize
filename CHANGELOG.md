@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.22.4 (2021-10-18)
+
+* Re-raise error on ffmpeg command failure.
+
+  This prevents incorrectly telling the user that a normalized file was written when it wasn't.
+
+
 ## v1.22.3 (2021-08-31)
 
 * Set tqdm lock for logging only when multiprocessing is available.
@@ -293,9 +300,6 @@
 * Add pypi badge.
 
 * Allow release script to add changelog for future version; upload to pypi.
-
-
-## v1.13.11 (2019-04-16)
 
 * Add release script.
 
