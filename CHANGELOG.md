@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.22.5 (2022-01-25)
+
+* Print warning for bit depths > 16, addresses #163.
+
+
 ## v1.22.4 (2021-10-18)
 
 * Re-raise error on ffmpeg command failure.
@@ -300,6 +305,9 @@
 * Add pypi badge.
 
 * Allow release script to add changelog for future version; upload to pypi.
+
+
+## v1.13.11 (2019-04-16)
 
 * Add release script.
 
