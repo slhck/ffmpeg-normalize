@@ -106,7 +106,7 @@ class MediaFile:
                 sample_rate = (
                     int(sample_rate_match.group(1)) if sample_rate_match else None
                 )
-                bit_depth_match = re.search(r"s(\d+)p?,", line)
+                bit_depth_match = re.search(r"[sfu](\d+)(p|le|be)?", line)
                 bit_depth = int(bit_depth_match.group(1)) if bit_depth_match else None
                 self.streams["audio"][stream_id] = AudioStream(
                     self,
