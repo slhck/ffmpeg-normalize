@@ -169,7 +169,7 @@ class MediaFile:
             if self.ffmpeg_normalize.normalization_type == "ebu":
                 fun = getattr(audio_stream, "parse_loudnorm_stats")
             else:
-                fun = getattr(audio_stream, "parse_volumedetect_stats")
+                fun = getattr(audio_stream, "parse_astats")
 
             if self.ffmpeg_normalize.progress:
                 with tqdm(

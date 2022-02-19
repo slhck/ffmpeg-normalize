@@ -133,15 +133,15 @@ class AudioStream(MediaStream):
         filter_str = input_label + ",".join(filter_chain)
         return filter_str
 
-    def parse_volumedetect_stats(self):
+    def parse_astats(self):
         """
-        Use ffmpeg with volumedetect filter to get the mean volume of the input file.
+        Use ffmpeg with astats filter to get the mean (RMS) and max (peak) volume of the input file.
         """
         logger.info(
-            f"Running first pass volumedetect filter for stream {self.stream_id}"
+            f"Running first pass astats filter for stream {self.stream_id}"
         )
 
-        filter_str = self._get_filter_str_with_pre_filter("volumedetect")
+        filter_str = self._get_filter_str_with_pre_filter("astats=measure_overall=Peak_level+RMS_level:measure_perchannel=0")
 
         cmd = [
             self.media_file.ffmpeg_normalize.ffmpeg_exe,
@@ -163,10 +163,10 @@ class AudioStream(MediaStream):
             yield progress
         output = cmd_runner.get_output()
 
-        logger.debug("Volumedetect command output:")
+        logger.debug("astats command output:")
         logger.debug(output)
 
-        mean_volume_matches = re.findall(r"mean_volume: ([\-\d\.]+) dB", output)
+        mean_volume_matches = re.findall(r"RMS level dB: ([\-\d\.]+)", output)
         if mean_volume_matches:
             self.loudness_statistics["mean"] = float(mean_volume_matches[0])
         else:
@@ -174,7 +174,7 @@ class AudioStream(MediaStream):
                 f"Could not get mean volume for {self.media_file.input_file}"
             )
 
-        max_volume_matches = re.findall(r"max_volume: ([\-\d\.]+) dB", output)
+        max_volume_matches = re.findall(r"Peak level dB: ([\-\d\.]+)", output)
         if max_volume_matches:
             self.loudness_statistics["max"] = float(max_volume_matches[0])
         else:
