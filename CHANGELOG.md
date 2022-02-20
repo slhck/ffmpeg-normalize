@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.22.6 (2022-02-20)
+
+* Use astats instead of volumedetect filter, fixes #163.
+
+  Allows floating point calculation.
+
+
 ## v1.22.5 (2022-01-25)
 
 * Print warning for bit depths > 16, addresses #163.
