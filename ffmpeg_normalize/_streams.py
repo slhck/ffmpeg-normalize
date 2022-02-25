@@ -70,13 +70,6 @@ class AudioStream(MediaStream):
         self.sample_rate = sample_rate
         self.bit_depth = bit_depth
 
-        if self.bit_depth is not None and self.bit_depth > 16:
-            logger.warn(
-                "Bit depths >16 are not supported by the volume detection filter. "
-                "Your output may be clipped. "
-                "See https://trac.ffmpeg.org/ticket/9613 for more info."
-            )
-
         self.duration = duration
 
         if (
