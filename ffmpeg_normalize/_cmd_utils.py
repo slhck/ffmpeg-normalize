@@ -50,11 +50,13 @@ class CommandRunner:
 
     def run_ffmpeg_command(self):
         # wrapper for 'ffmpeg-progress-yield'
+        logger.debug(f"Running command: {self.cmd}")
         ff = FfmpegProgress(self.cmd, dry_run=self.dry)
         for progress in ff.run_command_with_progress():
             yield progress
 
         self.output = ff.stderr
+        logger.debug(f"ffmpeg output: {self.output}")
 
     def run_command(self):
         logger.debug(f"Running command: {self.cmd}")
