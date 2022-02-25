@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.22.7 (2022-02-25)
+
+* Debug command output for ffmpeg commands.
+
+* Remove unneeded warning message.
+
+
 ## v1.22.6 (2022-02-20)
 
 * Use astats instead of volumedetect filter, fixes #163.
