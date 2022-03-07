@@ -161,7 +161,10 @@ class AudioStream(MediaStream):
 
         mean_volume_matches = re.findall(r"RMS level dB: ([\-\d\.]+)", output)
         if mean_volume_matches:
-            self.loudness_statistics["mean"] = float(mean_volume_matches[0])
+            if mean_volume_matches[0] == "-":
+                self.loudness_statistics["mean"] = -math.inf
+            else:
+                self.loudness_statistics["mean"] = float(mean_volume_matches[0])
         else:
             raise FFmpegNormalizeError(
                 f"Could not get mean volume for {self.media_file.input_file}"
@@ -169,7 +172,10 @@ class AudioStream(MediaStream):
 
         max_volume_matches = re.findall(r"Peak level dB: ([\-\d\.]+)", output)
         if max_volume_matches:
-            self.loudness_statistics["max"] = float(max_volume_matches[0])
+            if max_volume_matches[0] == "-":
+                self.loudness_statistics["max"] = -math.inf
+            else:
+                self.loudness_statistics["max"] = float(max_volume_matches[0])
         else:
             raise FFmpegNormalizeError(
                 f"Could not get max volume for {self.media_file.input_file}"
