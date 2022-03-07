@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.22.8 (2022-03-07)
+
+* Properly detect -inf dB input.
+
+
 ## v1.22.7 (2022-02-25)
 
 * Debug command output for ffmpeg commands.
