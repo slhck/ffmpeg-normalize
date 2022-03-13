@@ -25,22 +25,31 @@ Read on for more info.
 - [Description](#description)
 - [Examples](#examples)
 - [Detailed Options](#detailed-options)
-    - [File Input/Output](#file-inputoutput)
-    - [General](#general)
-    - [Normalization](#normalization)
-    - [EBU R128 Normalization](#ebu-r128-normalization)
-    - [Audio Encoding](#audio-encoding)
-    - [Other Encoding Options](#other-encoding-options)
-    - [Output Format](#output-format)
-    - [Environment Variables](#environment-variables)
+  - [File Input/Output](#file-inputoutput)
+  - [General](#general)
+  - [Normalization](#normalization)
+  - [EBU R128 Normalization](#ebu-r128-normalization)
+  - [Audio Encoding](#audio-encoding)
+  - [Other Encoding Options](#other-encoding-options)
+  - [Input/Output Format](#inputoutput-format)
+  - [Environment Variables](#environment-variables)
 - [FAQ](#faq)
+  - [The program doesn't work because the "loudnorm" filter can't be found](#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found)
+  - [Should I use this to normalize my music collection?](#should-i-use-this-to-normalize-my-music-collection)
+  - [Why are my output files MKV?](#why-are-my-output-files-mkv)
+  - [The conversion does not work and I get a cryptic ffmpeg error!](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error)
+  - [What are the different normalization algorithms?](#what-are-the-different-normalization-algorithms)
+  - [Couldn't I just run `loudnorm` with ffmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
+  - [After updating, this program does not work as expected anymore!](#after-updating-this-program-does-not-work-as-expected-anymore)
+  - [Can I buy you a beer / coffee / random drink?](#can-i-buy-you-a-beer--coffee--random-drink)
 
 -------------
 
 ## Requirements
 
 -   Python 3.6 or higher
--   ffmpeg v3.1 or above from <http://ffmpeg.org/> installed in your \$PATH
+-   ffmpeg v4.2 or higher from <https://ffmpeg.org/> – static builds using the latest Git master are recommended
+-   `ffmpeg` must be in your \$PATH
 
 ## Installation
 
