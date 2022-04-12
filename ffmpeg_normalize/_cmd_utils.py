@@ -1,6 +1,6 @@
 from __future__ import division
 import os
-import sys
+from shutil import which
 import subprocess
 from platform import system as _current_os
 import re
@@ -88,35 +88,6 @@ class CommandRunner:
 
     def get_output(self):
         return self.output
-
-
-def which(program):
-    """
-    Find a program in PATH and return path
-    From: http://stackoverflow.com/q/377017/
-    """
-
-    def is_exe(fpath):
-        found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-        if not found and sys.platform == "win32":
-            fpath = fpath + ".exe"
-            found = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-        return found
-
-    fpath, _ = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            logger.debug("found executable: " + str(program))
-            return program
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            path = os.path.expandvars(os.path.expanduser(path)).strip('"')
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                logger.debug("found executable in path: " + str(exe_file))
-                return exe_file
-
-    return None
 
 
 def dict_to_filter_opts(opts):
