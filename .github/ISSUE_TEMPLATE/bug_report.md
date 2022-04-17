@@ -1,10 +1,14 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: I ran across an error or bug in the program
 
 ---
 
-**:warning: Please read this carefully! If you do not fill out this information, your bug report may be closed.**
+**:warning: Please read this carefully and edit the example responses! If you do not fill out this information, your bug report may be closed without comment.**
+
+**Checklist** (please tick all boxes)
+- [ ] I am using the latest version of `ffmpeg-normalize` (run `pip3 install --upgrade ffmpeg-normalize`)
+- [ ] I am using the latest stable version of `ffmpeg` or a recent build from Git master
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
@@ -27,5 +31,5 @@ Any output you get when running the command with the `--debug` flag:
 
 **Environment (please complete the following information):**
 - [ ] Your operating system
-- [ ] Your Python version / distribution (`python --version`)
+- [ ] Your Python version / distribution (`python3 --version` or `python --version`)
 - [ ] Your ffmpeg version (`ffmpeg -version`)
