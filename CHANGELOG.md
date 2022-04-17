@@ -1,6 +1,21 @@
 # Changelog
 
 
+## v1.22.9 (2022-04-17)
+
+* Improve issue templates.
+
+* Do not print ffmpeg progress in debug logs.
+
+* Remove unused import.
+
+* Replace which() function with shlex version.
+
+* Add python 3.10 in setup.py.
+
+* Clarify minimum ffmpeg version.
+
+
 ## v1.22.8 (2022-03-07)
 
 * Properly detect -inf dB input.
