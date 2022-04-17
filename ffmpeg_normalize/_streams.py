@@ -156,8 +156,7 @@ class AudioStream(MediaStream):
             yield progress
         output = cmd_runner.get_output()
 
-        logger.debug("astats command output:")
-        logger.debug(output)
+        logger.debug(f"astats command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}")
 
         mean_volume_matches = re.findall(r"RMS level dB: ([\-\d\.]+)", output)
         if mean_volume_matches:
@@ -222,8 +221,7 @@ class AudioStream(MediaStream):
             yield progress
         output = cmd_runner.get_output()
 
-        logger.debug("Loudnorm first pass command output:")
-        logger.debug(output)
+        logger.debug(f"Loudnorm first pass command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}")
 
         output_lines = [line.strip() for line in output.split("\n")]
 

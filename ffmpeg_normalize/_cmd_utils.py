@@ -1,3 +1,4 @@
+import logging
 import os
 from shutil import which
 import subprocess
@@ -47,6 +48,17 @@ class CommandRunner:
         self.dry = dry
         self.output = None
 
+    @staticmethod
+    def prune_ffmpeg_progress_from_output(output: str) -> str:
+        return "\n".join(
+            [
+                line for line in output.splitlines()
+                if not any(
+                    key in line for key in ["bitrate=", "total_size=", "out_time_us=", "out_time_ms=", "out_time=", "dup_frames=", "drop_frames=", "speed=", "progress="]
+                )
+            ]
+        )
+
     def run_ffmpeg_command(self):
         # wrapper for 'ffmpeg-progress-yield'
         logger.debug(f"Running command: {self.cmd}")
@@ -55,7 +67,9 @@ class CommandRunner:
             yield progress
 
         self.output = ff.stderr
-        logger.debug(f"ffmpeg output: {self.output}")
+
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.debug(f"ffmpeg output: {CommandRunner.prune_ffmpeg_progress_from_output(self.output)}")
 
     def run_command(self):
         logger.debug(f"Running command: {self.cmd}")
