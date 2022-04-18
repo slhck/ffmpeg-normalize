@@ -10,10 +10,10 @@ Batch processing of several input files is possible, including video files.
 
 **A very quick how-to:**
 
-1. Install ffmpeg
+1. Install a recent version of [ffmpeg](https://ffmpeg.org/download.html)
 2. Run `pip3 install ffmpeg-normalize`
 3. Run `ffmpeg-normalize /path/to/your/file.mp4`
-4. Done! 🎧
+4. Done! 🎧 (the file will be in a folder called `normalized`)
 
 Read on for more info.
 
@@ -42,6 +42,7 @@ Read on for more info.
   - [Couldn't I just run `loudnorm` with ffmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
   - [After updating, this program does not work as expected anymore!](#after-updating-this-program-does-not-work-as-expected-anymore)
   - [Can I buy you a beer / coffee / random drink?](#can-i-buy-you-a-beer--coffee--random-drink)
+- [Related Tools and Articles](#related-tools-and-articles)
 
 -------------
 
@@ -53,9 +54,13 @@ Read on for more info.
 
 ## Installation
 
-    pip3 install ffmpeg-normalize
+For Python 3 and pip:
 
-Or download this repository, then run `pip install .`.
+```bash
+pip3 install ffmpeg-normalize
+```
+
+Or download this repository, then run `pip3 install .`.
 
 ## Usage
 
@@ -306,7 +311,9 @@ I chose MKV as a default output container since it handles almost every possible
 
 ### The conversion does not work and I get a cryptic ffmpeg error!
 
-One possible reason is that the input file contains some streams that cannot be mapped to the output file. Examples:
+Make sure you use a recent version of ffmpeg. The [static builds](https://ffmpeg.org/download.html) are usually the best option.
+
+Another possible reason is that the input file contains some streams that cannot be mapped to the output file. Examples:
 
 - You are trying to normalize a movie file, writing to a `.wav` or `.mp3` file. WAV/MP3 files only support audio, not video. Disable video and subtitles with `-vn` and `-sn`, or choose a container that supports video (e.g. `.mkv`).
 
@@ -336,11 +343,17 @@ You are probably using a 0.x version of this program. There are significant chan
 
 If you found this program useful and feel like giving back, feel free to send a donation [via PayPal](https://paypal.me/WernerRobitza).
 
+## Related Tools and Articles
+
+- [Create an AppleScript application to drop or open a folder of files in ffmpeg-normalize](https://prehensileblog.wordpress.com/2022/04/15/create-an-applescript-application-to-drop-or-open-a-folder-of-files-in-ffmpeg-normalize/)
+
+*(Have a link? Please propose an edit to this section via a pull request!)*
+
 # License
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2018 Werner Robitza
+Copyright (c) 2015-2022 Werner Robitza
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
