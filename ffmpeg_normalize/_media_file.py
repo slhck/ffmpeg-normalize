@@ -12,7 +12,7 @@ from ._logger import setup_custom_logger
 
 logger = setup_custom_logger("ffmpeg_normalize")
 
-
+AUDIO_ONLY_FORMATS = ["ogg", "wav"]
 class MediaFile:
     """
     Class that holds a file, its streams and adjustments
@@ -33,6 +33,7 @@ class MediaFile:
         self.skip = False
         self.input_file = input_file
         self.output_file = output_file
+        self.output_ext = os.path.splitext(output_file)[1][1:]
         self.streams = {"audio": {}, "video": {}, "subtitle": {}}
 
         self.parse_streams()
@@ -162,6 +163,15 @@ class MediaFile:
             for _ in self._second_pass():
                 pass
 
+    def _can_write_output_video(self):
+        """
+        Determine whether the output file can contain video at all.
+        """
+        if self.output_ext in AUDIO_ONLY_FORMATS:
+            return False
+
+        return not self.ffmpeg_normalize.video_disable
+
     def _first_pass(self):
         logger.debug(f"Parsing normalization info for {self.input_file}")
 
@@ -233,7 +243,7 @@ class MediaFile:
 
         # get the target output stream types depending on the options
         output_stream_types = ["audio"]
-        if not self.ffmpeg_normalize.video_disable:
+        if self._can_write_output_video():
             output_stream_types.append("video")
         if not self.ffmpeg_normalize.subtitle_disable:
             output_stream_types.append("subtitle")
@@ -277,11 +287,14 @@ class MediaFile:
             cmd.extend(["-map_chapters", "0"])
 
         # collect all '-map' and codecs needed for output video based on input video
-        if not self.ffmpeg_normalize.video_disable:
-            for s in self.streams["video"].keys():
-                cmd.extend(["-map", f"0:{s}"])
-            # set codec (copy by default)
-            cmd.extend(["-c:v", self.ffmpeg_normalize.video_codec])
+        if self.streams["video"]:
+            if self._can_write_output_video():
+                for s in self.streams["video"].keys():
+                    cmd.extend(["-map", f"0:{s}"])
+                # set codec (copy by default)
+                cmd.extend(["-c:v", self.ffmpeg_normalize.video_codec])
+            else:
+                logger.warn(f"The chosen output extension {self.output_ext} does not support video/cover art. It will be disabled.")
 
         # ... and map the output of the normalization filters
         for ol in output_labels:

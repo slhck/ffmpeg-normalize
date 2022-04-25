@@ -14,7 +14,6 @@ NORMALIZATION_TYPES = ["ebu", "rms", "peak"]
 PCM_INCOMPATIBLE_FORMATS = ["mp4", "mp3", "ogg", "webm"]
 PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm"]
 
-
 def check_range(number, min_r, max_r, name=""):
     """
     Check if a number is within a given range
