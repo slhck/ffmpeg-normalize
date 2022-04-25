@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.22.10 (2022-04-25)
+
+* Add warning for cover art, addresses #174 and #175.
+
+* Update README.
+
+
 ## v1.22.9 (2022-04-17)
 
 * Improve issue templates.
