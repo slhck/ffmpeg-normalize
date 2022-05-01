@@ -64,20 +64,21 @@ Or download this repository, then run `pip3 install .`.
 
 ## Usage
 
-    ffmpeg-normalize input [input ...]
-                [-h]
-                [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER]
-                [-f] [-d] [-v] [-q] [-n] [-pr]
-                [--version]
-                [-nt {ebu,rms,peak}] [-t TARGET_LEVEL] [-p]
-                [-lrt LOUDNESS_RANGE_TARGET] [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
-                [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE] [-ar SAMPLE_RATE] [-koa]
-                [-prf PRE_FILTER] [-pof POST_FILTER]
-                [-vn] [-c:v VIDEO_CODEC]
-                [-sn] [-mn] [-cn]
-                [-ei EXTRA_INPUT_OPTIONS] [-e EXTRA_OUTPUT_OPTIONS]
-                [-ofmt OUTPUT_FORMAT]
-                [-ext EXTENSION]
+```
+ffmpeg-normalize [-h]
+    [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER]
+    [-f] [-d] [-v] [-q] [-n] [-pr]
+    [--version]
+    [-nt {ebu,rms,peak}]
+    [-t TARGET_LEVEL] [-p] [-lrt LOUDNESS_RANGE_TARGET] [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono] [--dynamic]
+    [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE] [-ar SAMPLE_RATE] [-koa]
+    [-prf PRE_FILTER] [-pof POST_FILTER]
+    [-vn] [-c:v VIDEO_CODEC]
+    [-sn] [-mn] [-cn]
+    [-ei EXTRA_INPUT_OPTIONS] [-e EXTRA_OUTPUT_OPTIONS]
+    [-ofmt OUTPUT_FORMAT] [-ext EXTENSION]
+    input [input ...]
+```
 
 For more information, run `ffmpeg-normalize -h`, or read on.
 
@@ -197,6 +198,12 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 - `--dual-mono`: Treat mono input files as "dual-mono".
 
     If a mono file is intended for playback on a stereo system, its EBU R128 measurement will be perceptually incorrect. If set, this option will compensate for this effect. Multi-channel input files are not affected by this option.
+
+- `--dynamic`: Force dynamic normalization mode.
+
+    Instead of applying linear EBU R128 normalization, choose a dynamic normalization. This is not usually recommended.
+
+    Dynamic mode will automatically change the sample rate to 192 kHz. Use -ar/--sample-rate to specify a different output sample rate.
 
 ### Audio Encoding
 
@@ -333,7 +340,15 @@ Also, if there is some other broken metadata, you can try to disable copying ove
 
 ### Couldn't I just run `loudnorm` with ffmpeg?
 
-You absolutely can. However, you can get better accuracy and linear normalization with two passes of the filter. Since ffmpeg does not allow you to automatically run these two passes, you have to do it yourself and parse the output values from the first run. If this program is too over-engineered for you, you could also use an approach such as featured [in this Ruby script](https://gist.github.com/kylophone/84ba07f6205895e65c9634a956bf6d54) that performs the two `loudnorm` passes.
+You absolutely can. However, you can get better accuracy and linear normalization with two passes of the filter. Since ffmpeg does not allow you to automatically run these two passes, you have to do it yourself and parse the output values from the first run.
+
+If ffmpeg-normalize is too over-engineered for you, you could also use an approach such as featured [in this Ruby script](https://gist.github.com/kylophone/84ba07f6205895e65c9634a956bf6d54) that performs the two `loudnorm` passes.
+
+If you want dynamic normalization (the loudnorm default), simply use ffmpeg with one pass, e.g.:
+
+```bash
+ffmpeg -i input.mp3 -af loudnorm -c:a aac -b:a 192k output.m4a
+```
 
 ### After updating, this program does not work as expected anymore!
 

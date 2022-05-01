@@ -28,24 +28,6 @@ def create_parser():
                 __version__
             )
         ),
-        usage=textwrap.dedent(
-            """\
-            ffmpeg-normalize input [input ...]
-                [-h]
-                [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER]
-                [-f] [-d] [-v] [-q] [-n] [-pr]
-                [--version]
-                [-nt {ebu,rms,peak}] [-t TARGET_LEVEL] [-p]
-                [-lrt LOUDNESS_RANGE_TARGET] [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono]
-                [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE] [-ar SAMPLE_RATE] [-koa]
-                [-prf PRE_FILTER] [-pof POST_FILTER]
-                [-vn] [-c:v VIDEO_CODEC]
-                [-sn] [-mn] [-cn]
-                [-ei EXTRA_INPUT_OPTIONS] [-e EXTRA_OUTPUT_OPTIONS]
-                [-ofmt OUTPUT_FORMAT]
-                [-ext EXTENSION]
-        """
-        ),
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=textwrap.dedent(
             """\
@@ -240,6 +222,22 @@ def create_parser():
         measurement will be perceptually incorrect. If set, this option will
         compensate for this effect. Multi-channel input files are not affected
         by this option.
+        """
+        ),
+    )
+
+    group_ebu.add_argument(
+        "--dynamic",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Force dynamic normalization mode.
+
+        Instead of applying linear EBU R128 normalization, choose a dynamic
+        normalization. This is not usually recommended.
+
+        Dynamic mode will automatically change the sample rate to 192 kHz. Use
+        -ar/--sample-rate to specify a different output sample rate.
         """
         ),
     )
@@ -474,6 +472,7 @@ def main():
         true_peak=cli_args.true_peak,
         offset=cli_args.offset,
         dual_mono=cli_args.dual_mono,
+        dynamic=cli_args.dynamic,
         audio_codec=cli_args.audio_codec,
         audio_bitrate=cli_args.audio_bitrate,
         sample_rate=cli_args.sample_rate,

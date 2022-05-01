@@ -45,6 +45,7 @@ class FFmpegNormalize:
         true_peak=-2.0,
         offset=0.0,
         dual_mono=False,
+        dynamic=False,
         audio_codec="pcm_s16le",
         audio_bitrate=None,
         sample_rate=None,
@@ -89,6 +90,7 @@ class FFmpegNormalize:
         self.offset = check_range(offset, -99, 99, name="offset")
 
         self.dual_mono = True if dual_mono in ["true", True] else False
+        self.dynamic = True if dynamic in ["true", True] else False
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
         self.sample_rate = int(sample_rate) if sample_rate is not None else None

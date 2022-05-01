@@ -312,12 +312,6 @@ class MediaFile:
             cmd.extend(["-b:a", str(self.ffmpeg_normalize.audio_bitrate)])
         if self.ffmpeg_normalize.sample_rate:
             cmd.extend(["-ar", str(self.ffmpeg_normalize.sample_rate)])
-        else:
-            if self.ffmpeg_normalize.normalization_type == "ebu":
-                logger.warn(
-                    "The sample rate will automatically be set to 192 kHz by the loudnorm filter. "
-                    "Specify -ar/--sample-rate to override it."
-                )
 
         # ... and subtitles
         if not self.ffmpeg_normalize.subtitle_disable:

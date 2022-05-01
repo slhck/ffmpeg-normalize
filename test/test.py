@@ -139,9 +139,9 @@ class TestFFmpegNormalize:
 
     def test_default_warnings(self):
         _, stderr = ffmpeg_normalize_call(
-            ["test/test.mp4", "-o", "normalized/test2.wav"]
+            ["test/test.mp4", "--dynamic", "-o", "normalized/test2.wav"]
         )
-        assert "The sample rate will automatically be set" in stderr
+        assert "sample rate will automatically be set" in stderr
 
     def test_multiple_outputs(self):
         os.makedirs("normalized", exist_ok=True)

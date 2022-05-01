@@ -289,14 +289,25 @@ class AudioStream(MediaStream):
                 "First pass not run, you must call parse_loudnorm_stats first"
             )
 
-        input_i = float(self.loudness_statistics["ebu"]["input_i"])
-        if input_i > 0:
+        if float(self.loudness_statistics["ebu"]["input_i"]) > 0:
             logger.warn(
-                "Input file had measured input loudness greater than zero ({}), capping at 0".format(
-                    "input_i"
-                )
+                f"Input file had measured input loudness greater than zero ({self.loudness_statistics['ebu']['input_i']}), capping at 0"
             )
             self.loudness_statistics["ebu"]["input_i"] = 0
+
+        will_use_dynamic_mode = self.media_file.ffmpeg_normalize.dynamic
+        if self.media_file.ffmpeg_normalize.loudness_range_target < self.loudness_statistics["ebu"]["input_lra"]:
+            logger.warn(
+                f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}, which is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
+                "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization."
+            )
+            will_use_dynamic_mode = True
+
+        if will_use_dynamic_mode and not self.ffmpeg_normalize.sample_rate:
+            logger.warn(
+                "In dynamic mode, the sample rate will automatically be set to 192 kHz by the loudnorm filter. "
+                "Specify -ar/--sample-rate to override it."
+            )
 
         opts = {
             "i": self.media_file.ffmpeg_normalize.target_level,
@@ -307,7 +318,7 @@ class AudioStream(MediaStream):
             "measured_lra": float(self.loudness_statistics["ebu"]["input_lra"]),
             "measured_tp": float(self.loudness_statistics["ebu"]["input_tp"]),
             "measured_thresh": float(self.loudness_statistics["ebu"]["input_thresh"]),
-            "linear": "true",
+            "linear": "false" if self.media_file.ffmpeg_normalize.dynamic else "true",
             "print_format": "json",
         }
 
