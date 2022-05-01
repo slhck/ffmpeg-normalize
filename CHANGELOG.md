@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.23.0 (2022-05-01)
+
+* Add way to force dynamic mode, clarify usage, fixes #176.
+
+
 ## v1.22.10 (2022-04-25)
 
 * Add warning for cover art, addresses #174 and #175.
