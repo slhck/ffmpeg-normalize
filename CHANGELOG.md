@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.23.1 (2022-07-12)
+
+* Increase possible loudness range target to 50.
+
+
 ## v1.23.0 (2022-05-01)
 
 * Add way to force dynamic mode, clarify usage, fixes #176.
