@@ -178,7 +178,7 @@ def create_parser():
         help=textwrap.dedent(
             """\
         EBU Loudness Range Target in LUFS (default: 7.0).
-        Range is 1.0 - 20.0.
+        Range is 1.0 - 50.0.
         """
         ),
         default=7.0,

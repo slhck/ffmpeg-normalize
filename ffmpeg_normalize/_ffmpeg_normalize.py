@@ -84,7 +84,7 @@ class FFmpegNormalize:
         # self.threshold = float(threshold)
 
         self.loudness_range_target = check_range(
-            loudness_range_target, 1, 20, name="loudness_range_target"
+            loudness_range_target, 1, 50, name="loudness_range_target"
         )
         self.true_peak = check_range(true_peak, -9, 0, name="true_peak")
         self.offset = check_range(offset, -99, 99, name="offset")
