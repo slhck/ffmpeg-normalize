@@ -529,7 +529,7 @@ def main():
                         cli_args.output_folder
                     )
                 )
-                os.makedirs(cli_args.output_folder)
+                os.makedirs(cli_args.output_folder, exist_ok=True)
 
         if os.path.exists(output_file) and not cli_args.force:
             logger.error(
