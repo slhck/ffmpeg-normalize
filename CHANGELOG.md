@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.24.0 (2022-08-02)
+
+* Update python requirements.
+
+* Prevent race condition in output dir creation.
+
+
 ## v1.23.1 (2022-07-12)
 
 * Increase possible loudness range target to 50.
