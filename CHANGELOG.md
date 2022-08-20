@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.25.0 (2022-08-20)
+
+* Add option to keep loudness range target, fixes #181.
+
+* Only show warning about disabling video if not yet disabled, addresses #184.
+
+
 ## v1.24.1 (2022-08-20)
 
 * Code formatting.
