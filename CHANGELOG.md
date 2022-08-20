@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.24.1 (2022-08-20)
+
+* Code formatting.
+
+* Extend warning for audio-only format to opus, fixes #184.
+
+
 ## v1.24.0 (2022-08-02)
 
 * Update python requirements.
