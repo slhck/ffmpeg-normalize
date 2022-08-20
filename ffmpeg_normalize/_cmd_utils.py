@@ -52,9 +52,21 @@ class CommandRunner:
     def prune_ffmpeg_progress_from_output(output: str) -> str:
         return "\n".join(
             [
-                line for line in output.splitlines()
+                line
+                for line in output.splitlines()
                 if not any(
-                    key in line for key in ["bitrate=", "total_size=", "out_time_us=", "out_time_ms=", "out_time=", "dup_frames=", "drop_frames=", "speed=", "progress="]
+                    key in line
+                    for key in [
+                        "bitrate=",
+                        "total_size=",
+                        "out_time_us=",
+                        "out_time_ms=",
+                        "out_time=",
+                        "dup_frames=",
+                        "drop_frames=",
+                        "speed=",
+                        "progress=",
+                    ]
                 )
             ]
         )
@@ -69,7 +81,9 @@ class CommandRunner:
         self.output = ff.stderr
 
         if logger.getEffectiveLevel() == logging.DEBUG:
-            logger.debug(f"ffmpeg output: {CommandRunner.prune_ffmpeg_progress_from_output(self.output)}")
+            logger.debug(
+                f"ffmpeg output: {CommandRunner.prune_ffmpeg_progress_from_output(self.output)}"
+            )
 
     def run_command(self):
         logger.debug(f"Running command: {self.cmd}")
@@ -95,9 +109,7 @@ class CommandRunner:
         if p.returncode == 0:
             self.output = stdout + stderr
         else:
-            raise RuntimeError(
-                f"Error running command {self.cmd}: {str(stderr)}"
-            )
+            raise RuntimeError(f"Error running command {self.cmd}: {str(stderr)}")
 
     def get_output(self):
         return self.output

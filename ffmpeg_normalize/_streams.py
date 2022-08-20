@@ -130,11 +130,11 @@ class AudioStream(MediaStream):
         """
         Use ffmpeg with astats filter to get the mean (RMS) and max (peak) volume of the input file.
         """
-        logger.info(
-            f"Running first pass astats filter for stream {self.stream_id}"
-        )
+        logger.info(f"Running first pass astats filter for stream {self.stream_id}")
 
-        filter_str = self._get_filter_str_with_pre_filter("astats=measure_overall=Peak_level+RMS_level:measure_perchannel=0")
+        filter_str = self._get_filter_str_with_pre_filter(
+            "astats=measure_overall=Peak_level+RMS_level:measure_perchannel=0"
+        )
 
         cmd = [
             self.media_file.ffmpeg_normalize.ffmpeg_exe,
@@ -156,7 +156,9 @@ class AudioStream(MediaStream):
             yield progress
         output = cmd_runner.get_output()
 
-        logger.debug(f"astats command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}")
+        logger.debug(
+            f"astats command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}"
+        )
 
         mean_volume_matches = re.findall(r"RMS level dB: ([\-\d\.]+)", output)
         if mean_volume_matches:
@@ -221,7 +223,9 @@ class AudioStream(MediaStream):
             yield progress
         output = cmd_runner.get_output()
 
-        logger.debug(f"Loudnorm first pass command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}")
+        logger.debug(
+            f"Loudnorm first pass command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}"
+        )
 
         output_lines = [line.strip() for line in output.split("\n")]
 
@@ -296,7 +300,10 @@ class AudioStream(MediaStream):
             self.loudness_statistics["ebu"]["input_i"] = 0
 
         will_use_dynamic_mode = self.media_file.ffmpeg_normalize.dynamic
-        if self.media_file.ffmpeg_normalize.loudness_range_target < self.loudness_statistics["ebu"]["input_lra"]:
+        if (
+            self.media_file.ffmpeg_normalize.loudness_range_target
+            < self.loudness_statistics["ebu"]["input_lra"]
+        ):
             logger.warn(
                 f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}, which is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
                 "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization."

@@ -14,6 +14,7 @@ logger = setup_custom_logger("ffmpeg_normalize")
 
 AUDIO_ONLY_FORMATS = ["ogg", "wav", "opus"]
 
+
 class MediaFile:
     """
     Class that holds a file, its streams and adjustments
@@ -295,7 +296,9 @@ class MediaFile:
                 # set codec (copy by default)
                 cmd.extend(["-c:v", self.ffmpeg_normalize.video_codec])
             else:
-                logger.warn(f"The chosen output extension {self.output_ext} does not support video/cover art. It will be disabled.")
+                logger.warn(
+                    f"The chosen output extension {self.output_ext} does not support video/cover art. It will be disabled."
+                )
 
         # ... and map the output of the normalization filters
         for ol in output_labels:

@@ -14,6 +14,7 @@ NORMALIZATION_TYPES = ["ebu", "rms", "peak"]
 PCM_INCOMPATIBLE_FORMATS = ["mp4", "mp3", "ogg", "webm"]
 PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm"]
 
+
 def check_range(number, min_r, max_r, name=""):
     """
     Check if a number is within a given range
@@ -21,9 +22,7 @@ def check_range(number, min_r, max_r, name=""):
     try:
         number = float(number)
         if number < min_r or number > max_r:
-            raise FFmpegNormalizeError(
-                f"{name} must be within [{min_r},{max_r}]"
-            )
+            raise FFmpegNormalizeError(f"{name} must be within [{min_r},{max_r}]")
         return number
         pass
     except Exception as e:
@@ -161,8 +160,8 @@ class FFmpegNormalize:
             self.audio_codec is None or "pcm" in self.audio_codec
         ) and ext in PCM_INCOMPATIBLE_EXTS:
             raise FFmpegNormalizeError(
-                f"Output extension {ext} does not support PCM audio. " +
-                "Please choose a suitable audio codec with the -c:a option."
+                f"Output extension {ext} does not support PCM audio. "
+                + "Please choose a suitable audio codec with the -c:a option."
             )
 
         mf = MediaFile(self, input_file, output_file)

@@ -22,14 +22,17 @@ class TqdmLoggingHandler(logging.StreamHandler):
         except Exception:
             self.handleError(record)
 
+
 def set_mp_lock():
     try:
         from multiprocessing import Lock
+
         tqdm.set_lock(Lock())
     except (ImportError, OSError):
         # Some python environments do not support multiprocessing
         # See: https://github.com/slhck/ffmpeg-normalize/issues/156
         pass
+
 
 def setup_custom_logger(name):
     """
