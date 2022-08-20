@@ -12,7 +12,8 @@ from ._logger import setup_custom_logger
 
 logger = setup_custom_logger("ffmpeg_normalize")
 
-AUDIO_ONLY_FORMATS = ["ogg", "wav"]
+AUDIO_ONLY_FORMATS = ["ogg", "wav", "opus"]
+
 class MediaFile:
     """
     Class that holds a file, its streams and adjustments
