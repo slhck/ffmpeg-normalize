@@ -296,9 +296,10 @@ class MediaFile:
                 # set codec (copy by default)
                 cmd.extend(["-c:v", self.ffmpeg_normalize.video_codec])
             else:
-                logger.warn(
-                    f"The chosen output extension {self.output_ext} does not support video/cover art. It will be disabled."
-                )
+                if not self.ffmpeg_normalize.video_disable:
+                    logger.warn(
+                        f"The chosen output extension {self.output_ext} does not support video/cover art. It will be disabled."
+                    )
 
         # ... and map the output of the normalization filters
         for ol in output_labels:
