@@ -300,13 +300,21 @@ class AudioStream(MediaStream):
             self.loudness_statistics["ebu"]["input_i"] = 0
 
         will_use_dynamic_mode = self.media_file.ffmpeg_normalize.dynamic
+
+        if self.media_file.ffmpeg_normalize.keep_loudness_range_target:
+            logger.debug("Keeping target loudness range in second pass loudnorm filter")
+            self.media_file.ffmpeg_normalize.loudness_range_target = (
+                self.loudness_statistics["ebu"]["input_lra"]
+            )
+
         if (
             self.media_file.ffmpeg_normalize.loudness_range_target
             < self.loudness_statistics["ebu"]["input_lra"]
         ):
             logger.warn(
                 f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}, which is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
-                "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization."
+                "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization. "
+                "Alternatively, use the --keep-loudness-range-target option to keep the target loudness range from the input."
             )
             will_use_dynamic_mode = True
 

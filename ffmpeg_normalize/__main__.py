@@ -185,6 +185,16 @@ def create_parser():
     )
 
     group_ebu.add_argument(
+        "--keep-loudness-range-target",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Keep the input loudness range target to allow for linear normalization.
+        """
+        ),
+    )
+
+    group_ebu.add_argument(
         "-tp",
         "--true-peak",
         type=float,
@@ -469,6 +479,7 @@ def main():
         print_stats=cli_args.print_stats,
         loudness_range_target=cli_args.loudness_range_target,
         # threshold=cli_args.threshold,
+        keep_loudness_range_target=cli_args.keep_loudness_range_target,
         true_peak=cli_args.true_peak,
         offset=cli_args.offset,
         dual_mono=cli_args.dual_mono,

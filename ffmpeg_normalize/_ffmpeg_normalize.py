@@ -41,6 +41,7 @@ class FFmpegNormalize:
         print_stats=False,
         # threshold=0.5,
         loudness_range_target=7.0,
+        keep_loudness_range_target=False,
         true_peak=-2.0,
         offset=0.0,
         dual_mono=False,
@@ -85,6 +86,8 @@ class FFmpegNormalize:
         self.loudness_range_target = check_range(
             loudness_range_target, 1, 50, name="loudness_range_target"
         )
+
+        self.keep_loudness_range_target = keep_loudness_range_target
         self.true_peak = check_range(true_peak, -9, 0, name="true_peak")
         self.offset = check_range(offset, -99, 99, name="offset")
 

@@ -185,6 +185,8 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
     Range is 1.0 - 50.0.
 
+- `--keep-loudness-range-target`: Keep the input loudness range target to allow for linear normalization.
+
 - `-tp TRUE_PEAK, --true-peak TRUE_PEAK`: EBU Maximum True Peak in dBTP (default: -2.0).
 
     Range is -9.0 - +0.0.
