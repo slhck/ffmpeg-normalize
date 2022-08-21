@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.25.1 (2022-08-21)
+
+* Add warning in case user specifies both --lrt and --keep-loudness-range-target.
+
+
 ## v1.25.0 (2022-08-20)
 
 * Add option to keep loudness range target, fixes #181.
