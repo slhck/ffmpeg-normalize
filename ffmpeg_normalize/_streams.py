@@ -310,6 +310,7 @@ class AudioStream(MediaStream):
         if (
             self.media_file.ffmpeg_normalize.loudness_range_target
             < self.loudness_statistics["ebu"]["input_lra"]
+            and not will_use_dynamic_mode
         ):
             logger.warn(
                 f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}, which is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
