@@ -262,7 +262,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
     If JSON is used, you need to wrap the whole argument in quotes to prevent shell expansion and to preserve literal quotes inside the string. If a simple string is used, you need to specify the argument with `-e=`.
 
-    Examples: `-e '[ "-f", "mpegts" ]'` or `-e="-f mpegts"`
+    Examples: `-ei '[ "-f", "mpegts", "-r", "24" ]'` or `-ei="-f mpegts -r 24"`
 
 - `-e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS`: Extra output options list.
 
@@ -272,7 +272,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
     If JSON is used, you need to wrap the whole argument in quotes to prevent shell expansion and to preserve literal quotes inside the string. If a simple string is used, you need to specify the argument with `-e=`.
 
-    Examples: `-e '[ "-vbr", "3" ]'` or `-e="-vbr 3"`
+    Examples: `-e '[ "-vbr", "3", "-preset:v", "ultrafast" ]'` or `-e="-vbr 3 -preset:v ultrafast"`
 
 - `-ofmt OUTPUT_FORMAT, --output-format OUTPUT_FORMAT`: Media format to use for output file(s).
 
