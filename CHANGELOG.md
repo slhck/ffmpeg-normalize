@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.25.2 (2022-09-14)
+
+* Constrain parsed ranges to avoid out of bounds, fixes #189.
+
+* Fix readme for extra-input-options.
+
+* Warn about dynamic mode only if not already set, fixes #187.
+
+
 ## v1.25.1 (2022-08-21)
 
 * Add warning in case user specifies both --lrt and --keep-loudness-range-target.
