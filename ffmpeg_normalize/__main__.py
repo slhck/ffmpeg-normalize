@@ -39,7 +39,7 @@ def create_parser():
                     Note: You need to use full paths.
 
               - `FFMPEG_PATH`
-                    Sets the full path to an `ffmpeg` executable other than
+                    Sets the full path to a `ffmpeg` executable other than
                     the system default.
 
 
@@ -85,7 +85,7 @@ def create_parser():
 
     group_general = parser.add_argument_group("General Options")
     group_general.add_argument(
-        "-f", "--force", action="store_true", help="Force overwrite existing files"
+        "-f", "--force", action="store_true", help="Force overwrites existing files"
     )
     group_general.add_argument(
         "-d", "--debug", action="store_true", help="Print debugging output"
@@ -178,7 +178,7 @@ def create_parser():
         help=textwrap.dedent(
             """\
         EBU Loudness Range Target in LUFS (default: 7.0).
-        Range is 1.0 - 50.0.
+        The range is 1.0 - 50.0.
         """
         ),
         default=7.0,
@@ -201,7 +201,7 @@ def create_parser():
         help=textwrap.dedent(
             """\
         EBU Maximum True Peak in dBTP (default: -2.0).
-        Range is -9.0 - +0.0.
+        The range is -9.0 - +0.0.
         """
         ),
         default=-2.0,
@@ -215,7 +215,7 @@ def create_parser():
         EBU Offset Gain (default: 0.0).
         The gain is applied before the true-peak limiter in the first pass only.
         The offset for the second pass will be automatically determined based on the first pass statistics.
-        Range is -99.0 - +99.0.
+        The range is -99.0 - +99.0.
         """
         ),
         default=0.0,
@@ -243,10 +243,10 @@ def create_parser():
             """\
         Force dynamic normalization mode.
 
-        Instead of applying linear EBU R128 normalization, choose a dynamic
+        Instead of applying linear EBU R128 normalization, choose dynamic
         normalization. This is not usually recommended.
 
-        Dynamic mode will automatically change the sample rate to 192 kHz. Use
+        The dynamic mode will automatically change the sample rate to 192 kHz. Use
         -ar/--sample-rate to specify a different output sample rate.
         """
         ),
@@ -286,7 +286,7 @@ def create_parser():
             """\
         Audio sample rate to use for output files in Hz.
 
-        Will use input sample rate by default, except for EBU normalization,
+        Will use the input sample rate by default, except for EBU normalization,
         which will change the input sample rate to 192 kHz.
         """
         ),
@@ -295,7 +295,7 @@ def create_parser():
         "-koa",
         "--keep-original-audio",
         action="store_true",
-        help="Copy original, non-normalized audio streams to output file",
+        help="Copy original, non-normalized audio streams to the output file",
     )
     group_acodec.add_argument(
         "-prf",
@@ -338,7 +338,7 @@ def create_parser():
         Video codec to use for output files (default: 'copy').
         See `ffmpeg -encoders` for a list.
 
-        Will attempt to copy video codec by default.
+        Will attempt to copy the video codec by default.
         """
         ),
         default="copy",
@@ -371,7 +371,7 @@ def create_parser():
             """\
         Extra input options list.
 
-        A list of extra ffmpeg command line arguments valid for the input,
+        A list of extra FFmpeg command line arguments valid for the input,
         applied before ffmpeg's `-i`.
 
         You can either use a JSON-formatted list (i.e., a list of
@@ -395,7 +395,7 @@ def create_parser():
             """\
         Extra output options list.
 
-        A list of extra ffmpeg command line arguments.
+        A list of extra FFmpeg command line arguments.
 
         You can either use a JSON-formatted list (i.e., a list of
         comma-separated, quoted elements within square brackets), or a simple
@@ -419,7 +419,7 @@ def create_parser():
         Media format to use for output file(s).
         See 'ffmpeg -formats' for a list.
 
-        If not specified, the format will be inferred by ffmpeg from the output
+        If not specified, the format will be inferred by FFmpeg from the output
         file name. If the output file name is not explicitly specified, the
         extension will govern the format (see '--extension' option).
         """
