@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://pypi.org/project/ffmpeg-normalize) [![Python package](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml/badge.svg)](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml)
 
-A utility for batch-normalizing audio using ffmpeg.
+A utility for batch-normalizing audio using FFmpeg.
 
 This program normalizes media files to a certain loudness level using the EBU R128 loudness normalization procedure. It can also perform RMS-based normalization (where the mean is lifted or attenuated), or peak normalization to a certain target level.
 
@@ -10,7 +10,7 @@ Batch processing of several input files is possible, including video files.
 
 **A very quick how-to:**
 
-1. Install a recent version of [ffmpeg](https://ffmpeg.org/download.html)
+1. Install a recent version of [FFmpeg](https://ffmpeg.org/download.html)
 2. Run `pip3 install ffmpeg-normalize`
 3. Run `ffmpeg-normalize /path/to/your/file.mp4`
 4. Done! 🎧 (the file will be in a folder called `normalized`)
@@ -37,9 +37,9 @@ Read on for more info.
   - [The program doesn't work because the "loudnorm" filter can't be found](#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found)
   - [Should I use this to normalize my music collection?](#should-i-use-this-to-normalize-my-music-collection)
   - [Why are my output files MKV?](#why-are-my-output-files-mkv)
-  - [The conversion does not work and I get a cryptic ffmpeg error!](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error)
+  - [The conversion does not work and I get a cryptic FFmpeg error!](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error)
   - [What are the different normalization algorithms?](#what-are-the-different-normalization-algorithms)
-  - [Couldn't I just run `loudnorm` with ffmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
+  - [Couldn't I just run `loudnorm` with FFmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
   - [After updating, this program does not work as expected anymore!](#after-updating-this-program-does-not-work-as-expected-anymore)
   - [Can I buy you a beer / coffee / random drink?](#can-i-buy-you-a-beer--coffee--random-drink)
 - [Related Tools and Articles](#related-tools-and-articles)
@@ -49,7 +49,7 @@ Read on for more info.
 ## Requirements
 
 -   Python 3.7 or higher
--   ffmpeg v4.2 or higher from <https://ffmpeg.org/> – static builds using the latest Git master are recommended
+-   FFmpeg v4.2 or higher from <https://ffmpeg.org/> – static builds using the latest Git master are recommended
 -   `ffmpeg` must be in your \$PATH
 
 ## Installation
@@ -84,11 +84,11 @@ For more information, run `ffmpeg-normalize -h`, or read on.
 
 ## Description
 
-Please read this section for a high level introduction.
+Please read this section for a high-level introduction.
 
 **What does the program do?**
 
-The program takes one or more input files and, by default, writes them to a folder called `normalized`, using an `.mkv` container. All audio streams will be normalized so that they have the same (perceived) volume.
+The program takes one or more input files and, by default, writes them to a folder called `normalized`, using a `.mkv` container. All audio streams will be normalized so that they have the same (perceived) volume.
 
 **How do I specify the input?**
 
@@ -118,9 +118,9 @@ The normalization will be performed with the [`loudnorm` filter](http://ffmpeg.o
 
 **What codec is chosen?**
 
-The default audio encoding method is uncompressed PCM (`pcm_s16le`) to avoid introducing compression artifacts. This will result in a much higher bitrate than you might want, for example if your input files are MP3s.
+The default audio encoding method is uncompressed PCM (`pcm_s16le`) to avoid introducing compression artifacts. This will result in a much higher bitrate than you might want, for example, if your input files are MP3s.
 
-Some containers (like MP4) also cannot handle PCM audio. If you want to use such containers and/or keep the file size down, use `-c:a` and specify an audio codec (e.g., `-c:a aac` for ffmpeg's built-in AAC encoder).
+Some containers (like MP4) also cannot handle PCM audio. If you want to use such containers and/or keep the file size down, use `-c:a` and specify an audio codec (e.g., `-c:a aac` for FFmpeg's built-in AAC encoder).
 
 ## Examples
 
@@ -147,7 +147,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 ### General
 
-- `-f, --force`: Force overwrite existing files
+- `-f, --force`: Force overwrites existing files
 
 - `-d, --debug`: Print debugging output
 
@@ -183,7 +183,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 - `-lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET`: EBU Loudness Range Target in LUFS (default: 7.0).
 
-    Range is 1.0 - 50.0.
+    The range is 1.0 - 50.0.
 
 - `--keep-loudness-range-target`: Keep the input loudness range target to allow for linear normalization.
 
@@ -203,9 +203,9 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 - `--dynamic`: Force dynamic normalization mode.
 
-    Instead of applying linear EBU R128 normalization, choose a dynamic normalization. This is not usually recommended.
+    Instead of applying linear EBU R128 normalization, choose dynamic normalization. This is not usually recommended.
 
-    Dynamic mode will automatically change the sample rate to 192 kHz. Use -ar/--sample-rate to specify a different output sample rate.
+    The dynamic mode will automatically change the sample rate to 192 kHz. Use -ar/--sample-rate to specify a different output sample rate.
 
 ### Audio Encoding
 
@@ -221,9 +221,9 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 - `-ar SAMPLE_RATE, --sample-rate SAMPLE_RATE`: Audio sample rate to use for output files in Hz.
 
-    Will use input sample rate by default, except for EBU normalization, which will change the input sample rate to 192 kHz.
+    Will use the input sample rate by default, except for EBU normalization, which will change the input sample rate to 192 kHz.
 
-- `-koa, --keep-original-audio`: Copy original, non-normalized audio streams to output file
+- `-koa, --keep-original-audio`: Copy original, non-normalized audio streams to output the file
 
 - `-prf PRE_FILTER, --pre-filter PRE_FILTER`: Add an audio filter chain before applying normalization.
 
@@ -243,7 +243,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
     See `ffmpeg -encoders` for a list.
 
-    Will attempt to copy video codec by default.
+    Will attempt to copy the video codec by default.
 
 - `-sn, --subtitle-disable`: Do not write subtitle streams to output
 
@@ -256,7 +256,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 - `-ei EXTRA_INPUT_OPTIONS, --extra-input-options EXTRA_INPUT_OPTIONS`: Extra input options list.
 
-    A list of extra ffmpeg command line arguments valid for the input, applied before ffmpeg's `-i`.
+    A list of extra FFmpeg command line arguments valid for the input, applied before FFmpeg's `-i`.
 
     You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.
 
@@ -266,7 +266,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 - `-e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS`: Extra output options list.
 
-    A list of extra ffmpeg command line arguments valid for the output.
+    A list of extra FFmpeg command line arguments valid for the output.
 
     You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.
 
@@ -278,7 +278,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
     See `ffmpeg -formats` for a list.
 
-    If not specified, the format will be inferred by ffmpeg from the output file name. If the output file name is not explicitly specified, the extension will govern the format (see '--extension' option).
+    If not specified, the format will be inferred by FFmpeg from the output file name. If the output file name is not explicitly specified, the extension will govern the format (see '--extension' option).
 
 - `-ext EXTENSION, --extension EXTENSION`: Output file extension to use for output files that were not explicitly specified. (Default: `mkv`)
 
@@ -294,7 +294,7 @@ The program additionally respects environment variables:
 
 - `FFMPEG_PATH`
 
-    Sets the full path to an `ffmpeg` executable other than
+    Sets the full path to a `FFmpeg` executable other than
     the system default or you can provide a file name available on $PATH
 
 
@@ -302,31 +302,31 @@ The program additionally respects environment variables:
 
 ### The program doesn't work because the "loudnorm" filter can't be found
 
-Make sure you run ffmpeg v3.1 or higher and that `loudnorm` is part of the output when you run `ffmpeg -filters`. Many distributions package outdated ffmpeg 2.x versions, or (even worse), Libav's `ffmpeg` disguising as a real `ffmpeg` from the FFmpeg project.
+Make sure you run FFmpeg v3.1 or higher and that `loudnorm` is part of the output when you run `ffmpeg -filters`. Many distributions package outdated FFmpeg 2.x versions, or (even worse), Libav's `FFmpeg` disguising as a real `FFmpeg` from the FFmpeg project.
 
-Some ffmpeg builds also do not have the `loudnorm` filter enabled.
+Some FFmpeg builds also do not have the `loudnorm` filter enabled.
 
 You can always download a static build from [their website](http://ffmpeg.org/download.html) and use that.
 
-If you have to use an outdated ffmpeg version, you can only use `rms` or `peak` as normalization types, but I can't promise that the program will work correctly.
+If you have to use an outdated FFmpeg version, you can only use `rms` or `peak` as normalization types, but I can't promise that the program will work correctly.
 
 ### Should I use this to normalize my music collection?
 
-When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this on your precious music collection, unless you have a backup of the originals or accept potential quality reduction. If you just want to normalize the subjective volume of the files without changing the actual content, consider using [MP3Gain](http://mp3gain.sourceforge.net/) and [aacgain](http://aacgain.altosdesign.com/).
+When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this on your precious music collection, unless you have a backup of the originals or accept a potential quality reduction. If you just want to normalize the subjective volume of the files without changing the actual content, consider using [MP3Gain](http://mp3gain.sourceforge.net/) and [aacgain](http://aacgain.altosdesign.com/).
 
 ### Why are my output files MKV?
 
 I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.
 
-### The conversion does not work and I get a cryptic ffmpeg error!
+### The conversion does not work and I get a cryptic FFmpeg error!
 
-Make sure you use a recent version of ffmpeg. The [static builds](https://ffmpeg.org/download.html) are usually the best option.
+Make sure you use a recent version of FFmpeg. The [static builds](https://ffmpeg.org/download.html) are usually the best option.
 
 Another possible reason is that the input file contains some streams that cannot be mapped to the output file. Examples:
 
 - You are trying to normalize a movie file, writing to a `.wav` or `.mp3` file. WAV/MP3 files only support audio, not video. Disable video and subtitles with `-vn` and `-sn`, or choose a container that supports video (e.g. `.mkv`).
 
-- You are trying to normalize a file, writing to an `.mp4` container. This program defaults to PCM audio, but MP4 does not support PCM audio. Make sure that your audio codec is set to something MP4 containers support (e.g. `-c:a aac).
+- You are trying to normalize a file, writing to a `.mp4` container. This program defaults to PCM audio, but MP4 does not support PCM audio. Make sure that your audio codec is set to something MP4 containers support (e.g. `-c:a aac).
 
 The default output container is `.mkv` as it will support most input stream types. If you want a different output container, [make sure that it supports](https://en.wikipedia.org/wiki/Comparison_of_container_file_formats) your input file's video, audio, and subtitle streams (if any).
 
@@ -338,15 +338,15 @@ Also, if there is some other broken metadata, you can try to disable copying ove
 
 - **Peak Normalization** analyzes the peak signal level in dBFS and increases the volume of the input signal such that the maximum in the output is 0 dB (or any other chosen threshold). Since spikes in the signal can cause high volume peaks, peak normalization might still result in files that are subjectively quieter than other, non-peak-normalized files.
 
-- **RMS-based Normalization** analyzes the [RMS power](https://en.wikipedia.org/wiki/Root_mean_square#Average_power) of the signal and changes the volume such that a new RMS target is reached. Otherwise it works similar to peak normalization.
+- **RMS-based Normalization** analyzes the [RMS power](https://en.wikipedia.org/wiki/Root_mean_square#Average_power) of the signal and changes the volume such that a new RMS target is reached. Otherwise, it works similar to peak normalization.
 
-### Couldn't I just run `loudnorm` with ffmpeg?
+### Couldn't I just run `loudnorm` with FFmpeg?
 
-You absolutely can. However, you can get better accuracy and linear normalization with two passes of the filter. Since ffmpeg does not allow you to automatically run these two passes, you have to do it yourself and parse the output values from the first run.
+You absolutely can. However, you can get better accuracy and linear normalization with two passes of the filter. Since FFmpeg does not allow you to automatically run these two passes, you have to do it yourself and parse the output values from the first run.
 
 If ffmpeg-normalize is too over-engineered for you, you could also use an approach such as featured [in this Ruby script](https://gist.github.com/kylophone/84ba07f6205895e65c9634a956bf6d54) that performs the two `loudnorm` passes.
 
-If you want dynamic normalization (the loudnorm default), simply use ffmpeg with one pass, e.g.:
+If you want dynamic normalization (the loudnorm default), simply use FFmpeg with one pass, e.g.:
 
 ```bash
 ffmpeg -i input.mp3 -af loudnorm -c:a aac -b:a 192k output.m4a
@@ -354,7 +354,7 @@ ffmpeg -i input.mp3 -af loudnorm -c:a aac -b:a 192k output.m4a
 
 ### After updating, this program does not work as expected anymore!
 
-You are probably using a 0.x version of this program. There are significant changes to the command line arguments and inner workings of this program, so please  adapt your scripts to the new one. Those changes were necessary to address a few issues that kept piling up; leaving the program as-is would have made it hard to extend it. You can continue using the old version (find it under *Releases* on GitHub or request the specific version from PyPi), but it will not be supported anymore.
+You are probably using a 0.x version of this program. There are significant changes to the command line arguments and inner workings of this program, so please  adapt your scripts for the new one. Those changes were necessary to address a few issues that kept piling up; leaving the program as-is would have made it hard to extend it. You can continue using the old version (find it under *Releases* on GitHub or request the specific version from PyPi), but it will not be supported anymore.
 
 ### Can I buy you a beer / coffee / random drink?
 
