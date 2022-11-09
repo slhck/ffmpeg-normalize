@@ -41,6 +41,7 @@ Read on for more info.
   - [The conversion does not work and I get a cryptic ffmpeg error!](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error)
   - [What are the different normalization algorithms?](#what-are-the-different-normalization-algorithms)
   - [Couldn't I just run `loudnorm` with ffmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
+  - [What about speech?](#what-about-speech)
   - [After updating, this program does not work as expected anymore!](#after-updating-this-program-does-not-work-as-expected-anymore)
   - [Can I buy you a beer / coffee / random drink?](#can-i-buy-you-a-beer--coffee--random-drink)
 - [Related Tools and Articles](#related-tools-and-articles)
@@ -364,6 +365,12 @@ If you want dynamic normalization (the loudnorm default), simply use ffmpeg with
 ```bash
 ffmpeg -i input.mp3 -af loudnorm -c:a aac -b:a 192k output.m4a
 ```
+
+### What about speech?
+
+You should check out the `speechnorm` filter that is part of ffmpeg. It is a designed to be used in one pass, so you don't need this script at all.
+
+See [the documentation](https://ffmpeg.org/ffmpeg-all.html#speechnorm) for more information.
 
 ### After updating, this program does not work as expected anymore!
 
