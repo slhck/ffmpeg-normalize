@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.25.3 (2022-11-09)
+
+* Update README.
+
+* Update list of pcm-incompatible extensions.
+
+
 ## v1.25.2 (2022-09-14)
 
 * Constrain parsed ranges to avoid out of bounds, fixes #189.
