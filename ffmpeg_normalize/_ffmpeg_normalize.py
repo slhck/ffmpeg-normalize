@@ -12,7 +12,7 @@ logger = setup_custom_logger("ffmpeg_normalize")
 
 NORMALIZATION_TYPES = ["ebu", "rms", "peak"]
 PCM_INCOMPATIBLE_FORMATS = ["mp4", "mp3", "ogg", "webm"]
-PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm"]
+PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm", "flac", "opus"]
 
 
 def check_range(number, min_r, max_r, name=""):
