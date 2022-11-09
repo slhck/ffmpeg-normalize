@@ -37,6 +37,7 @@ Read on for more info.
   - [The program doesn't work because the "loudnorm" filter can't be found](#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found)
   - [Should I use this to normalize my music collection?](#should-i-use-this-to-normalize-my-music-collection)
   - [Why are my output files MKV?](#why-are-my-output-files-mkv)
+  - ["Could not write header for output file" error](#could-not-write-header-for-output-file-error)
   - [The conversion does not work and I get a cryptic ffmpeg error!](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error)
   - [What are the different normalization algorithms?](#what-are-the-different-normalization-algorithms)
   - [Couldn't I just run `loudnorm` with ffmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
@@ -318,19 +319,31 @@ When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will in
 
 I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.
 
+### "Could not write header for output file" error
+
+See the [next section](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error).
+
 ### The conversion does not work and I get a cryptic ffmpeg error!
 
-Make sure you use a recent version of ffmpeg. The [static builds](https://ffmpeg.org/download.html) are usually the best option.
+Maybe ffmpeg says something like:
 
-Another possible reason is that the input file contains some streams that cannot be mapped to the output file. Examples:
+> Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument
+
+Or the program says:
+
+> … Please choose a suitable audio codec with the `-c:a` option.
+
+One possible reason is that the input file contains some streams that cannot be mapped to the output file, or that you are using a codec that does not work for the output file. Examples:
 
 - You are trying to normalize a movie file, writing to a `.wav` or `.mp3` file. WAV/MP3 files only support audio, not video. Disable video and subtitles with `-vn` and `-sn`, or choose a container that supports video (e.g. `.mkv`).
 
-- You are trying to normalize a file, writing to an `.mp4` container. This program defaults to PCM audio, but MP4 does not support PCM audio. Make sure that your audio codec is set to something MP4 containers support (e.g. `-c:a aac).
+- You are trying to normalize a file, writing to an `.mp4` container. This program defaults to PCM audio, but MP4 does not support PCM audio. Make sure that your audio codec is set to something MP4 containers support (e.g. `-c:a aac`).
 
 The default output container is `.mkv` as it will support most input stream types. If you want a different output container, [make sure that it supports](https://en.wikipedia.org/wiki/Comparison_of_container_file_formats) your input file's video, audio, and subtitle streams (if any).
 
 Also, if there is some other broken metadata, you can try to disable copying over of metadata with `-mn`.
+
+Finally, make sure you use a recent version of ffmpeg. The [static builds](https://ffmpeg.org/download.html) are usually the best option.
 
 ### What are the different normalization algorithms?
 
