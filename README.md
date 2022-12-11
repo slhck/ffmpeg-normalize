@@ -1,7 +1,7 @@
 # ffmpeg-normalize
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://pypi.org/project/ffmpeg-normalize) [![Python package](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml/badge.svg)](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml)
@@ -406,6 +406,7 @@ If you found this program useful and feel like giving back, feel free to send a 
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/aviolo"><img src="https://avatars.githubusercontent.com/u/560229?v=4?s=100" width="100px;" alt="Anthony Violo"/><br /><sub><b>Anthony Violo</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=aviolo" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://jacobs.af/"><img src="https://avatars.githubusercontent.com/u/952830?v=4?s=100" width="100px;" alt="Eric Jacobs"/><br /><sub><b>Eric Jacobs</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=jetpks" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kostalski"><img src="https://avatars.githubusercontent.com/u/34033008?v=4?s=100" width="100px;" alt="kostalski"/><br /><sub><b>kostalski</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=kostalski" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://justinppearson.com/"><img src="https://avatars.githubusercontent.com/u/8844823?v=4?s=100" width="100px;" alt="Justin Pearson"/><br /><sub><b>Justin Pearson</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=justinpearson" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
