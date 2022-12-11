@@ -2,6 +2,7 @@ import os
 import re
 import json
 import math
+from typing import Optional, TypedDict
 
 from ._errors import FFmpegNormalizeError
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
@@ -9,6 +10,21 @@ from ._logger import setup_custom_logger
 
 logger = setup_custom_logger("ffmpeg_normalize")
 
+class EbuLoudnessStatistics(TypedDict):
+    input_i: float
+    input_tp: float
+    input_lra: float
+    input_thresh: float
+    output_i: float
+    output_tp: float
+    output_lra: float
+    output_thresh: float
+    target_offset: float
+
+class LoudnessStatistics(TypedDict):
+    ebu: Optional[EbuLoudnessStatistics]
+    mean: Optional[float]
+    max: Optional[float]
 
 class MediaStream(object):
     def __init__(self, ffmpeg_normalize, media_file, stream_type, stream_id):
@@ -65,7 +81,11 @@ class AudioStream(MediaStream):
             media_file, ffmpeg_normalize, "audio", stream_id
         )
 
-        self.loudness_statistics = {"ebu": None, "mean": None, "max": None}
+        self.loudness_statistics: LoudnessStatistics = {
+            "ebu": None,
+            "mean": None,
+            "max": None,
+        }
 
         self.sample_rate = sample_rate
         self.bit_depth = bit_depth
@@ -327,7 +347,8 @@ class AudioStream(MediaStream):
             and not will_use_dynamic_mode
         ):
             logger.warning(
-                f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}, which is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
+                f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}. "
+                f"This is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
                 "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization. "
                 "Alternatively, use the --keep-loudness-range-target option to keep the target loudness range from the input."
             )

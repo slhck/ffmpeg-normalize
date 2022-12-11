@@ -17,14 +17,13 @@ PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm", "flac", "opus"]
 
 def check_range(number, min_r, max_r, name=""):
     """
-    Check if a number is within a given range
+    Check if a number is within a given range and return itself
     """
     try:
         number = float(number)
         if number < min_r or number > max_r:
             raise FFmpegNormalizeError(f"{name} must be within [{min_r},{max_r}]")
         return number
-        pass
     except Exception as e:
         raise e
 

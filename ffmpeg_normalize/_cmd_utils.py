@@ -34,7 +34,7 @@ def to_ms(s=None, des=None, **kwargs):
         hour = int(kwargs.get("hour", 0))
         minute = int(kwargs.get("min", 0))
         sec = int(kwargs.get("sec", 0))
-        ms = int(kwargs.get("ms"))
+        ms = int(kwargs.get("ms", 0))
 
     result = (hour * 60 * 60 * 1000) + (minute * 60 * 1000) + (sec * 1000) + ms
     if des and isinstance(des, int):
@@ -80,7 +80,7 @@ class CommandRunner:
 
         self.output = ff.stderr
 
-        if logger.getEffectiveLevel() == logging.DEBUG:
+        if logger.getEffectiveLevel() == logging.DEBUG and self.output is not None:
             logger.debug(
                 f"ffmpeg output: {CommandRunner.prune_ffmpeg_progress_from_output(self.output)}"
             )
@@ -112,6 +112,8 @@ class CommandRunner:
             raise RuntimeError(f"Error running command {self.cmd}: {str(stderr)}")
 
     def get_output(self):
+        if self.output is None:
+            raise FFmpegNormalizeError("Command has not been run yet")
         return self.output
 
 

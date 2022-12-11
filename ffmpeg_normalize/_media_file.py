@@ -20,16 +20,14 @@ class MediaFile:
     Class that holds a file, its streams and adjustments
     """
 
-    def __init__(self, ffmpeg_normalize, input_file, output_file=None):
+    def __init__(self, ffmpeg_normalize, input_file, output_file):
         """
         Initialize a media file for later normalization.
 
         Arguments:
             ffmpeg_normalize {FFmpegNormalize} -- reference to overall settings
             input_file {str} -- Path to input file
-
-        Keyword Arguments:
-            output_file {str} -- Path to output file (default: {None})
+            output_file {str} -- Path to output file
         """
         self.ffmpeg_normalize = ffmpeg_normalize
         self.skip = False
