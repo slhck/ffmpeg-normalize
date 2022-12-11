@@ -77,7 +77,7 @@ class AudioStream(MediaStream):
             and self.duration
             and self.duration <= 3
         ):
-            logger.warn(
+            logger.warning(
                 "Audio stream has a duration of less than 3 seconds. "
                 "Normalization may not work. "
                 "See https://github.com/slhck/ffmpeg-normalize/issues/87 for more info."
@@ -308,7 +308,7 @@ class AudioStream(MediaStream):
             )
 
         if float(self.loudness_statistics["ebu"]["input_i"]) > 0:
-            logger.warn(
+            logger.warning(
                 f"Input file had measured input loudness greater than zero ({self.loudness_statistics['ebu']['input_i']}), capping at 0"
             )
             self.loudness_statistics["ebu"]["input_i"] = 0
@@ -326,7 +326,7 @@ class AudioStream(MediaStream):
             < self.loudness_statistics["ebu"]["input_lra"]
             and not will_use_dynamic_mode
         ):
-            logger.warn(
+            logger.warning(
                 f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}, which is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
                 "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization. "
                 "Alternatively, use the --keep-loudness-range-target option to keep the target loudness range from the input."
@@ -334,7 +334,7 @@ class AudioStream(MediaStream):
             will_use_dynamic_mode = True
 
         if will_use_dynamic_mode and not self.ffmpeg_normalize.sample_rate:
-            logger.warn(
+            logger.warning(
                 "In dynamic mode, the sample rate will automatically be set to 192 kHz by the loudnorm filter. "
                 "Specify -ar/--sample-rate to override it."
             )

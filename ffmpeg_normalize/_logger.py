@@ -34,14 +34,15 @@ def set_mp_lock():
         pass
 
 
-def setup_custom_logger(name):
+def setup_custom_logger(name) -> logging.Logger:
     """
     Create a logger with a certain name and level
     """
     global loggers
 
-    if loggers.get(name):
-        return loggers.get(name)
+    existing_logger = loggers.get(name)
+    if existing_logger is not None:
+        return existing_logger
 
     formatter = logging.Formatter(fmt="%(levelname)s: %(message)s")
 

@@ -297,7 +297,7 @@ class MediaFile:
                 cmd.extend(["-c:v", self.ffmpeg_normalize.video_codec])
             else:
                 if not self.ffmpeg_normalize.video_disable:
-                    logger.warn(
+                    logger.warning(
                         f"The chosen output extension {self.output_ext} does not support video/cover art. It will be disabled."
                     )
 

@@ -90,7 +90,7 @@ class FFmpegNormalize:
         self.keep_loudness_range_target = keep_loudness_range_target
 
         if self.keep_loudness_range_target and loudness_range_target != 7.0:
-            logger.warn(
+            logger.warning(
                 "Setting --keep-loudness-range-target will override your set loudness range target value! "
                 "Remove --keep-loudness-range-target or remove the --lrt/--loudness-range-target option."
             )
