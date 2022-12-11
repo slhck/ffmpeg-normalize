@@ -1,5 +1,9 @@
 # ffmpeg-normalize
 
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
 [![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://pypi.org/project/ffmpeg-normalize) [![Python package](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml/badge.svg)](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml)
 
 A utility for batch-normalizing audio using ffmpeg.
@@ -45,6 +49,8 @@ Read on for more info.
   - [After updating, this program does not work as expected anymore!](#after-updating-this-program-does-not-work-as-expected-anymore)
   - [Can I buy you a beer / coffee / random drink?](#can-i-buy-you-a-beer--coffee--random-drink)
 - [Related Tools and Articles](#related-tools-and-articles)
+- [Contributors](#contributors)
+- [License](#license)
 
 -------------
 
@@ -386,7 +392,34 @@ If you found this program useful and feel like giving back, feel free to send a 
 
 *(Have a link? Please propose an edit to this section via a pull request!)*
 
-# License
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://overtag.dk/"><img src="https://avatars.githubusercontent.com/u/374612?v=4?s=100" width="100px;" alt="Benjamin Balder Bach"/><br /><sub><b>Benjamin Balder Bach</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=benjaoming" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td align="center" size="13px" colspan="7">
+        <img src="https://raw.githubusercontent.com/all-contributors/all-contributors-cli/1b8533af435da9854653492b1327a23a4dbd0a10/assets/logo-small.svg">
+          <a href="https://all-contributors.js.org/docs/en/bot/usage">Add your contributions</a>
+        </img>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+## License
 
 The MIT License (MIT)
 
