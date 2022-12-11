@@ -45,6 +45,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "jetpks",
+      "name": "Eric Jacobs",
+      "avatar_url": "https://avatars.githubusercontent.com/u/952830?v=4",
+      "profile": "https://jacobs.af/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
