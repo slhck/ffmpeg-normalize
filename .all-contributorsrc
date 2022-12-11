@@ -90,6 +90,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mpuels",
+      "name": "Marc Püls",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2924816?v=4",
+      "profile": "https://github.com/mpuels",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
