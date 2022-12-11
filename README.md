@@ -1,7 +1,7 @@
 # ffmpeg-normalize
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://pypi.org/project/ffmpeg-normalize) [![Python package](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml/badge.svg)](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml)
@@ -403,6 +403,7 @@ If you found this program useful and feel like giving back, feel free to send a 
       <td align="center" valign="top" width="14.28%"><a href="https://overtag.dk/"><img src="https://avatars.githubusercontent.com/u/374612?v=4?s=100" width="100px;" alt="Benjamin Balder Bach"/><br /><sub><b>Benjamin Balder Bach</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=benjaoming" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://chaos.social/@eleni"><img src="https://avatars.githubusercontent.com/u/511547?v=4?s=100" width="100px;" alt="Eleni Lixourioti"/><br /><sub><b>Eleni Lixourioti</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=Geekfish" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/thenewguy"><img src="https://avatars.githubusercontent.com/u/77731?v=4?s=100" width="100px;" alt="thenewguy"/><br /><sub><b>thenewguy</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=thenewguy" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/aviolo"><img src="https://avatars.githubusercontent.com/u/560229?v=4?s=100" width="100px;" alt="Anthony Violo"/><br /><sub><b>Anthony Violo</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=aviolo" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
