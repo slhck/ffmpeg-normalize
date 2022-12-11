@@ -1,7 +1,7 @@
 # ffmpeg-normalize
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://pypi.org/project/ffmpeg-normalize) [![Python package](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml/badge.svg)](https://github.com/slhck/ffmpeg-normalize/actions/workflows/python-package.yml)
@@ -410,6 +410,7 @@ If you found this program useful and feel like giving back, feel free to send a 
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Nottt"><img src="https://avatars.githubusercontent.com/u/13532436?v=4?s=100" width="100px;" alt="ad90xa0-aa"/><br /><sub><b>ad90xa0-aa</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=Nottt" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mathijsz"><img src="https://avatars.githubusercontent.com/u/1891187?v=4?s=100" width="100px;" alt="Mathijs"/><br /><sub><b>Mathijs</b></sub></a><br /><a href="https://github.com/slhck/ffmoeg-normalize/commits?author=Mathijsz" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
