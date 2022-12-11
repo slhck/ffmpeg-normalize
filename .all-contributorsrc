@@ -18,6 +18,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Geekfish",
+      "name": "Eleni Lixourioti",
+      "avatar_url": "https://avatars.githubusercontent.com/u/511547?v=4",
+      "profile": "https://chaos.social/@eleni",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
