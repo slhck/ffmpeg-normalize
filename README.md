@@ -56,7 +56,7 @@ Read on for more info.
 
 ## Requirements
 
--   Python 3.7 or higher
+-   Python 3.8 or higher
 -   ffmpeg v4.2 or higher from <https://ffmpeg.org/> – static builds using the latest Git master are recommended
 -   `ffmpeg` must be in your \$PATH
 
