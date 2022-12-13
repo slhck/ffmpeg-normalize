@@ -12,7 +12,8 @@ from ._logger import setup_custom_logger
 
 logger = setup_custom_logger("ffmpeg_normalize")
 
-AUDIO_ONLY_FORMATS = ["ogg", "wav", "opus"]
+AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mp3", "mka", "oga", "ogg", "opus", "wav"}
+ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
 
 
 class MediaFile:
@@ -136,7 +137,7 @@ class MediaFile:
             )
 
         if (
-            os.path.splitext(self.output_file)[1].lower() in [".wav", ".mp3", ".aac"]
+            self.output_ext.lower() in ONE_STREAM
             and len(self.streams["audio"].values()) > 1
         ):
             logger.warning(
@@ -167,7 +168,7 @@ class MediaFile:
         """
         Determine whether the output file can contain video at all.
         """
-        if self.output_ext in AUDIO_ONLY_FORMATS:
+        if self.output_ext.lower() in AUDIO_ONLY_FORMATS:
             return False
 
         return not self.ffmpeg_normalize.video_disable
