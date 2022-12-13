@@ -357,8 +357,7 @@ class MediaFile:
         try:
             cmd_runner = CommandRunner(cmd)
             try:
-                for progress in cmd_runner.run_ffmpeg_command():
-                    yield progress
+                yield from cmd_runner.run_ffmpeg_command()
             except Exception as e:
                 logger.error(
                     "Error while running command {}! Error: {}".format(

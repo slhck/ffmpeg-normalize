@@ -26,7 +26,7 @@ class LoudnessStatistics(TypedDict):
     mean: Optional[float]
     max: Optional[float]
 
-class MediaStream(object):
+class MediaStream:
     def __init__(self, ffmpeg_normalize, media_file, stream_type, stream_id):
         """
         Arguments:
@@ -49,14 +49,14 @@ class MediaStream(object):
 
 class VideoStream(MediaStream):
     def __init__(self, ffmpeg_normalize, media_file, stream_id):
-        super(VideoStream, self).__init__(
+        super().__init__(
             media_file, ffmpeg_normalize, "video", stream_id
         )
 
 
 class SubtitleStream(MediaStream):
     def __init__(self, ffmpeg_normalize, media_file, stream_id):
-        super(SubtitleStream, self).__init__(
+        super().__init__(
             media_file, ffmpeg_normalize, "subtitle", stream_id
         )
 
@@ -77,7 +77,7 @@ class AudioStream(MediaStream):
             bit_depth {int}
             duration {int} -- duration in seconds
         """
-        super(AudioStream, self).__init__(
+        super().__init__(
             media_file, ffmpeg_normalize, "audio", stream_id
         )
 
@@ -186,8 +186,7 @@ class AudioStream(MediaStream):
         ]
 
         cmd_runner = CommandRunner(cmd)
-        for progress in cmd_runner.run_ffmpeg_command():
-            yield progress
+        yield from cmd_runner.run_ffmpeg_command()
         output = cmd_runner.get_output()
 
         logger.debug(
@@ -253,8 +252,7 @@ class AudioStream(MediaStream):
         ]
 
         cmd_runner = CommandRunner(cmd)
-        for progress in cmd_runner.run_ffmpeg_command():
-            yield progress
+        yield from cmd_runner.run_ffmpeg_command()
         output = cmd_runner.get_output()
 
         logger.debug(
