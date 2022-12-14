@@ -37,6 +37,7 @@ Read on for more info.
   - [Other Encoding Options](#other-encoding-options)
   - [Input/Output Format](#inputoutput-format)
   - [Environment Variables](#environment-variables)
+- [API](#api)
 - [FAQ](#faq)
   - [The program doesn't work because the "loudnorm" filter can't be found](#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found)
   - [Should I use this to normalize my music collection?](#should-i-use-this-to-normalize-my-music-collection)
@@ -305,6 +306,11 @@ The program additionally respects environment variables:
     Sets the full path to an `ffmpeg` executable other than
     the system default or you can provide a file name available on $PATH
 
+## API
+
+This program has a simple API that can be used to integrate it into other Python programs.
+
+For more information see the [API documentation](https://htmlpreview.github.io/?https://github.com/slhck/ffmpeg-normalize/blob/master/docs/ffmpeg_normalize.html).
 
 ## FAQ
 
