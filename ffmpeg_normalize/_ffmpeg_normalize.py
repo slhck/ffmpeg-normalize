@@ -1,6 +1,7 @@
 import os
 import json
 from numbers import Number
+from typing import List, Literal, Union
 from tqdm import tqdm
 
 from ._cmd_utils import get_ffmpeg_exe, ffmpeg_has_loudnorm
@@ -15,7 +16,7 @@ PCM_INCOMPATIBLE_FORMATS = ["mp4", "mp3", "ogg", "webm"]
 PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm", "flac", "opus"]
 
 
-def check_range(number: float, min_r: float, max_r: float, name: str="") -> float:
+def check_range(number: float, min_r: float, max_r: float, name: str = "") -> float:
     """
     Check if a number is within a given range.
 
@@ -46,41 +47,65 @@ class FFmpegNormalize:
     ffmpeg-normalize class.
 
     Args:
-        See README.md for a full list of arguments.
+        normalization_type (str, optional): Normalization type. Defaults to "ebu".
+        target_level (float, optional): Target level. Defaults to -23.0.
+        print_stats (bool, optional): Print loudnorm stats. Defaults to False.
+        loudness_range_target (float, optional): Loudness range target. Defaults to 7.0.
+        keep_loudness_range_target (bool, optional): Keep loudness range target. Defaults to False.
+        true_peak (float, optional): True peak. Defaults to -2.0.
+        offset (float, optional): Offset. Defaults to 0.0.
+        dual_mono (bool, optional): Dual mono. Defaults to False.
+        dynamic (bool, optional): Dynamic. Defaults to False.
+        audio_codec (str, optional): Audio codec. Defaults to "pcm_s16le".
+        audio_bitrate (float, optional): Audio bitrate. Defaults to None.
+        sample_rate (int, optional): Sample rate. Defaults to None.
+        keep_original_audio (bool, optional): Keep original audio. Defaults to False.
+        pre_filter (str, optional): Pre filter. Defaults to None.
+        post_filter (str, optional): Post filter. Defaults to None.
+        video_codec (str, optional): Video codec. Defaults to "copy".
+        video_disable (bool, optional): Disable video. Defaults to False.
+        subtitle_disable (bool, optional): Disable subtitles. Defaults to False.
+        metadata_disable (bool, optional): Disable metadata. Defaults to False.
+        chapters_disable (bool, optional): Disable chapters. Defaults to False.
+        extra_input_options (list, optional): Extra input options. Defaults to None.
+        extra_output_options (list, optional): Extra output options. Defaults to None.
+        output_format (str, optional): Output format. Defaults to None.
+        dry_run (bool, optional): Dry run. Defaults to False.
+        debug (bool, optional): Debug. Defaults to False.
+        progress (bool, optional): Progress. Defaults to False.
 
     Raises:
         FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
     """
-
     def __init__(
         self,
-        normalization_type="ebu",
-        target_level=-23.0,
-        print_stats=False,
+        normalization_type: Literal["ebu", "rms", "peak"] = "ebu",
+        target_level: float = -23.0,
+        print_stats: bool = False,
         # threshold=0.5,
-        loudness_range_target=7.0,
-        keep_loudness_range_target=False,
-        true_peak=-2.0,
-        offset=0.0,
-        dual_mono=False,
-        dynamic=False,
-        audio_codec="pcm_s16le",
-        audio_bitrate=None,
-        sample_rate=None,
-        keep_original_audio=False,
-        pre_filter=None,
-        post_filter=None,
+        loudness_range_target: float = 7.0,
+        keep_loudness_range_target: bool = False,
+        true_peak: float = -2.0,
+        offset: float = 0.0,
+        dual_mono: bool = False,
+        dynamic: bool = False,
+        audio_codec: str = "pcm_s16le",
+        audio_bitrate: Union[float, None] = None,
+        sample_rate: Union[int, None] = None,
+        keep_original_audio: bool = False,
+        pre_filter: Union[str, None] = None,
+        post_filter: Union[str, None] = None,
         video_codec="copy",
-        video_disable=False,
-        subtitle_disable=False,
-        metadata_disable=False,
-        chapters_disable=False,
-        extra_input_options=None,
-        extra_output_options=None,
-        output_format=None,
-        dry_run=False,
-        debug=False,
-        progress=False,
+        video_disable: bool = False,
+        subtitle_disable: bool = False,
+        metadata_disable: bool = False,
+        chapters_disable: bool = False,
+        extra_input_options: Union[List[str], None] = None,
+        extra_output_options: Union[List[str], None] = None,
+        output_format: Union[str, None] = None,
+        dry_run: bool = False,
+        debug: bool = False,
+        progress: bool = False,
     ):
         self.ffmpeg_exe = get_ffmpeg_exe()
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
@@ -176,7 +201,7 @@ class FFmpegNormalize:
         """
         Add a media file to normalize
 
-        Arguments:
+        Args:
             input_file (str): Path to input file
             output_file (str): Path to output file
         """

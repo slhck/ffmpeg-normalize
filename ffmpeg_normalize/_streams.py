@@ -96,9 +96,9 @@ class AudioStream(MediaStream):
             ffmpeg_normalize (FFmpegNormalize): The FFmpegNormalize object.
             media_file (MediaFile): The MediaFile object.
             stream_id (int): The stream ID.
-            sample_rate (int) -- sample rate in Hz
-            bit_depth (int) -- bit depth in bits
-            duration (float) -- duration in seconds
+            sample_rate (int): sample rate in Hz
+            bit_depth (int): bit depth in bits
+            duration (float): duration in seconds
         """
         super().__init__(
             ffmpeg_normalize, media_file, "audio", stream_id
