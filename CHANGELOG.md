@@ -1,6 +1,67 @@
 # Changelog
 
 
+## v1.26.0 (2022-12-14)
+
+* Add .editorconfig.
+
+* Link to API docs.
+
+* Add docs.
+
+* Add type hints, document everything, refactor some code.
+
+* Add more audio formats (#199)
+
+* Add python 3.11 to CI.
+
+* Docs: add WyattBlue as a contributor for code (#198)
+
+  * docs: update README.md
+
+  * docs: update .all-contributorsrc
+
+* Upgrade to Python 3.8 syntax (#197)
+
+* Fix python version in github tests.
+
+* Bump requirements to latest versions.
+
+* Add python 3.11 to list of languages.
+
+* Bump required python version to 3.8.
+
+* Various minor code cleanups and type hints.
+
+* Harmonize logger code.
+
+* Update python version in tests.
+
+* Docs: add @mvbattista as a contributor.
+
+* Docs: add @mpuels as a contributor.
+
+* Docs: add @Mathijsz as a contributor.
+
+* Docs: add @Nottt as a contributor.
+
+* Docs: add @justinpearson as a contributor.
+
+* Docs: add @kostalski as a contributor.
+
+* Docs: add @jetpks as a contributor.
+
+* Docs: add @aviolo as a contributor.
+
+* Docs: add @thenewguy as a contributor.
+
+* Docs: add @Geekfish as a contributor.
+
+* Docs: add @benjaoming as a contributor.
+
+* Reference speechnorm.
+
+
 ## v1.25.3 (2022-11-09)
 
 * Update README.
