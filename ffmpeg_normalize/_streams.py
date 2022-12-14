@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import os
 import re
 import json
 import math
-from typing import Optional, TypedDict
+from typing import Generator, List, Literal, Optional, TypedDict, Union, TYPE_CHECKING
 
 from ._errors import FFmpegNormalizeError
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
 from ._logger import setup_custom_logger
+
+if TYPE_CHECKING:
+    from ._ffmpeg_normalize import FFmpegNormalize
+    from ._media_file import MediaFile
 
 logger = setup_custom_logger("ffmpeg_normalize")
 
@@ -26,13 +32,21 @@ class LoudnessStatistics(TypedDict):
     mean: Optional[float]
     max: Optional[float]
 
+class LoudnessStatisticsWithMetadata(LoudnessStatistics):
+    input_file: str
+    output_file: str
+    stream_id: int
+
 class MediaStream:
-    def __init__(self, ffmpeg_normalize, media_file, stream_type, stream_id):
+    def __init__(self, ffmpeg_normalize: FFmpegNormalize, media_file: MediaFile, stream_type: Literal["audio", "video", "subtitle"], stream_id: int):
         """
-        Arguments:
-            media_file {MediaFile} -- parent media file
-            stream_type {str} -- stream type
-            stream_id {int} -- Audio stream id
+        Create a MediaStream object.
+
+        Args:
+            ffmpeg_normalize (FFmpegNormalize): The FFmpegNormalize object.
+            media_file (MediaFile): The MediaFile object.
+            stream_type (Literal["audio", "video", "subtitle"]): The type of the stream.
+            stream_id (int): The stream ID.
         """
         self.ffmpeg_normalize = ffmpeg_normalize
         self.media_file = media_file
@@ -40,6 +54,10 @@ class MediaStream:
         self.stream_id = stream_id
 
     def __repr__(self):
+        """
+        Returns:
+            str: A string representation of the MediaStream object.
+        """
         return "<{}, {} stream {}>".format(
             os.path.basename(self.media_file.input_file),
             self.stream_type,
@@ -50,35 +68,40 @@ class MediaStream:
 class VideoStream(MediaStream):
     def __init__(self, ffmpeg_normalize, media_file, stream_id):
         super().__init__(
-            media_file, ffmpeg_normalize, "video", stream_id
+            ffmpeg_normalize, media_file, "video", stream_id
         )
 
 
 class SubtitleStream(MediaStream):
     def __init__(self, ffmpeg_normalize, media_file, stream_id):
         super().__init__(
-            media_file, ffmpeg_normalize, "subtitle", stream_id
+            ffmpeg_normalize, media_file, "subtitle", stream_id
         )
 
 
 class AudioStream(MediaStream):
     def __init__(
         self,
-        ffmpeg_normalize,
-        media_file,
-        stream_id,
-        sample_rate=None,
-        bit_depth=None,
-        duration=None,
+        ffmpeg_normalize: FFmpegNormalize,
+        media_file: MediaFile,
+        stream_id: int,
+        sample_rate: Union[int, None],
+        bit_depth: Union[int, None],
+        duration: Union[float, None],
     ):
         """
-        Arguments:
-            sample_rate {int} -- in Hz
-            bit_depth {int}
-            duration {int} -- duration in seconds
+        Create an AudioStream object.
+
+        Args:
+            ffmpeg_normalize (FFmpegNormalize): The FFmpegNormalize object.
+            media_file (MediaFile): The MediaFile object.
+            stream_id (int): The stream ID.
+            sample_rate (int) -- sample rate in Hz
+            bit_depth (int) -- bit depth in bits
+            duration (float) -- duration in seconds
         """
         super().__init__(
-            media_file, ffmpeg_normalize, "audio", stream_id
+            ffmpeg_normalize, media_file, "audio", stream_id
         )
 
         self.loudness_statistics: LoudnessStatistics = {
@@ -109,9 +132,21 @@ class AudioStream(MediaStream):
         )
 
     @staticmethod
-    def _constrain(number, min_range, max_range, name=None):
+    def _constrain(number: float, min_range: float, max_range: float, name: Union[str, None] = None) -> float:
         """
-        Constrain a number between two values
+        Constrain a number between two values.
+
+        Args:
+            number (float): The number to constrain.
+            min_range (float): The minimum value.
+            max_range (float): The maximum value.
+            name (str): The name of the number (for logging).
+
+        Returns:
+            float: The constrained number.
+
+        Raises:
+            ValueError: If min_range is greater than max_range.
         """
         if min_range > max_range:
             raise ValueError("min must be smaller than max")
@@ -122,19 +157,30 @@ class AudioStream(MediaStream):
             )
         return result
 
-    def get_stats(self):
+    def get_stats(self) -> LoudnessStatisticsWithMetadata:
         """
-        Return statistics
+        Return loudness statistics for the stream.
+
+        Returns:
+            dict: A dictionary containing the loudness statistics.
         """
-        stats = {
+        stats: LoudnessStatisticsWithMetadata = {
             "input_file": self.media_file.input_file,
             "output_file": self.media_file.output_file,
             "stream_id": self.stream_id,
+            "ebu": self.loudness_statistics["ebu"],
+            "mean": self.loudness_statistics["mean"],
+            "max": self.loudness_statistics["max"],
         }
-        stats.update(self.loudness_statistics)
         return stats
 
-    def get_pcm_codec(self):
+    def get_pcm_codec(self) -> str:
+        """
+        Get the PCM codec string for the stream.
+
+        Returns:
+            str: The PCM codec string.
+        """
         if not self.bit_depth:
             return "pcm_s16le"
         elif self.bit_depth <= 8:
@@ -147,10 +193,16 @@ class AudioStream(MediaStream):
             )
             return "pcm_s16le"
 
-    def _get_filter_str_with_pre_filter(self, current_filter):
+    def _get_filter_str_with_pre_filter(self, current_filter: str) -> str:
         """
-        Get a filter string for current_filter, with the pre-filter
+        Get a filter string for current_filter, with the pre-filter
         added before. Applies the input label before.
+
+        Args:
+            current_filter (str): The current filter.
+
+        Returns:
+            str: The filter string.
         """
         input_label = f"[0:{self.stream_id}]"
         filter_chain = []
@@ -160,9 +212,12 @@ class AudioStream(MediaStream):
         filter_str = input_label + ",".join(filter_chain)
         return filter_str
 
-    def parse_astats(self):
+    def parse_astats(self) -> Generator[int, None, None]:
         """
         Use ffmpeg with astats filter to get the mean (RMS) and max (peak) volume of the input file.
+
+        Yields:
+            int: The progress of the command.
         """
         logger.info(f"Running first pass astats filter for stream {self.stream_id}")
 
@@ -215,9 +270,12 @@ class AudioStream(MediaStream):
                 f"Could not get max volume for {self.media_file.input_file}"
             )
 
-    def parse_loudnorm_stats(self):
+    def parse_loudnorm_stats(self) -> Generator[int, None, None]:
         """
         Run a first pass loudnorm filter to get measured data.
+
+        Yields:
+            int: The progress of the command.
         """
         logger.info(f"Running first pass loudnorm filter for stream {self.stream_id}")
 
@@ -266,7 +324,19 @@ class AudioStream(MediaStream):
         )
 
     @staticmethod
-    def _parse_loudnorm_output(output_lines):
+    def _parse_loudnorm_output(output_lines: List[str]) -> EbuLoudnessStatistics:
+        """
+        Parse the output of a loudnorm filter to get the EBU loudness statistics.
+
+        Args:
+            output_lines (List[str]): The output lines of the loudnorm filter.
+
+        Raises:
+            FFmpegNormalizeError: When the output could not be parsed.
+
+        Returns:
+            EbuLoudnessStatistics: The EBU loudness statistics.
+        """
         loudnorm_start = False
         loudnorm_end = False
         for index, line in enumerate(output_lines):
@@ -315,7 +385,7 @@ class AudioStream(MediaStream):
                 f"Could not parse loudnorm stats; wrong JSON format in string: {e}"
             )
 
-    def get_second_pass_opts_ebu(self):
+    def get_second_pass_opts_ebu(self) -> str:
         """
         Return second pass loudnorm filter options string for ffmpeg
         """
@@ -378,11 +448,19 @@ class AudioStream(MediaStream):
 
         return "loudnorm=" + dict_to_filter_opts(opts)
 
-    def get_second_pass_opts_peakrms(self):
+    def get_second_pass_opts_peakrms(self) -> str:
         """
         Set the adjustment gain based on chosen option and mean/max volume,
         return the matching ffmpeg volume filter.
+
+        Returns:
+            str: ffmpeg volume filter string
         """
+        if self.loudness_statistics["max"] is None or self.loudness_statistics["mean"] is None:
+            raise FFmpegNormalizeError(
+                "First pass not run, no mean/max volume to normalize to"
+            )
+
         normalization_type = self.media_file.ffmpeg_normalize.normalization_type
         target_level = self.media_file.ffmpeg_normalize.target_level
 

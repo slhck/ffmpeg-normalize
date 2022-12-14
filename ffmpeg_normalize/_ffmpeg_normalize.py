@@ -15,9 +15,22 @@ PCM_INCOMPATIBLE_FORMATS = ["mp4", "mp3", "ogg", "webm"]
 PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm", "flac", "opus"]
 
 
-def check_range(number, min_r, max_r, name=""):
+def check_range(number: float, min_r: float, max_r: float, name: str="") -> float:
     """
-    Check if a number is within a given range and return itself
+    Check if a number is within a given range.
+
+    Args:
+        number (float): Number to check
+        min_r (float): Minimum range
+        max_r (float): Maximum range
+        name (str): Name of the number to check
+
+    Returns:
+        float: Number if it is within the range
+
+    Raises:
+        FFmpegNormalizeError: If the number is not within the range
+        Exception: If the number cannot be converted to a float
     """
     try:
         number = float(number)
@@ -31,6 +44,12 @@ def check_range(number, min_r, max_r, name=""):
 class FFmpegNormalize:
     """
     ffmpeg-normalize class.
+
+    Args:
+        See README.md for a full list of arguments.
+
+    Raises:
+        FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
     """
 
     def __init__(
@@ -153,13 +172,13 @@ class FFmpegNormalize:
         self.media_files = []
         self.file_count = 0
 
-    def add_media_file(self, input_file, output_file):
+    def add_media_file(self, input_file: str, output_file: str):
         """
         Add a media file to normalize
 
         Arguments:
-            input_file {str} -- Path to input file
-            output_file {str} -- Path to output file
+            input_file (str): Path to input file
+            output_file (str): Path to output file
         """
         if not os.path.exists(input_file):
             raise FFmpegNormalizeError("file " + input_file + " does not exist")

@@ -4,6 +4,7 @@ from shutil import which
 import subprocess
 from platform import system as _current_os
 import re
+from typing import Dict, List, Union
 from ffmpeg_progress_yield import FfmpegProgress
 
 from ._errors import FFmpegNormalizeError
@@ -23,8 +24,22 @@ DUR_REGEX = re.compile(
 )
 
 
-# https://gist.github.com/Hellowlol/5f8545e999259b4371c91ac223409209
-def to_ms(s=None, des=None, **kwargs):
+def to_ms(s: Union[str, None] = None, decimals: Union[int, None] = None, **kwargs) -> int:
+    """This function converts a string with time format "hh:mm:ss:ms" to milliseconds
+
+    Args:
+        s (str): String with time format "hh:mm:ss:ms", if not provided, the function will use the keyword arguments (optional)
+        decimals (int): Number of decimals to round to (optional)
+
+    Keyword Args:
+        hour: Number of hours (optional)
+        min: Number of minutes (optional)
+        sec: Number of seconds (optional)
+        ms: Number of milliseconds (optional)
+
+    Returns:
+        int: Integer with the number of milliseconds
+    """
     if s:
         hour = int(s[0:2])
         minute = int(s[3:5])
@@ -37,19 +52,37 @@ def to_ms(s=None, des=None, **kwargs):
         ms = int(kwargs.get("ms", 0))
 
     result = (hour * 60 * 60 * 1000) + (minute * 60 * 1000) + (sec * 1000) + ms
-    if des and isinstance(des, int):
-        return round(result, des)
+    if decimals and isinstance(decimals, int):
+        return round(result, decimals)
     return result
 
 
 class CommandRunner:
-    def __init__(self, cmd, dry=False):
+    """
+    Wrapper for running ffmpeg commands
+    """
+    def __init__(self, cmd: List[str], dry=False):
+        """Create a CommandRunner object
+
+        Args:
+            cmd: Command to run as a list of strings
+            dry (bool, optional): Dry run mode. Defaults to False.
+        """
         self.cmd = cmd
         self.dry = dry
         self.output = None
 
     @staticmethod
     def prune_ffmpeg_progress_from_output(output: str) -> str:
+        """
+        Prune ffmpeg progress lines from output
+
+        Args:
+            output (str): Output from ffmpeg
+
+        Returns:
+            str: Output with progress lines removed
+        """
         return "\n".join(
             [
                 line
@@ -72,6 +105,12 @@ class CommandRunner:
         )
 
     def run_ffmpeg_command(self):
+        """
+        Run an ffmpeg command
+
+        Yields:
+            int: Progress percentage
+        """
         # wrapper for 'ffmpeg-progress-yield'
         logger.debug(f"Running command: {self.cmd}")
         ff = FfmpegProgress(self.cmd, dry_run=self.dry)
@@ -85,6 +124,12 @@ class CommandRunner:
             )
 
     def run_command(self):
+        """
+        Run the actual command (not ffmpeg)
+
+        Raises:
+            RuntimeError: If command returns non-zero exit code
+        """
         logger.debug(f"Running command: {self.cmd}")
 
         if self.dry:
@@ -116,16 +161,31 @@ class CommandRunner:
         return self.output
 
 
-def dict_to_filter_opts(opts):
+def dict_to_filter_opts(opts: Dict[str, str]) -> str:
+    """
+    Convert a dictionary to a ffmpeg filter option string
+
+    Args:
+        opts (Dict[str, str]): Dictionary of options
+
+    Returns:
+        str: Filter option string
+    """
     filter_opts = []
     for k, v in opts.items():
         filter_opts.append(f"{k}={v}")
     return ":".join(filter_opts)
 
 
-def get_ffmpeg_exe():
+def get_ffmpeg_exe() -> str:
     """
     Return path to ffmpeg executable
+
+    Returns:
+        str: Path to ffmpeg executable
+
+    Raises:
+        FFmpegNormalizeError: If ffmpeg is not found
     """
     ffmpeg_path = os.getenv("FFMPEG_PATH")
     if ffmpeg_path:
@@ -157,10 +217,12 @@ def get_ffmpeg_exe():
     return ffmpeg_exe
 
 
-def ffmpeg_has_loudnorm():
+def ffmpeg_has_loudnorm() -> bool:
     """
-    Run feature detection on ffmpeg, returns True if ffmpeg supports
-    the loudnorm filter
+    Run feature detection on ffmpeg to see if it supports the loudnorm filter.
+
+    Returns:
+        bool: True if loudnorm is supported, False otherwise
     """
     cmd_runner = CommandRunner([get_ffmpeg_exe(), "-filters"])
     cmd_runner.run_command()

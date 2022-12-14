@@ -4,6 +4,7 @@ import logging
 import os
 import shlex
 import json
+from typing import List
 
 try:
     from json.decoder import JSONDecodeError
@@ -440,9 +441,15 @@ def create_parser():
     return parser
 
 
-def _split_options(opts):
+def _split_options(opts: str) -> List[str]:
     """
-    Parse extra options (input or output) into a list
+    Parse extra options (input or output) into a list.
+
+    Args:
+        opts: String of options
+
+    Returns:
+        list: List of options
     """
     if not opts:
         return []
