@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import re
 import json
-import math
 from typing import Generator, List, Literal, Optional, TypedDict, Union, TYPE_CHECKING
 
 from ._errors import FFmpegNormalizeError
@@ -53,15 +52,10 @@ class MediaStream:
         self.stream_type = stream_type
         self.stream_id = stream_id
 
-    def __repr__(self):
-        """
-        Returns:
-            str: A string representation of the MediaStream object.
-        """
-        return "<{}, {} stream {}>".format(
-            os.path.basename(self.media_file.input_file),
-            self.stream_type,
-            self.stream_id,
+    def __repr__(self) -> str:
+        return (
+            f"<{os.path.basename(self.media_file.input_file)}, "
+            f"{self.stream_type} stream {self.stream_id}>"
         )
 
 
@@ -125,11 +119,6 @@ class AudioStream(MediaStream):
                 "Normalization may not work. "
                 "See https://github.com/slhck/ffmpeg-normalize/issues/87 for more info."
             )
-
-    def __repr__(self):
-        return "<{}, audio stream {}>".format(
-            os.path.basename(self.media_file.input_file), self.stream_id
-        )
 
     @staticmethod
     def _constrain(number: float, min_range: float, max_range: float, name: Union[str, None] = None) -> float:
@@ -251,7 +240,7 @@ class AudioStream(MediaStream):
         mean_volume_matches = re.findall(r"RMS level dB: ([\-\d\.]+)", output)
         if mean_volume_matches:
             if mean_volume_matches[0] == "-":
-                self.loudness_statistics["mean"] = -math.inf
+                self.loudness_statistics["mean"] = float("-inf")
             else:
                 self.loudness_statistics["mean"] = float(mean_volume_matches[0])
         else:
@@ -262,7 +251,7 @@ class AudioStream(MediaStream):
         max_volume_matches = re.findall(r"Peak level dB: ([\-\d\.]+)", output)
         if max_volume_matches:
             if max_volume_matches[0] == "-":
-                self.loudness_statistics["max"] = -math.inf
+                self.loudness_statistics["max"] = float("-inf")
             else:
                 self.loudness_statistics["max"] = float(max_volume_matches[0])
         else:
@@ -397,7 +386,8 @@ class AudioStream(MediaStream):
 
         if float(self.loudness_statistics["ebu"]["input_i"]) > 0:
             logger.warning(
-                f"Input file had measured input loudness greater than zero ({self.loudness_statistics['ebu']['input_i']}), capping at 0"
+                "Input file had measured input loudness greater than zero "
+                f"({self.loudness_statistics['ebu']['input_i']}), capping at 0"
             )
             self.loudness_statistics["ebu"]["input_i"] = 0
 
@@ -474,16 +464,11 @@ class AudioStream(MediaStream):
             )
 
         logger.info(
-            "Adjusting stream {} by {} dB to reach {}".format(
-                self.stream_id, adjustment, target_level
-            )
+            f"Adjusting stream {self.stream_id} by {adjustment} dB to reach {target_level}"
         )
 
-        if self.loudness_statistics["max"] + adjustment > 0:
-            logger.warning(
-                "Adjusting will lead to clipping of {} dB".format(
-                    self.loudness_statistics["max"] + adjustment
-                )
-            )
+        clip_amount = self.loudness_statistics["max"] + adjustment
+        if clip_amount > 0:
+            logger.warning(f"Adjusting will lead to clipping of {clip_amount} dB")
 
         return f"volume={adjustment}dB"

@@ -197,7 +197,7 @@ class FFmpegNormalize:
         self.media_files = []
         self.file_count = 0
 
-    def add_media_file(self, input_file: str, output_file: str):
+    def add_media_file(self, input_file: str, output_file: str) -> None:
         """
         Add a media file to normalize
 
@@ -206,7 +206,7 @@ class FFmpegNormalize:
             output_file (str): Path to output file
         """
         if not os.path.exists(input_file):
-            raise FFmpegNormalizeError("file " + input_file + " does not exist")
+            raise FFmpegNormalizeError(f"file {input_file} does not exist")
 
         ext = os.path.splitext(output_file)[1][1:]
         if (
@@ -214,7 +214,7 @@ class FFmpegNormalize:
         ) and ext in PCM_INCOMPATIBLE_EXTS:
             raise FFmpegNormalizeError(
                 f"Output extension {ext} does not support PCM audio. "
-                + "Please choose a suitable audio codec with the -c:a option."
+                "Please choose a suitable audio codec with the -c:a option."
             )
 
         mf = MediaFile(self, input_file, output_file)
@@ -222,7 +222,7 @@ class FFmpegNormalize:
 
         self.file_count += 1
 
-    def run_normalization(self):
+    def run_normalization(self) -> None:
         """
         Run the normalization procedures
         """
@@ -239,9 +239,8 @@ class FFmpegNormalize:
                 if len(self.media_files) > 1:
                     # simply warn and do not die
                     logger.error(
-                        "Error processing input file {}, will continue batch-processing. Error was: {}".format(
-                            media_file, e
-                        )
+                        f"Error processing input file {media_file}, will "
+                        f"continue batch-processing. Error was: {e}"
                     )
                 else:
                     # raise the error so the program will exit

@@ -63,16 +63,10 @@ class MediaFile:
             + list(self.streams["subtitle"].keys())
         )
 
-    def __repr__(self):
-        """
-        Return a string representation of this object.
-
-        Returns:
-            str: String representation
-        """
+    def __repr__(self) -> str:
         return os.path.basename(self.input_file)
 
-    def parse_streams(self):
+    def parse_streams(self) -> None:
         """
         Try to parse all input streams from file and set them in self.streams.
 
@@ -115,7 +109,7 @@ class MediaFile:
                 else:
                     duration = duration_search.groupdict()
                     duration = to_ms(**duration) / 1000
-                    logger.debug("Found duration: " + str(duration) + " s")
+                    logger.debug(f"Found duration: {duration} s")
 
             if not line.startswith("Stream"):
                 continue
@@ -272,7 +266,7 @@ class MediaFile:
 
         return filter_complex_cmd, output_labels
 
-    def _second_pass(self):
+    def _second_pass(self) -> None:
         """
         Construct the second pass command and run it.
 
@@ -398,11 +392,8 @@ class MediaFile:
             try:
                 yield from cmd_runner.run_ffmpeg_command()
             except Exception as e:
-                logger.error(
-                    "Error while running command {}! Error: {}".format(
-                        " ".join([shlex.quote(c) for c in cmd]), e
-                    )
-                )
+                cmd_str = " ".join([shlex.quote(c) for c in cmd])
+                logger.error(f"Error while running command {cmd_str}! Error: {e}")
                 raise e
             else:
                 # move file from TMP to output file
