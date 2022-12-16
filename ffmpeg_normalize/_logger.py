@@ -11,7 +11,7 @@ class TqdmLoggingHandler(logging.StreamHandler):
     def __init__(self):
         super().__init__(sys.stderr)
 
-    def emit(self, record):
+    def emit(self, record) -> None:
         try:
             msg = self.format(record)
             set_mp_lock()
@@ -23,7 +23,7 @@ class TqdmLoggingHandler(logging.StreamHandler):
             self.handleError(record)
 
 
-def set_mp_lock():
+def set_mp_lock() -> None:
     try:
         from multiprocessing import Lock
 

@@ -524,9 +524,8 @@ def main():
         if cli_args.output is not None and index < len(cli_args.output):
             if cli_args.output_folder and cli_args.output_folder != "normalized":
                 logger.warning(
-                    "Output folder {} is ignored for input file {}".format(
-                        cli_args.output_folder, input_file
-                    )
+                    f"Output folder {cli_args.output_folder} is ignored for "
+                    f"input file {input_file}"
                 )
             output_file = cli_args.output[index]
             output_dir = os.path.dirname(output_file)
@@ -543,17 +542,13 @@ def main():
             )
             if not os.path.isdir(cli_args.output_folder) and not cli_args.dry_run:
                 logger.warning(
-                    "Output directory '{}' does not exist, will create".format(
-                        cli_args.output_folder
-                    )
+                    f"Output directory '{cli_args.output_folder}' does not exist, will create"
                 )
                 os.makedirs(cli_args.output_folder, exist_ok=True)
 
         if os.path.exists(output_file) and not cli_args.force:
             logger.error(
-                "Output file {} already exists, skipping. Use -f to force overwriting.".format(
-                    output_file
-                )
+                f"Output file {output_file} already exists, skipping. Use -f to force overwriting."
             )
         else:
             ffmpeg_normalize.add_media_file(input_file, output_file)
