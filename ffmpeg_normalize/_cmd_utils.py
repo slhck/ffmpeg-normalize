@@ -1,10 +1,11 @@
 import logging
 import os
-from shutil import which
-import subprocess
-from platform import system as _current_os
 import re
-from typing import Dict, List, Union
+import subprocess
+from platform import system
+from shutil import which
+from typing import Dict, Iterator, List, Union
+
 from ffmpeg_progress_yield import FfmpegProgress
 
 from ._errors import FFmpegNormalizeError
@@ -12,13 +13,7 @@ from ._logger import setup_custom_logger
 
 logger = setup_custom_logger("ffmpeg_normalize")
 
-CUR_OS = _current_os()
-IS_WIN = CUR_OS in ["Windows", "cli"]
-IS_NIX = (not IS_WIN) and any(
-    CUR_OS.startswith(i)
-    for i in ["CYGWIN", "MSYS", "Linux", "Darwin", "SunOS", "FreeBSD", "NetBSD"]
-)
-NUL = "NUL" if IS_WIN else "/dev/null"
+NUL = "NUL" if system() in ("Windows", "cli") else "/dev/null"
 DUR_REGEX = re.compile(
     r"Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})"
 )
@@ -61,7 +56,7 @@ class CommandRunner:
     """
     Wrapper for running ffmpeg commands
     """
-    def __init__(self, cmd: List[str], dry=False):
+    def __init__(self, cmd: List[str], dry: bool = False):
         """Create a CommandRunner object
 
         Args:
@@ -70,7 +65,7 @@ class CommandRunner:
         """
         self.cmd = cmd
         self.dry = dry
-        self.output = None
+        self.output: Union[str, None] = None
 
     @staticmethod
     def prune_ffmpeg_progress_from_output(output: str) -> str:
@@ -104,7 +99,8 @@ class CommandRunner:
             ]
         )
 
-    def run_ffmpeg_command(self):
+
+    def run_ffmpeg_command(self) -> Iterator[int]:
         """
         Run an ffmpeg command
 
@@ -123,7 +119,8 @@ class CommandRunner:
                 f"ffmpeg output: {CommandRunner.prune_ffmpeg_progress_from_output(self.output)}"
             )
 
-    def run_command(self):
+
+    def run_command(self) -> None:
         """
         Run the actual command (not ffmpeg)
 
@@ -145,17 +142,18 @@ class CommandRunner:
         )
 
         # simple running of command
-        stdout, stderr = p.communicate()
+        stdout_bytes, stderr_bytes = p.communicate()
 
-        stdout = stdout.decode("utf8", errors="replace")
-        stderr = stderr.decode("utf8", errors="replace")
+        stdout = stdout_bytes.decode("utf8", errors="replace")
+        stderr = stderr_bytes.decode("utf8", errors="replace")
 
         if p.returncode == 0:
             self.output = stdout + stderr
         else:
-            raise RuntimeError(f"Error running command {self.cmd}: {str(stderr)}")
+            raise RuntimeError(f"Error running command {self.cmd}: {stderr}")
 
-    def get_output(self):
+
+    def get_output(self) -> str:
         if self.output is None:
             raise FFmpegNormalizeError("Command has not been run yet")
         return self.output
@@ -187,34 +185,27 @@ def get_ffmpeg_exe() -> str:
     Raises:
         FFmpegNormalizeError: If ffmpeg is not found
     """
-    ffmpeg_path = os.getenv("FFMPEG_PATH")
-    if ffmpeg_path:
-        if os.sep in ffmpeg_path:
-            ffmpeg_exe = ffmpeg_path
-            if not os.path.isfile(ffmpeg_exe):
-                raise FFmpegNormalizeError(f"No file exists at {ffmpeg_exe}")
-        else:
-            ffmpeg_exe = which(ffmpeg_path)
-            if not ffmpeg_exe:
-                raise FFmpegNormalizeError(
-                    f"Could not find '{ffmpeg_path}' in your $PATH."
-                )
-    else:
-        ffmpeg_exe = which("ffmpeg")
+    if ff_path := os.getenv("FFMPEG_PATH"):
+        if os.sep in ff_path:
+            if not os.path.isfile(ff_path):
+                raise FFmpegNormalizeError(f"No file exists at {ff_path}")
 
-    if not ffmpeg_exe:
-        if which("avconv"):
-            raise FFmpegNormalizeError(
-                "avconv is not supported. "
-                "Please install ffmpeg from http://ffmpeg.org instead."
-            )
-        else:
-            raise FFmpegNormalizeError(
-                "Could not find ffmpeg in your $PATH or $FFMPEG_PATH. "
-                "Please install ffmpeg from http://ffmpeg.org"
-            )
+            return ff_path
 
-    return ffmpeg_exe
+        ff_exe = which(ff_path)
+        if not ff_exe:
+            raise FFmpegNormalizeError(f"Could not find '{ff_path}' in your $PATH.")
+
+        return ff_exe
+
+    ff_path = which("ffmpeg")
+    if not ff_path:
+        raise FFmpegNormalizeError(
+            "Could not find ffmpeg in your $PATH or $FFMPEG_PATH. "
+            "Please install ffmpeg from http://ffmpeg.org"
+        )
+
+    return ff_path
 
 
 def ffmpeg_has_loudnorm() -> bool:
@@ -226,12 +217,11 @@ def ffmpeg_has_loudnorm() -> bool:
     """
     cmd_runner = CommandRunner([get_ffmpeg_exe(), "-filters"])
     cmd_runner.run_command()
-    output = cmd_runner.get_output()
-    if "loudnorm" in output:
-        return True
-    else:
+
+    supports_loudnorm = "loudnorm" in cmd_runner.get_output()
+    if not supports_loudnorm:
         logger.error(
-            "Your ffmpeg version does not support the 'loudnorm' filter. "
-            "Please make sure you are running ffmpeg v3.1 or above."
+            "Your ffmpeg does not support the 'loudnorm' filter. "
+            "Please make sure you are running ffmpeg v4.2 or above."
         )
-        return False
+    return supports_loudnorm
