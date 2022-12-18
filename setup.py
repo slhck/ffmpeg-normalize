@@ -29,6 +29,9 @@ setup(
     url="https://github.com/slhck/ffmpeg-normalize",
     packages=["ffmpeg_normalize"],
     include_package_data=True,
+    package_data={
+        "ffmpeg_normalize": ["py.typed"],
+    },
     install_requires=[
         "tqdm>=4.38.0",
         "colorama>=0.4.3",
