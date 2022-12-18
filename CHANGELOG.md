@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v1.26.1 (2022-12-18)
+
+* Bump requirements.
+
+* Add py.typed support.
+
+* General refactoring + type hints (#202)
+
+* Re-write to f-strings when possible (#201)
+
+* Remove unnecessary utf-8 declarations (#200)
+
+  "-*- coding: utf-8 -*-" is a Python 2 construct and can be safely
+  removed. Other utf-8 declarations are also unnecessary.
+
+
 ## v1.26.0 (2022-12-14)
 
 * Add .editorconfig.
