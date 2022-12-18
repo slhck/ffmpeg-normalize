@@ -35,7 +35,7 @@ setup(
     install_requires=[
         "tqdm>=4.38.0",
         "colorama>=0.4.3",
-        "ffmpeg-progress-yield>=0.1.2",
+        "ffmpeg-progress-yield>=0.5.0",
     ],
     license="MIT",
     zip_safe=False,
