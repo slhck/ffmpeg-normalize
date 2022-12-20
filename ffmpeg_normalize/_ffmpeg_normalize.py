@@ -15,7 +15,8 @@ if TYPE_CHECKING:
 logger = setup_custom_logger("ffmpeg_normalize")
 
 NORMALIZATION_TYPES = ("ebu", "rms", "peak")
-PCM_INCOMPATIBLE_FORMATS = {"flac", "mp3", "mp4", "m4a", "ogg", "opus", "webm"}
+PCM_INCOMPATIBLE_FORMATS = {"flac", "mp3", "mp4", "ogg", "oga", "opus", "webm"}
+PCM_INCOMPATIBLE_EXTS = {"flac", "mp3", "mp4", "m4a", "ogg", "oga", "opus", "webm"}
 
 
 def check_range(number: object, min_r: float, max_r: float, name: str = "") -> float:
@@ -200,7 +201,7 @@ class FFmpegNormalize:
         ext = os.path.splitext(output_file)[1][1:]
         if (
             self.audio_codec is None or "pcm" in self.audio_codec
-        ) and ext in PCM_INCOMPATIBLE_FORMATS:
+        ) and ext in PCM_INCOMPATIBLE_EXTS:
             raise FFmpegNormalizeError(
                 f"Output extension {ext} does not support PCM audio. "
                 "Please choose a suitable audio codec with the -c:a option."
