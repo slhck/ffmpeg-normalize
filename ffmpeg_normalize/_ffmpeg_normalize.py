@@ -1,45 +1,46 @@
-import os
 import json
-from numbers import Number
-from typing import List, Literal, Union
+import os
+from typing import TYPE_CHECKING, List, Literal, Union
+
 from tqdm import tqdm
 
-from ._cmd_utils import get_ffmpeg_exe, ffmpeg_has_loudnorm
-from ._media_file import MediaFile
+from ._cmd_utils import ffmpeg_has_loudnorm, get_ffmpeg_exe
 from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
+from ._media_file import MediaFile
+
+if TYPE_CHECKING:
+    from ._streams import LoudnessStatisticsWithMetadata
 
 logger = setup_custom_logger("ffmpeg_normalize")
 
-NORMALIZATION_TYPES = ["ebu", "rms", "peak"]
-PCM_INCOMPATIBLE_FORMATS = ["mp4", "mp3", "ogg", "webm"]
-PCM_INCOMPATIBLE_EXTS = ["mp4", "m4a", "mp3", "ogg", "webm", "flac", "opus"]
+NORMALIZATION_TYPES = ("ebu", "rms", "peak")
+PCM_INCOMPATIBLE_FORMATS = {"flac", "mp3", "mp4", "ogg", "oga", "opus", "webm"}
+PCM_INCOMPATIBLE_EXTS = {"flac", "mp3", "mp4", "m4a", "ogg", "oga", "opus", "webm"}
 
 
-def check_range(number: float, min_r: float, max_r: float, name: str = "") -> float:
+def check_range(number: object, min_r: float, max_r: float, name: str = "") -> float:
     """
-    Check if a number is within a given range.
+    Checks if "number" is an int or float and is between min_r (inclusive)
+    and max_r (inclusive).
 
     Args:
-        number (float): Number to check
+        number (object): Number to check
         min_r (float): Minimum range
         max_r (float): Maximum range
-        name (str): Name of the number to check
+        name (str): Name of object being checked
 
     Returns:
-        float: Number if it is within the range
+        float: within given range
 
     Raises:
-        FFmpegNormalizeError: If the number is not within the range
-        Exception: If the number cannot be converted to a float
+        FFmpegNormalizeError: If number is wrong type or not within range
     """
-    try:
-        number = float(number)
-        if number < min_r or number > max_r:
-            raise FFmpegNormalizeError(f"{name} must be within [{min_r},{max_r}]")
-        return number
-    except Exception as e:
-        raise e
+    if not isinstance(number, (float, int)):
+        raise FFmpegNormalizeError(f"{name} must be an int or float")
+    if number < min_r or number > max_r:
+        raise FFmpegNormalizeError(f"{name} must be within [{min_r},{max_r}]")
+    return number
 
 
 class FFmpegNormalize:
@@ -77,6 +78,7 @@ class FFmpegNormalize:
     Raises:
         FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
     """
+
     def __init__(
         self,
         normalization_type: Literal["ebu", "rms", "peak"] = "ebu",
@@ -91,11 +93,11 @@ class FFmpegNormalize:
         dynamic: bool = False,
         audio_codec: str = "pcm_s16le",
         audio_bitrate: Union[float, None] = None,
-        sample_rate: Union[int, None] = None,
+        sample_rate: Union[float, int, None] = None,
         keep_original_audio: bool = False,
         pre_filter: Union[str, None] = None,
         post_filter: Union[str, None] = None,
-        video_codec="copy",
+        video_codec: str = "copy",
         video_disable: bool = False,
         subtitle_disable: bool = False,
         metadata_disable: bool = False,
@@ -110,11 +112,16 @@ class FFmpegNormalize:
         self.ffmpeg_exe = get_ffmpeg_exe()
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
 
+        if normalization_type not in NORMALIZATION_TYPES:
+            raise FFmpegNormalizeError(
+                f"Normalization type must be: 'ebu', 'rms', or 'peak'"
+            )
         self.normalization_type = normalization_type
+
         if not self.has_loudnorm_capabilities and self.normalization_type == "ebu":
             raise FFmpegNormalizeError(
-                "Your ffmpeg version does not support the 'loudnorm' EBU R128 filter. "
-                "Please install ffmpeg v3.1 or above, or choose another normalization type."
+                "Your ffmpeg does not support the 'loudnorm' EBU R128 filter. "
+                "Please install ffmpeg v4.2 or above, or choose another normalization type."
             )
 
         if self.normalization_type == "ebu":
@@ -141,11 +148,16 @@ class FFmpegNormalize:
         self.true_peak = check_range(true_peak, -9, 0, name="true_peak")
         self.offset = check_range(offset, -99, 99, name="offset")
 
-        self.dual_mono = True if dual_mono in ["true", True] else False
-        self.dynamic = True if dynamic in ["true", True] else False
+        # Ensure library user is passing correct types
+        assert isinstance(dual_mono, bool), "dual_mono must be bool"
+        assert isinstance(dynamic, bool), "dynamic must be bool"
+
+        self.dual_mono = dual_mono
+        self.dynamic = dynamic
+        self.sample_rate = None if sample_rate is None else int(sample_rate)
+
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
-        self.sample_rate = int(sample_rate) if sample_rate is not None else None
         self.keep_original_audio = keep_original_audio
         self.video_codec = video_codec
         self.video_disable = video_disable
@@ -163,38 +175,16 @@ class FFmpegNormalize:
         self.debug = debug
         self.progress = progress
 
-        self.stats = []
-
         if (
-            self.output_format
-            and (self.audio_codec is None or "pcm" in self.audio_codec)
-            and self.output_format in PCM_INCOMPATIBLE_FORMATS
-        ):
+            self.audio_codec is None or "pcm" in self.audio_codec
+        ) and self.output_format in PCM_INCOMPATIBLE_FORMATS:
             raise FFmpegNormalizeError(
                 f"Output format {self.output_format} does not support PCM audio. "
-                + "Please choose a suitable audio codec with the -c:a option."
+                "Please choose a suitable audio codec with the -c:a option."
             )
 
-        if normalization_type not in NORMALIZATION_TYPES:
-            raise FFmpegNormalizeError(
-                f"Normalization type must be one of {NORMALIZATION_TYPES}"
-            )
-
-        if self.target_level and not isinstance(self.target_level, Number):
-            raise FFmpegNormalizeError("target_level must be a number")
-
-        if self.loudness_range_target and not isinstance(
-            self.loudness_range_target, Number
-        ):
-            raise FFmpegNormalizeError("loudness_range_target must be a number")
-
-        if self.true_peak and not isinstance(self.true_peak, Number):
-            raise FFmpegNormalizeError("true_peak must be a number")
-
-        if float(target_level) > 0:
-            raise FFmpegNormalizeError("Target level must be below 0")
-
-        self.media_files = []
+        self.stats: List[LoudnessStatisticsWithMetadata] = []
+        self.media_files: List[MediaFile] = []
         self.file_count = 0
 
     def add_media_file(self, input_file: str, output_file: str) -> None:
@@ -217,9 +207,7 @@ class FFmpegNormalize:
                 "Please choose a suitable audio codec with the -c:a option."
             )
 
-        mf = MediaFile(self, input_file, output_file)
-        self.media_files.append(mf)
-
+        self.media_files.append(MediaFile(self, input_file, output_file))
         self.file_count += 1
 
     def run_normalization(self) -> None:
