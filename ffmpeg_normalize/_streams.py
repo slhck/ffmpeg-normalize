@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import json
 import os
 import re
-import json
-from typing import Generator, List, Literal, Optional, TypedDict, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterator, List, Literal, Optional, TypedDict, Union
 
-from ._errors import FFmpegNormalizeError
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
+from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
 
 if TYPE_CHECKING:
@@ -201,7 +201,7 @@ class AudioStream(MediaStream):
         filter_str = input_label + ",".join(filter_chain)
         return filter_str
 
-    def parse_astats(self) -> Generator[int, None, None]:
+    def parse_astats(self) -> Iterator[int]:
         """
         Use ffmpeg with astats filter to get the mean (RMS) and max (peak) volume of the input file.
 
@@ -259,7 +259,7 @@ class AudioStream(MediaStream):
                 f"Could not get max volume for {self.media_file.input_file}"
             )
 
-    def parse_loudnorm_stats(self) -> Generator[int, None, None]:
+    def parse_loudnorm_stats(self) -> Iterator[int]:
         """
         Run a first pass loudnorm filter to get measured data.
 

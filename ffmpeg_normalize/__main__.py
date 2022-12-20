@@ -1,20 +1,16 @@
 import argparse
-import textwrap
+import json
 import logging
 import os
 import shlex
-import json
+import textwrap
+from json.decoder import JSONDecodeError
 from typing import List
 
-try:
-    from json.decoder import JSONDecodeError
-except ImportError:
-    JSONDecodeError = ValueError
-
-from ._version import __version__
-from ._ffmpeg_normalize import FFmpegNormalize, NORMALIZATION_TYPES
 from ._errors import FFmpegNormalizeError
+from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
 from ._logger import setup_custom_logger
+from ._version import __version__
 
 logger = setup_custom_logger("ffmpeg_normalize")
 
