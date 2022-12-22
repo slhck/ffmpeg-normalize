@@ -357,7 +357,7 @@ class MediaFile:
 
         if self.ffmpeg_normalize.keep_original_audio:
             highest_index = len(self.streams["audio"])
-            for index, (_, s) in enumerate(self.streams["audio"].items()):
+            for index, _ in enumerate(self.streams["audio"].items()):
                 cmd.extend(["-map", f"0:a:{index}"])
                 cmd.extend([f"-c:a:{highest_index + index}", "copy"])
 

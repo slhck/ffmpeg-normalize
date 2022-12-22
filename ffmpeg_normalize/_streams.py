@@ -326,8 +326,8 @@ class AudioStream(MediaStream):
         Returns:
             EbuLoudnessStatistics: The EBU loudness statistics.
         """
-        loudnorm_start = False
-        loudnorm_end = False
+        loudnorm_start = 0
+        loudnorm_end = 0
         for index, line in enumerate(output_lines):
             if line.startswith("[Parsed_loudnorm"):
                 loudnorm_start = index + 1

@@ -114,7 +114,7 @@ class FFmpegNormalize:
 
         if normalization_type not in NORMALIZATION_TYPES:
             raise FFmpegNormalizeError(
-                f"Normalization type must be: 'ebu', 'rms', or 'peak'"
+                "Normalization type must be: 'ebu', 'rms', or 'peak'"
             )
         self.normalization_type = normalization_type
 
