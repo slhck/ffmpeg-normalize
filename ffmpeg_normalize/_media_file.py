@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import os
 import re
-import tempfile
-import shutil
-from tqdm import tqdm
 import shlex
-from typing import List, Tuple, TypedDict, TYPE_CHECKING
+import shutil
+import tempfile
+from typing import TYPE_CHECKING, Iterator, List, Literal, Tuple, TypedDict
 
-from ._streams import AudioStream, VideoStream, SubtitleStream
+from tqdm import tqdm
+
+from ._cmd_utils import DUR_REGEX, NUL, CommandRunner, to_ms
 from ._errors import FFmpegNormalizeError
-from ._cmd_utils import NUL, CommandRunner, DUR_REGEX, to_ms
 from ._logger import setup_custom_logger
+from ._streams import AudioStream, SubtitleStream, VideoStream
 
-# types
 if TYPE_CHECKING:
     from ffmpeg_normalize import FFmpegNormalize
 
@@ -107,8 +107,7 @@ class MediaFile:
                 if not duration_search:
                     logger.warning("Could not extract duration from input file!")
                 else:
-                    duration = duration_search.groupdict()
-                    duration = to_ms(**duration) / 1000
+                    duration = to_ms(None, None, **duration_search.groupdict()) / 1000
                     logger.debug(f"Found duration: {duration} s")
 
             if not line.startswith("Stream"):
@@ -266,7 +265,7 @@ class MediaFile:
 
         return filter_complex_cmd, output_labels
 
-    def _second_pass(self) -> None:
+    def _second_pass(self) -> Iterator[int]:
         """
         Construct the second pass command and run it.
 
@@ -275,7 +274,7 @@ class MediaFile:
         logger.info(f"Running second pass for {self.input_file}")
 
         # get the target output stream types depending on the options
-        output_stream_types = ["audio"]
+        output_stream_types: List[Literal["audio", "video", "subtitle"]] = ["audio"]
         if self._can_write_output_video():
             output_stream_types.append("video")
         if not self.ffmpeg_normalize.subtitle_disable:

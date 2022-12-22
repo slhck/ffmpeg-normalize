@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import logging
 from platform import system
 from tqdm import tqdm
 import sys
 
-loggers = {}
+loggers: dict[str, logging.Logger] = {}
 
 
 # https://stackoverflow.com/questions/38543506/
@@ -34,7 +36,7 @@ def set_mp_lock() -> None:
         pass
 
 
-def setup_custom_logger(name) -> logging.Logger:
+def setup_custom_logger(name: str) -> logging.Logger:
     """
     Create a logger with a certain name and level
     """
