@@ -159,7 +159,7 @@ class CommandRunner:
         return self.output
 
 
-def dict_to_filter_opts(opts: Dict[str, str]) -> str:
+def dict_to_filter_opts(opts: Dict[str, object]) -> str:
     """
     Convert a dictionary to a ffmpeg filter option string
 
