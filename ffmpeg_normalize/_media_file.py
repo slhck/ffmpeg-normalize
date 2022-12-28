@@ -3,8 +3,8 @@ from __future__ import annotations
 import os
 import re
 import shlex
-import shutil
-import tempfile
+from shutil import move, rmtree
+from tempfile import mkdtemp
 from typing import TYPE_CHECKING, Iterator, List, Literal, Tuple, TypedDict
 
 from tqdm import tqdm
@@ -22,17 +22,21 @@ logger = setup_custom_logger("ffmpeg_normalize")
 AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mp3", "mka", "oga", "ogg", "opus", "wav"}
 ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
 
+
 class StreamDict(TypedDict):
     audio: dict[int, AudioStream]
     video: dict[int, VideoStream]
     subtitle: dict[int, SubtitleStream]
+
 
 class MediaFile:
     """
     Class that holds a file, its streams and adjustments
     """
 
-    def __init__(self, ffmpeg_normalize: FFmpegNormalize, input_file: str, output_file: str):
+    def __init__(
+        self, ffmpeg_normalize: FFmpegNormalize, input_file: str, output_file: str
+    ):
         """
         Initialize a media file for later normalization by parsing the streams.
 
@@ -377,15 +381,10 @@ class MediaFile:
             yield 100
             return
 
-        # create a temporary output file name
-        temp_dir = tempfile.gettempdir()
-        output_file_suffix = os.path.splitext(self.output_file)[1]
-        temp_file_name = os.path.join(
-            temp_dir, next(tempfile._get_candidate_names()) + output_file_suffix
-        )
-        cmd.append(temp_file_name)
+        temp_dir = mkdtemp()
+        temp_file = os.path.join(temp_dir, f"out.{self.output_ext}")
+        cmd.append(temp_file)
 
-        # run the actual command
         try:
             cmd_runner = CommandRunner(cmd)
             try:
@@ -395,15 +394,13 @@ class MediaFile:
                 logger.error(f"Error while running command {cmd_str}! Error: {e}")
                 raise e
             else:
-                # move file from TMP to output file
                 logger.debug(
-                    f"Moving temporary file from {temp_file_name} to {self.output_file}"
+                    f"Moving temporary file from {temp_file} to {self.output_file}"
                 )
-                shutil.move(temp_file_name, self.output_file)
+                move(temp_file, self.output_file)
+                rmtree(temp_dir, ignore_errors=True)
         except Exception as e:
-            # remove dangling temporary file
-            if os.path.isfile(temp_file_name):
-                os.remove(temp_file_name)
+            rmtree(temp_dir, ignore_errors=True)
             raise e
 
         logger.debug("Normalization finished")
