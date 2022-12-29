@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 from platform import system
+from shlex import quote
 from shutil import which
 from typing import Iterator
 
@@ -129,11 +130,12 @@ class CommandRunner:
         Raises:
             RuntimeError: If command returns non-zero exit code
         """
-        logger.debug(f"Running command: {self.cmd}")
 
         if self.dry:
-            logger.debug("Dry mode specified, not actually running command")
+            print(" ".join([quote(c) for c in self.cmd]))
             return
+
+        logger.debug(f"Running command: {self.cmd}")
 
         p = subprocess.Popen(
             self.cmd,
