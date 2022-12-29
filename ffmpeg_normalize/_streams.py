@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from typing import TYPE_CHECKING, Iterator, List, Literal, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Iterator, Literal, TypedDict
 
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
 from ._errors import FFmpegNormalizeError
@@ -27,9 +27,9 @@ class EbuLoudnessStatistics(TypedDict):
     target_offset: float
 
 class LoudnessStatistics(TypedDict):
-    ebu: Optional[EbuLoudnessStatistics]
-    mean: Optional[float]
-    max: Optional[float]
+    ebu: EbuLoudnessStatistics | None
+    mean: float | None
+    max: float | None
 
 class LoudnessStatisticsWithMetadata(LoudnessStatistics):
     input_file: str
@@ -79,9 +79,9 @@ class AudioStream(MediaStream):
         ffmpeg_normalize: FFmpegNormalize,
         media_file: MediaFile,
         stream_id: int,
-        sample_rate: Union[int, None],
-        bit_depth: Union[int, None],
-        duration: Union[float, None],
+        sample_rate: int | None,
+        bit_depth: int | None,
+        duration: float | None,
     ):
         """
         Create an AudioStream object.
@@ -121,7 +121,7 @@ class AudioStream(MediaStream):
             )
 
     @staticmethod
-    def _constrain(number: float, min_range: float, max_range: float, name: Union[str, None] = None) -> float:
+    def _constrain(number: float, min_range: float, max_range: float, name: str | None = None) -> float:
         """
         Constrain a number between two values.
 
@@ -313,12 +313,12 @@ class AudioStream(MediaStream):
         )
 
     @staticmethod
-    def _parse_loudnorm_output(output_lines: List[str]) -> EbuLoudnessStatistics:
+    def _parse_loudnorm_output(output_lines: list[str]) -> EbuLoudnessStatistics:
         """
         Parse the output of a loudnorm filter to get the EBU loudness statistics.
 
         Args:
-            output_lines (List[str]): The output lines of the loudnorm filter.
+            output_lines (list[str]): The output lines of the loudnorm filter.
 
         Raises:
             FFmpegNormalizeError: When the output could not be parsed.

@@ -5,7 +5,7 @@ import re
 import shlex
 from shutil import move, rmtree
 from tempfile import mkdtemp
-from typing import TYPE_CHECKING, Iterator, List, Literal, Tuple, TypedDict
+from typing import TYPE_CHECKING, Iterator, Literal, TypedDict
 
 from tqdm import tqdm
 
@@ -172,7 +172,7 @@ class MediaFile:
             self.streams["video"] = {}
             self.streams["subtitle"] = {}
 
-    def run_normalization(self):
+    def run_normalization(self) -> None:
         """
         Run the normalization process for this file.
         """
@@ -202,7 +202,7 @@ class MediaFile:
 
         return not self.ffmpeg_normalize.video_disable
 
-    def _first_pass(self):
+    def _first_pass(self) -> None:
         """
         Run the first pass of the normalization process.
         """
@@ -233,12 +233,12 @@ class MediaFile:
             ]
             self.ffmpeg_normalize.stats.extend(stats)
 
-    def _get_audio_filter_cmd(self) -> Tuple[str, List[str]]:
+    def _get_audio_filter_cmd(self) -> tuple[str, list[str]]:
         """
         Return the audio filter command and output labels needed.
 
         Returns:
-            Tuple[str, List[str]]: filter_complex command and the required output labels
+            tuple[str, list[str]]: filter_complex command and the required output labels
         """
         filter_chains = []
         output_labels = []
@@ -278,7 +278,7 @@ class MediaFile:
         logger.info(f"Running second pass for {self.input_file}")
 
         # get the target output stream types depending on the options
-        output_stream_types: List[Literal["audio", "video", "subtitle"]] = ["audio"]
+        output_stream_types: list[Literal["audio", "video", "subtitle"]] = ["audio"]
         if self._can_write_output_video():
             output_stream_types.append("video")
         if not self.ffmpeg_normalize.subtitle_disable:

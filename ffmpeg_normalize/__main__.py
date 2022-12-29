@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import json
 import logging
@@ -5,7 +7,6 @@ import os
 import shlex
 import textwrap
 from json.decoder import JSONDecodeError
-from typing import List
 
 from ._errors import FFmpegNormalizeError
 from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
@@ -15,7 +16,7 @@ from ._version import __version__
 logger = setup_custom_logger("ffmpeg_normalize")
 
 
-def create_parser():
+def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ffmpeg-normalize",
         description=textwrap.dedent(
@@ -437,7 +438,7 @@ def create_parser():
     return parser
 
 
-def _split_options(opts: str) -> List[str]:
+def _split_options(opts: str) -> list[str]:
     """
     Parse extra options (input or output) into a list.
 
@@ -462,7 +463,7 @@ def _split_options(opts: str) -> List[str]:
     return ret
 
 
-def main():
+def main() -> None:
     cli_args = create_parser().parse_args()
 
     if cli_args.quiet:

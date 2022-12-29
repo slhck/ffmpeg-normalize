@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import logging
 import os
 import re
 import subprocess
 from platform import system
 from shutil import which
-from typing import Dict, Iterator, List, Union
+from typing import Iterator
 
 from ffmpeg_progress_yield import FfmpegProgress
 
@@ -19,7 +21,7 @@ DUR_REGEX = re.compile(
 )
 
 
-def to_ms(s: Union[str, None] = None, decimals: Union[int, None] = None, **kwargs) -> int:
+def to_ms(s: str | None = None, decimals: int | None = None, **kwargs) -> int:
     """This function converts a string with time format "hh:mm:ss:ms" to milliseconds
 
     Args:
@@ -56,16 +58,16 @@ class CommandRunner:
     """
     Wrapper for running ffmpeg commands
     """
-    def __init__(self, cmd: List[str], dry: bool = False):
+    def __init__(self, cmd: list[str], dry: bool = False):
         """Create a CommandRunner object
 
         Args:
             cmd: Command to run as a list of strings
-            dry (bool, optional): Dry run mode. Defaults to False.
+            dry: Dry run mode. Defaults to False.
         """
         self.cmd = cmd
         self.dry = dry
-        self.output: Union[str, None] = None
+        self.output: str | None = None
 
     @staticmethod
     def prune_ffmpeg_progress_from_output(output: str) -> str:
@@ -159,12 +161,12 @@ class CommandRunner:
         return self.output
 
 
-def dict_to_filter_opts(opts: Dict[str, object]) -> str:
+def dict_to_filter_opts(opts: dict[str, object]) -> str:
     """
     Convert a dictionary to a ffmpeg filter option string
 
     Args:
-        opts (Dict[str, str]): Dictionary of options
+        opts (dict[str, object]): Dictionary of options
 
     Returns:
         str: Filter option string

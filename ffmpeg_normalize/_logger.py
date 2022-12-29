@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 import logging
-from platform import system
-from tqdm import tqdm
 import sys
+from platform import system
+
+from tqdm import tqdm
 
 loggers: dict[str, logging.Logger] = {}
 
 
 # https://stackoverflow.com/questions/38543506/
 class TqdmLoggingHandler(logging.StreamHandler):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(sys.stderr)
 
     def emit(self, record) -> None:
