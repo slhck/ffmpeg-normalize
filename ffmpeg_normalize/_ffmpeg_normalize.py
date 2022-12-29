@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import json
 import os
-from typing import TYPE_CHECKING, List, Literal, Union
+from typing import TYPE_CHECKING, Literal
 
 from tqdm import tqdm
 
@@ -92,19 +94,19 @@ class FFmpegNormalize:
         dual_mono: bool = False,
         dynamic: bool = False,
         audio_codec: str = "pcm_s16le",
-        audio_bitrate: Union[float, None] = None,
-        sample_rate: Union[float, int, None] = None,
+        audio_bitrate: float | None = None,
+        sample_rate: float | int | None = None,
         keep_original_audio: bool = False,
-        pre_filter: Union[str, None] = None,
-        post_filter: Union[str, None] = None,
+        pre_filter: str | None = None,
+        post_filter: str | None = None,
         video_codec: str = "copy",
         video_disable: bool = False,
         subtitle_disable: bool = False,
         metadata_disable: bool = False,
         chapters_disable: bool = False,
-        extra_input_options: Union[List[str], None] = None,
-        extra_output_options: Union[List[str], None] = None,
-        output_format: Union[str, None] = None,
+        extra_input_options: list[str] | None = None,
+        extra_output_options: list[str] | None = None,
+        output_format: str | None = None,
         dry_run: bool = False,
         debug: bool = False,
         progress: bool = False,
@@ -183,8 +185,8 @@ class FFmpegNormalize:
                 "Please choose a suitable audio codec with the -c:a option."
             )
 
-        self.stats: List[LoudnessStatisticsWithMetadata] = []
-        self.media_files: List[MediaFile] = []
+        self.stats: list[LoudnessStatisticsWithMetadata] = []
+        self.media_files: list[MediaFile] = []
         self.file_count = 0
 
     def add_media_file(self, input_file: str, output_file: str) -> None:
