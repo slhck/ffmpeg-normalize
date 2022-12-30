@@ -6,7 +6,7 @@ from platform import system
 
 from tqdm import tqdm
 
-loggers: dict[str, logging.Logger] = {}
+_global_log: logging.Logger | None = None
 
 
 # https://stackoverflow.com/questions/38543506/
@@ -14,7 +14,7 @@ class TqdmLoggingHandler(logging.StreamHandler):
     def __init__(self) -> None:
         super().__init__(sys.stderr)
 
-    def emit(self, record) -> None:
+    def emit(self, record: logging.LogRecord) -> None:
         try:
             msg = self.format(record)
             set_mp_lock()
@@ -37,21 +37,10 @@ def set_mp_lock() -> None:
         pass
 
 
-def setup_custom_logger(name: str) -> logging.Logger:
+def setup_custom_logger() -> logging.Logger:
     """
-    Create a logger with a certain name and level
+    Grab or create the global logger
     """
-    global loggers
-
-    existing_logger = loggers.get(name)
-    if existing_logger is not None:
-        return existing_logger
-
-    formatter = logging.Formatter(fmt="%(levelname)s: %(message)s")
-
-    # handler = logging.StreamHandler()
-    handler = TqdmLoggingHandler()
-    handler.setFormatter(formatter)
 
     # \033[1;30m - black
     # \033[1;31m - red
@@ -62,29 +51,23 @@ def setup_custom_logger(name: str) -> logging.Logger:
     # \033[1;36m - cyan
     # \033[1;37m - white
 
-    if system() not in ["Windows", "cli"]:
-        logging.addLevelName(
-            logging.ERROR, f"[1;31m{logging.getLevelName(logging.ERROR)}[1;0m"
-        )
-        logging.addLevelName(
-            logging.WARNING,
-            f"[1;33m{logging.getLevelName(logging.WARNING)}[1;0m",
-        )
-        logging.addLevelName(
-            logging.INFO, f"[1;34m{logging.getLevelName(logging.INFO)}[1;0m"
-        )
-        logging.addLevelName(
-            logging.DEBUG, f"[1;35m{logging.getLevelName(logging.DEBUG)}[1;0m"
-        )
+    global _global_log
+    if _global_log is not None:
+        return _global_log
 
-    logger = logging.getLogger(name)
+    if system() not in ("Windows", "cli"):
+        logging.addLevelName(logging.ERROR, "[1;31mERROR[1;0m")
+        logging.addLevelName(logging.WARNING, "[1;33mWARNING[1;0m")
+        logging.addLevelName(logging.INFO, "[1;34mINFO[1;0m")
+        logging.addLevelName(logging.DEBUG, "[1;35mDEBUG[1;0m")
+
+    logger = logging.Logger("ffmpeg_normalize")
     logger.setLevel(logging.WARNING)
 
-    # if (logger.hasHandlers()):
-    #     logger.handlers.clear()
-    if logger.handlers:
-        logger.handlers = []
+    handler = TqdmLoggingHandler()
+    handler.setFormatter(logging.Formatter(fmt="%(levelname)s: %(message)s"))
     logger.addHandler(handler)
-    loggers.update(dict(name=logger))
+
+    _global_log = logger
 
     return logger

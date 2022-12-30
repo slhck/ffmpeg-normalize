@@ -14,7 +14,7 @@ from ._media_file import MediaFile
 if TYPE_CHECKING:
     from ._streams import LoudnessStatisticsWithMetadata
 
-logger = setup_custom_logger("ffmpeg_normalize")
+logger = setup_custom_logger()
 
 NORMALIZATION_TYPES = ("ebu", "rms", "peak")
 PCM_INCOMPATIBLE_FORMATS = {"flac", "mp3", "mp4", "ogg", "oga", "opus", "webm"}

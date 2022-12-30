@@ -3,7 +3,7 @@ import sys
 
 from ._logger import setup_custom_logger
 
-logger = setup_custom_logger("ffmpeg_normalize")
+logger = setup_custom_logger()
 
 
 class FFmpegNormalizeError(Exception):

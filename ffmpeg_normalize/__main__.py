@@ -13,7 +13,7 @@ from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
 from ._logger import setup_custom_logger
 from ._version import __version__
 
-logger = setup_custom_logger("ffmpeg_normalize")
+logger = setup_custom_logger()
 
 
 def create_parser() -> argparse.ArgumentParser:
