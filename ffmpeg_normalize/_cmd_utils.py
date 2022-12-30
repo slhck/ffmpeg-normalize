@@ -13,7 +13,7 @@ from ffmpeg_progress_yield import FfmpegProgress
 from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
 
-logger = setup_custom_logger("ffmpeg_normalize")
+logger = setup_custom_logger()
 
 NUL = "NUL" if system() in ("Windows", "cli") else "/dev/null"
 DUR_REGEX = re.compile(

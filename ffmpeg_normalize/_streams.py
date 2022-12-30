@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ._ffmpeg_normalize import FFmpegNormalize
     from ._media_file import MediaFile
 
-logger = setup_custom_logger("ffmpeg_normalize")
+logger = setup_custom_logger()
 
 class EbuLoudnessStatistics(TypedDict):
     input_i: float

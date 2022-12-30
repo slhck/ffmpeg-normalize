@@ -17,7 +17,7 @@ from ._streams import AudioStream, SubtitleStream, VideoStream
 if TYPE_CHECKING:
     from ffmpeg_normalize import FFmpegNormalize
 
-logger = setup_custom_logger("ffmpeg_normalize")
+logger = setup_custom_logger()
 
 AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mp3", "mka", "oga", "ogg", "opus", "wav"}
 ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
