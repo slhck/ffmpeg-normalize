@@ -5,8 +5,10 @@ import json
 import logging
 import os
 import shlex
+import sys
 import textwrap
 from json.decoder import JSONDecodeError
+from typing import NoReturn
 
 from ._errors import FFmpegNormalizeError
 from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
@@ -438,31 +440,6 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _split_options(opts: str) -> list[str]:
-    """
-    Parse extra options (input or output) into a list.
-
-    Args:
-        opts: String of options
-
-    Returns:
-        list: List of options
-    """
-    if not opts:
-        return []
-    try:
-        if opts.startswith("["):
-            try:
-                ret = [str(s) for s in json.loads(opts)]
-            except JSONDecodeError:
-                ret = shlex.split(opts)
-        else:
-            ret = shlex.split(opts)
-    except Exception as e:
-        raise FFmpegNormalizeError(f"Could not parse extra_options: {e}")
-    return ret
-
-
 def main() -> None:
     cli_args = create_parser().parse_args()
 
@@ -472,6 +449,37 @@ def main() -> None:
         logger.setLevel(logging.DEBUG)
     elif cli_args.verbose:
         logger.setLevel(logging.INFO)
+
+    def error(message: object) -> NoReturn:
+        if logger.getEffectiveLevel() == logging.DEBUG:
+            logger.error(f"FFmpegNormalizeError: {message}")
+        else:
+            logger.error(message)
+        sys.exit(1)
+
+    def _split_options(opts: str) -> list[str]:
+        """
+        Parse extra options (input or output) into a list.
+
+        Args:
+            opts: String of options
+
+        Returns:
+            list: List of options
+        """
+        if not opts:
+            return []
+        try:
+            if opts.startswith("["):
+                try:
+                    ret = [str(s) for s in json.loads(opts)]
+                except JSONDecodeError:
+                    ret = shlex.split(opts)
+            else:
+                ret = shlex.split(opts)
+        except Exception as e:
+            error(f"Could not parse extra_options: {e}")
+        return ret
 
     # parse extra options
     extra_input_options = _split_options(cli_args.extra_input_options)
@@ -506,11 +514,7 @@ def main() -> None:
         progress=cli_args.progress,
     )
 
-    if (
-        cli_args.output is not None
-        and len(cli_args.output) > 0
-        and len(cli_args.input) > len(cli_args.output)
-    ):
+    if cli_args.output and len(cli_args.input) > len(cli_args.output):
         logger.warning(
             "There are more input files than output file names given. "
             "Please specify one output file name per input file using -o <output1> <output2> ... "
@@ -527,9 +531,7 @@ def main() -> None:
             output_file = cli_args.output[index]
             output_dir = os.path.dirname(output_file)
             if output_dir != "" and not os.path.isdir(output_dir):
-                raise FFmpegNormalizeError(
-                    f"Output file path {output_dir} does not exist"
-                )
+                error(f"Output file path {output_dir} does not exist")
         else:
             output_file = os.path.join(
                 cli_args.output_folder,
@@ -544,13 +546,19 @@ def main() -> None:
                 os.makedirs(cli_args.output_folder, exist_ok=True)
 
         if os.path.exists(output_file) and not cli_args.force:
-            logger.error(
+            error(
                 f"Output file {output_file} already exists, skipping. Use -f to force overwriting."
             )
-        else:
-            ffmpeg_normalize.add_media_file(input_file, output_file)
 
-    ffmpeg_normalize.run_normalization()
+        try:
+            ffmpeg_normalize.add_media_file(input_file, output_file)
+        except FFmpegNormalizeError as e:
+            error(e)
+
+    try:
+        ffmpeg_normalize.run_normalization()
+    except FFmpegNormalizeError as e:
+        error(e)
 
 
 if __name__ == "__main__":
