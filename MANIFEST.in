@@ -1,6 +1,0 @@
-include CHANGELOG.md
-include README.md
-include CONTRIBUTING.md
-include LICENSE
-include setup.cfg
-include test/*
