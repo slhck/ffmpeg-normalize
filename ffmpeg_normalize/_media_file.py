@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Iterator, Literal, TypedDict
 
 from tqdm import tqdm
 
-from ._cmd_utils import DUR_REGEX, NUL, CommandRunner, to_ms
+from ._cmd_utils import DUR_REGEX, NUL, CommandRunner
 from ._errors import FFmpegNormalizeError
 from ._logger import setup_custom_logger
 from ._streams import AudioStream, SubtitleStream, VideoStream
@@ -21,6 +21,15 @@ logger = setup_custom_logger()
 
 AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mp3", "mka", "oga", "ogg", "opus", "wav"}
 ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
+
+
+def _to_ms(**kwargs: str) -> int:
+    hour = int(kwargs.get("hour", 0))
+    minute = int(kwargs.get("min", 0))
+    sec = int(kwargs.get("sec", 0))
+    ms = int(kwargs.get("ms", 0))
+
+    return (hour * 60 * 60 * 1000) + (minute * 60 * 1000) + (sec * 1000) + ms
 
 
 class StreamDict(TypedDict):
@@ -94,9 +103,7 @@ class MediaFile:
             NUL,
         ]
 
-        cmd_runner = CommandRunner(cmd)
-        cmd_runner.run_command()
-        output = cmd_runner.get_output()
+        output = CommandRunner().run_command(cmd).get_output()
 
         logger.debug("Stream parsing command output:")
         logger.debug(output)
@@ -105,20 +112,17 @@ class MediaFile:
 
         duration = None
         for line in output_lines:
-
             if "Duration" in line:
-                duration_search = DUR_REGEX.search(line)
-                if not duration_search:
-                    logger.warning("Could not extract duration from input file!")
-                else:
-                    duration = to_ms(None, None, **duration_search.groupdict()) / 1000
+                if duration_search := DUR_REGEX.search(line):
+                    duration = _to_ms(**duration_search.groupdict()) / 1000
                     logger.debug(f"Found duration: {duration} s")
+                else:
+                    logger.warning("Could not extract duration from input file!")
 
             if not line.startswith("Stream"):
                 continue
 
-            stream_id_match = re.search(r"#0:([\d]+)", line)
-            if stream_id_match:
+            if stream_id_match := re.search(r"#0:([\d]+)", line):
                 stream_id = int(stream_id_match.group(1))
                 if stream_id in self._stream_ids():
                     continue
@@ -376,8 +380,7 @@ class MediaFile:
         # if dry run, only show sample command
         if self.ffmpeg_normalize.dry_run:
             cmd.append(self.output_file)
-            cmd_runner = CommandRunner(cmd, dry=True)
-            cmd_runner.run_command()
+            CommandRunner(dry=True).run_command(cmd)
             yield 100
             return
 
@@ -386,9 +389,8 @@ class MediaFile:
         cmd.append(temp_file)
 
         try:
-            cmd_runner = CommandRunner(cmd)
             try:
-                yield from cmd_runner.run_ffmpeg_command()
+                yield from CommandRunner().run_ffmpeg_command(cmd)
             except Exception as e:
                 cmd_str = " ".join([shlex.quote(c) for c in cmd])
                 logger.error(f"Error while running command {cmd_str}! Error: {e}")

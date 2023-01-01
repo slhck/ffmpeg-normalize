@@ -20,52 +20,17 @@ DUR_REGEX = re.compile(
     r"Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})"
 )
 
-
-def to_ms(s: str | None = None, decimals: int | None = None, **kwargs) -> int:
-    """This function converts a string with time format "hh:mm:ss:ms" to milliseconds
-
-    Args:
-        s (str): String with time format "hh:mm:ss:ms", if not provided, the function will use the keyword arguments (optional)
-        decimals (int): Number of decimals to round to (optional)
-
-    Keyword Args:
-        hour: Number of hours (optional)
-        min: Number of minutes (optional)
-        sec: Number of seconds (optional)
-        ms: Number of milliseconds (optional)
-
-    Returns:
-        int: Integer with the number of milliseconds
-    """
-    if s:
-        hour = int(s[0:2])
-        minute = int(s[3:5])
-        sec = int(s[6:8])
-        ms = int(s[10:11])
-    else:
-        hour = int(kwargs.get("hour", 0))
-        minute = int(kwargs.get("min", 0))
-        sec = int(kwargs.get("sec", 0))
-        ms = int(kwargs.get("ms", 0))
-
-    result = (hour * 60 * 60 * 1000) + (minute * 60 * 1000) + (sec * 1000) + ms
-    if decimals and isinstance(decimals, int):
-        return round(result, decimals)
-    return result
-
-
 class CommandRunner:
     """
     Wrapper for running ffmpeg commands
     """
-    def __init__(self, cmd: list[str], dry: bool = False):
+    def __init__(self, dry: bool = False):
         """Create a CommandRunner object
 
         Args:
             cmd: Command to run as a list of strings
             dry: Dry run mode. Defaults to False.
         """
-        self.cmd = cmd
         self.dry = dry
         self.output: str | None = None
 
@@ -102,7 +67,7 @@ class CommandRunner:
         )
 
 
-    def run_ffmpeg_command(self) -> Iterator[int]:
+    def run_ffmpeg_command(self, cmd: list[str]) -> Iterator[int]:
         """
         Run an ffmpeg command
 
@@ -110,8 +75,8 @@ class CommandRunner:
             int: Progress percentage
         """
         # wrapper for 'ffmpeg-progress-yield'
-        logger.debug(f"Running command: {self.cmd}")
-        ff = FfmpegProgress(self.cmd, dry_run=self.dry)
+        logger.debug(f"Running command: {cmd}")
+        ff = FfmpegProgress(cmd, dry_run=self.dry)
         yield from ff.run_command_with_progress()
 
         self.output = ff.stderr
@@ -122,38 +87,40 @@ class CommandRunner:
             )
 
 
-    def run_command(self) -> None:
+    def run_command(self, cmd: list[str]) -> CommandRunner:
         """
-        Run the actual command (not ffmpeg)
+        Run a command with subprocess
+
+        Returns:
+            CommandRunner: itself
 
         Raises:
             RuntimeError: If command returns non-zero exit code
         """
-        logger.debug(f"Running command: {self.cmd}")
+        logger.debug(f"Running command: {cmd}")
 
         if self.dry:
             logger.debug("Dry mode specified, not actually running command")
-            return
+            return self
 
         p = subprocess.Popen(
-            self.cmd,
+            cmd,
             stdin=subprocess.PIPE,  # Apply stdin isolation by creating separate pipe.
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=False,
         )
 
-        # simple running of command
         stdout_bytes, stderr_bytes = p.communicate()
 
         stdout = stdout_bytes.decode("utf8", errors="replace")
         stderr = stderr_bytes.decode("utf8", errors="replace")
 
-        if p.returncode == 0:
-            self.output = stdout + stderr
-        else:
-            raise RuntimeError(f"Error running command {self.cmd}: {stderr}")
+        if p.returncode != 0:
+            raise RuntimeError(f"Error running command {cmd}: {stderr}")
 
+        self.output = stdout + stderr
+        return self
 
     def get_output(self) -> str:
         if self.output is None:
@@ -217,10 +184,8 @@ def ffmpeg_has_loudnorm() -> bool:
     Returns:
         bool: True if loudnorm is supported, False otherwise
     """
-    cmd_runner = CommandRunner([get_ffmpeg_exe(), "-filters"])
-    cmd_runner.run_command()
-
-    supports_loudnorm = "loudnorm" in cmd_runner.get_output()
+    output = CommandRunner().run_command([get_ffmpeg_exe(), "-filters"]).get_output()
+    supports_loudnorm = "loudnorm" in output
     if not supports_loudnorm:
         logger.error(
             "Your ffmpeg does not support the 'loudnorm' filter. "
