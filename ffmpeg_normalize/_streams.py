@@ -229,8 +229,8 @@ class AudioStream(MediaStream):
             NUL,
         ]
 
-        cmd_runner = CommandRunner(cmd)
-        yield from cmd_runner.run_ffmpeg_command()
+        cmd_runner = CommandRunner()
+        yield from cmd_runner.run_ffmpeg_command(cmd)
         output = cmd_runner.get_output()
 
         logger.debug(
@@ -298,8 +298,8 @@ class AudioStream(MediaStream):
             NUL,
         ]
 
-        cmd_runner = CommandRunner(cmd)
-        yield from cmd_runner.run_ffmpeg_command()
+        cmd_runner = CommandRunner()
+        yield from cmd_runner.run_ffmpeg_command(cmd)
         output = cmd_runner.get_output()
 
         logger.debug(
