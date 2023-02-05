@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import logging
 import sys
-from platform import system
+import colorlog
+import argparse
+from ffmpeg_normalize import __module_name__ as LOGGER_NAME
 
 from tqdm import tqdm
-
-_global_log: logging.Logger | None = None
 
 
 # https://stackoverflow.com/questions/38543506/
@@ -37,37 +37,35 @@ def set_mp_lock() -> None:
         pass
 
 
-def setup_custom_logger() -> logging.Logger:
+def setup_cli_logger(arguments: argparse.Namespace) -> None:
+    """Configurs the CLI logger.
+
+    Args:
+        arguments (argparse.Namespace): The CLI arguments.
     """
-    Grab or create the global logger
-    """
 
-    # \033[1;30m - black
-    # \033[1;31m - red
-    # \033[1;32m - green
-    # \033[1;33m - yellow
-    # \033[1;34m - blue
-    # \033[1;35m - magenta
-    # \033[1;36m - cyan
-    # \033[1;37m - white
 
-    global _global_log
-    if _global_log is not None:
-        return _global_log
+    logger = colorlog.getLogger(LOGGER_NAME)
 
-    if system() not in ("Windows", "cli"):
-        logging.addLevelName(logging.ERROR, "[1;31mERROR[1;0m")
-        logging.addLevelName(logging.WARNING, "[1;33mWARNING[1;0m")
-        logging.addLevelName(logging.INFO, "[1;34mINFO[1;0m")
-        logging.addLevelName(logging.DEBUG, "[1;35mDEBUG[1;0m")
-
-    logger = logging.Logger("ffmpeg_normalize")
-    logger.setLevel(logging.WARNING)
 
     handler = TqdmLoggingHandler()
-    handler.setFormatter(logging.Formatter(fmt="%(levelname)s: %(message)s"))
+    handler.setFormatter(colorlog.ColoredFormatter(
+        "%(log_color)s%(levelname)s: %(message)s",
+        log_colors={
+            'DEBUG': 'cyan',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'red,bg_white',
+        })
+    )
     logger.addHandler(handler)
 
-    _global_log = logger
+    logger.setLevel(logging.WARNING)
 
-    return logger
+    if arguments.quiet:
+        logger.setLevel(logging.ERROR)
+    elif arguments.debug:
+        logger.setLevel(logging.DEBUG)
+    elif arguments.verbose:
+        logger.setLevel(logging.INFO)

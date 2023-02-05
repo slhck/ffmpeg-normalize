@@ -3,17 +3,17 @@ from __future__ import annotations
 import json
 import os
 import re
+import logging
 from typing import TYPE_CHECKING, Iterator, Literal, TypedDict
 
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
 from ._errors import FFmpegNormalizeError
-from ._logger import setup_custom_logger
 
 if TYPE_CHECKING:
     from ._ffmpeg_normalize import FFmpegNormalize
     from ._media_file import MediaFile
 
-logger = setup_custom_logger()
+_logger = logging.getLogger(__name__)
 
 class EbuLoudnessStatistics(TypedDict):
     input_i: float
@@ -114,7 +114,7 @@ class AudioStream(MediaStream):
             and self.duration
             and self.duration <= 3
         ):
-            logger.warning(
+            _logger.warning(
                 "Audio stream has a duration of less than 3 seconds. "
                 "Normalization may not work. "
                 "See https://github.com/slhck/ffmpeg-normalize/issues/87 for more info."
@@ -141,7 +141,7 @@ class AudioStream(MediaStream):
             raise ValueError("min must be smaller than max")
         result = max(min(number, max_range), min_range)
         if result != number and name is not None:
-            logger.warning(
+            _logger.warning(
                 f"Constraining {name} to range of [{min_range}, {max_range}]: {number} -> {result}"
             )
         return result
@@ -177,7 +177,7 @@ class AudioStream(MediaStream):
         elif self.bit_depth in [16, 24, 32, 64]:
             return f"pcm_s{self.bit_depth}le"
         else:
-            logger.warning(
+            _logger.warning(
                 f"Unsupported bit depth {self.bit_depth}, falling back to pcm_s16le"
             )
             return "pcm_s16le"
@@ -208,7 +208,7 @@ class AudioStream(MediaStream):
         Yields:
             int: The progress of the command.
         """
-        logger.info(f"Running first pass astats filter for stream {self.stream_id}")
+        _logger.info(f"Running first pass astats filter for stream {self.stream_id}")
 
         filter_str = self._get_filter_str_with_pre_filter(
             "astats=measure_overall=Peak_level+RMS_level:measure_perchannel=0"
@@ -233,7 +233,7 @@ class AudioStream(MediaStream):
         yield from cmd_runner.run_ffmpeg_command(cmd)
         output = cmd_runner.get_output()
 
-        logger.debug(
+        _logger.debug(
             f"astats command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}"
         )
 
@@ -266,7 +266,7 @@ class AudioStream(MediaStream):
         Yields:
             int: The progress of the command.
         """
-        logger.info(f"Running first pass loudnorm filter for stream {self.stream_id}")
+        _logger.info(f"Running first pass loudnorm filter for stream {self.stream_id}")
 
         opts = {
             "i": self.media_file.ffmpeg_normalize.target_level,
@@ -302,7 +302,7 @@ class AudioStream(MediaStream):
         yield from cmd_runner.run_ffmpeg_command(cmd)
         output = cmd_runner.get_output()
 
-        logger.debug(
+        _logger.debug(
             f"Loudnorm first pass command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}"
         )
 
@@ -346,7 +346,7 @@ class AudioStream(MediaStream):
                 "\n".join(output_lines[loudnorm_start:loudnorm_end])
             )
 
-            logger.debug(f"Loudnorm stats parsed: {json.dumps(loudnorm_stats)}")
+            _logger.debug(f"Loudnorm stats parsed: {json.dumps(loudnorm_stats)}")
 
             for key in [
                 "input_i",
@@ -385,7 +385,7 @@ class AudioStream(MediaStream):
             )
 
         if float(self.loudness_statistics["ebu"]["input_i"]) > 0:
-            logger.warning(
+            _logger.warning(
                 "Input file had measured input loudness greater than zero "
                 f"({self.loudness_statistics['ebu']['input_i']}), capping at 0"
             )
@@ -394,7 +394,7 @@ class AudioStream(MediaStream):
         will_use_dynamic_mode = self.media_file.ffmpeg_normalize.dynamic
 
         if self.media_file.ffmpeg_normalize.keep_loudness_range_target:
-            logger.debug("Keeping target loudness range in second pass loudnorm filter")
+            _logger.debug("Keeping target loudness range in second pass loudnorm filter")
             self.media_file.ffmpeg_normalize.loudness_range_target = (
                 self.loudness_statistics["ebu"]["input_lra"]
             )
@@ -404,7 +404,7 @@ class AudioStream(MediaStream):
             < self.loudness_statistics["ebu"]["input_lra"]
             and not will_use_dynamic_mode
         ):
-            logger.warning(
+            _logger.warning(
                 f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}. "
                 f"This is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
                 "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization. "
@@ -413,7 +413,7 @@ class AudioStream(MediaStream):
             will_use_dynamic_mode = True
 
         if will_use_dynamic_mode and not self.ffmpeg_normalize.sample_rate:
-            logger.warning(
+            _logger.warning(
                 "In dynamic mode, the sample rate will automatically be set to 192 kHz by the loudnorm filter. "
                 "Specify -ar/--sample-rate to override it."
             )
@@ -463,12 +463,12 @@ class AudioStream(MediaStream):
                 "Can only set adjustment for peak and RMS normalization"
             )
 
-        logger.info(
+        _logger.info(
             f"Adjusting stream {self.stream_id} by {adjustment} dB to reach {target_level}"
         )
 
         clip_amount = self.loudness_statistics["max"] + adjustment
         if clip_amount > 0:
-            logger.warning(f"Adjusting will lead to clipping of {clip_amount} dB")
+            _logger.warning(f"Adjusting will lead to clipping of {clip_amount} dB")
 
         return f"volume={adjustment}dB"
