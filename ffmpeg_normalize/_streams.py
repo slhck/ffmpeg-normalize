@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import re
-from typing import TYPE_CHECKING, Iterator, Literal, TypedDict
+from typing import TYPE_CHECKING, Iterator, Literal, TypedDict, cast
 
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
 from ._errors import FFmpegNormalizeError
@@ -70,12 +70,16 @@ class MediaStream:
 
 
 class VideoStream(MediaStream):
-    def __init__(self, ffmpeg_normalize, media_file, stream_id):
+    def __init__(
+        self, ffmpeg_normalize: FFmpegNormalize, media_file: MediaFile, stream_id: int
+    ):
         super().__init__(ffmpeg_normalize, media_file, "video", stream_id)
 
 
 class SubtitleStream(MediaStream):
-    def __init__(self, ffmpeg_normalize, media_file, stream_id):
+    def __init__(
+        self, ffmpeg_normalize: FFmpegNormalize, media_file: MediaFile, stream_id: int
+    ):
         super().__init__(ffmpeg_normalize, media_file, "subtitle", stream_id)
 
 
@@ -374,7 +378,7 @@ class AudioStream(MediaStream):
                     # convert to floats
                     loudnorm_stats[key] = float(loudnorm_stats[key])
 
-            return loudnorm_stats
+            return cast(EbuLoudnessStatistics, loudnorm_stats)
         except Exception as e:
             raise FFmpegNormalizeError(
                 f"Could not parse loudnorm stats; wrong JSON format in string: {e}"

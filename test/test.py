@@ -3,13 +3,14 @@ import os
 import shutil
 import subprocess
 import sys
+from typing import Any, Dict, List, Literal, Tuple, cast
 
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/../"))
 
 
-def ffmpeg_normalize_call(args):
+def ffmpeg_normalize_call(args: List[str]) -> Tuple[str, str]:
     cmd = [sys.executable, "-m", "ffmpeg_normalize"]
     cmd.extend(args)
 
@@ -24,16 +25,18 @@ def ffmpeg_normalize_call(args):
         raise e
 
 
-def _get_stats(input_file, normalization_type="ebu"):
+def _get_stats(
+    input_file: str, normalization_type: Literal["ebu", "rms", "peak"] = "ebu"
+) -> Dict:
     stdout, _ = ffmpeg_normalize_call(
         [input_file, "-f", "-n", "--print-stats", "-nt", normalization_type]
     )
-    stats = json.loads(stdout)
+    stats = cast(dict, json.loads(stdout))
     print(json.dumps(stats, indent=4))
     return stats
 
 
-def _get_stream_info(input_file):
+def _get_stream_info(input_file: str) -> List[Dict]:
     cmd = [
         "ffprobe",
         "-hide_banner",
@@ -44,12 +47,17 @@ def _get_stream_info(input_file):
         "json",
         "-show_streams",
     ]
-    return json.loads(
-        subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
-    )["streams"]
+    return cast(
+        list,
+        json.loads(
+            subprocess.check_output(
+                cmd, stderr=subprocess.STDOUT, universal_newlines=True
+            )
+        )["streams"],
+    )
 
 
-def fuzzy_equal(d1, d2, precision=0.1):
+def fuzzy_equal(d1: Any, d2: Any, precision: float = 0.1) -> bool:
     """
     Compare two objects recursively (just as standard '==' except floating point
     values are compared within given precision.
