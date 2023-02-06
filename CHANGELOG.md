@@ -1,6 +1,45 @@
 # Changelog
 
 
+## v1.26.2 (2023-02-06)
+
+* Add ignore-revs file.
+
+* Formatting and import sorting.
+
+* Refactor: Improved logging behavior (#216)
+
+* Add "apt update" (#215)
+
+* Remove stalebot.
+
+* Update README.
+
+* Move to_ms and make CommandRunner more ergonomic (#212)
+
+* Upgrade workflow, get ffmpeg from apt (#213)
+
+* Turn FFmpegNormalizeError into a normal Exception (#211)
+
+* Remove manifest.in (#210)
+
+* Simplify logging (#209)
+
+* Use pep585 type hints (#207)
+
+* Don't use tempfile's private module function (#206)
+
+* Fix smaller type errors.
+
+* Reduce mypy errors 12 -> 4 (#204)
+
+* Make input validation more efficient.
+
+  Make input validation more efficient
+
+  Re-separate formats and exts
+
+
 ## v1.26.1 (2022-12-18)
 
 * Bump requirements.
