@@ -1,9 +1,10 @@
-import os
-import sys
-import subprocess
-import pytest
 import json
+import os
 import shutil
+import subprocess
+import sys
+
+import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/../"))
 
@@ -290,7 +291,10 @@ class TestFFmpegNormalize:
         )
         assert os.path.isfile("normalized/test.aac")
         assert _get_stream_info("normalized/test.aac")[0]["codec_name"] == "aac"
-        assert abs(133000 - float(_get_stream_info("normalized/test.aac")[0]["bit_rate"])) > 10000
+        assert (
+            abs(133000 - float(_get_stream_info("normalized/test.aac")[0]["bit_rate"]))
+            > 10000
+        )
 
     def test_ar(self):
         ffmpeg_normalize_call(["test/test.mp4", "-ar", "48000"])

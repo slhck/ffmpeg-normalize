@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import argparse
 import logging
 import sys
-import colorlog
-import argparse
-from ffmpeg_normalize import __module_name__ as LOGGER_NAME
 
+import colorlog
 from tqdm import tqdm
+
+from ffmpeg_normalize import __module_name__ as LOGGER_NAME
 
 
 # https://stackoverflow.com/questions/38543506/
@@ -44,20 +45,20 @@ def setup_cli_logger(arguments: argparse.Namespace) -> None:
         arguments (argparse.Namespace): The CLI arguments.
     """
 
-
     logger = colorlog.getLogger(LOGGER_NAME)
 
-
     handler = TqdmLoggingHandler()
-    handler.setFormatter(colorlog.ColoredFormatter(
-        "%(log_color)s%(levelname)s: %(message)s",
-        log_colors={
-            'DEBUG': 'cyan',
-            'INFO': 'green',
-            'WARNING': 'yellow',
-            'ERROR': 'red',
-            'CRITICAL': 'red,bg_white',
-        })
+    handler.setFormatter(
+        colorlog.ColoredFormatter(
+            "%(log_color)s%(levelname)s: %(message)s",
+            log_colors={
+                "DEBUG": "cyan",
+                "INFO": "green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "red,bg_white",
+            },
+        )
     )
     logger.addHandler(handler)
 

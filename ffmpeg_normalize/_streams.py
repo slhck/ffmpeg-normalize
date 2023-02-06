@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
-import logging
 from typing import TYPE_CHECKING, Iterator, Literal, TypedDict
 
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from ._media_file import MediaFile
 
 _logger = logging.getLogger(__name__)
+
 
 class EbuLoudnessStatistics(TypedDict):
     input_i: float
@@ -26,18 +27,27 @@ class EbuLoudnessStatistics(TypedDict):
     output_thresh: float
     target_offset: float
 
+
 class LoudnessStatistics(TypedDict):
     ebu: EbuLoudnessStatistics | None
     mean: float | None
     max: float | None
+
 
 class LoudnessStatisticsWithMetadata(LoudnessStatistics):
     input_file: str
     output_file: str
     stream_id: int
 
+
 class MediaStream:
-    def __init__(self, ffmpeg_normalize: FFmpegNormalize, media_file: MediaFile, stream_type: Literal["audio", "video", "subtitle"], stream_id: int):
+    def __init__(
+        self,
+        ffmpeg_normalize: FFmpegNormalize,
+        media_file: MediaFile,
+        stream_type: Literal["audio", "video", "subtitle"],
+        stream_id: int,
+    ):
         """
         Create a MediaStream object.
 
@@ -61,16 +71,12 @@ class MediaStream:
 
 class VideoStream(MediaStream):
     def __init__(self, ffmpeg_normalize, media_file, stream_id):
-        super().__init__(
-            ffmpeg_normalize, media_file, "video", stream_id
-        )
+        super().__init__(ffmpeg_normalize, media_file, "video", stream_id)
 
 
 class SubtitleStream(MediaStream):
     def __init__(self, ffmpeg_normalize, media_file, stream_id):
-        super().__init__(
-            ffmpeg_normalize, media_file, "subtitle", stream_id
-        )
+        super().__init__(ffmpeg_normalize, media_file, "subtitle", stream_id)
 
 
 class AudioStream(MediaStream):
@@ -94,9 +100,7 @@ class AudioStream(MediaStream):
             bit_depth (int): bit depth in bits
             duration (float): duration in seconds
         """
-        super().__init__(
-            ffmpeg_normalize, media_file, "audio", stream_id
-        )
+        super().__init__(ffmpeg_normalize, media_file, "audio", stream_id)
 
         self.loudness_statistics: LoudnessStatistics = {
             "ebu": None,
@@ -121,7 +125,9 @@ class AudioStream(MediaStream):
             )
 
     @staticmethod
-    def _constrain(number: float, min_range: float, max_range: float, name: str | None = None) -> float:
+    def _constrain(
+        number: float, min_range: float, max_range: float, name: str | None = None
+    ) -> float:
         """
         Constrain a number between two values.
 
@@ -394,7 +400,9 @@ class AudioStream(MediaStream):
         will_use_dynamic_mode = self.media_file.ffmpeg_normalize.dynamic
 
         if self.media_file.ffmpeg_normalize.keep_loudness_range_target:
-            _logger.debug("Keeping target loudness range in second pass loudnorm filter")
+            _logger.debug(
+                "Keeping target loudness range in second pass loudnorm filter"
+            )
             self.media_file.ffmpeg_normalize.loudness_range_target = (
                 self.loudness_statistics["ebu"]["input_lra"]
             )
@@ -424,11 +432,21 @@ class AudioStream(MediaStream):
             "i": self.media_file.ffmpeg_normalize.target_level,
             "lra": self.media_file.ffmpeg_normalize.loudness_range_target,
             "tp": self.media_file.ffmpeg_normalize.true_peak,
-            "offset": self._constrain(float(stats["target_offset"]), -99, 99, name="target_offset"),
-            "measured_i": self._constrain(float(stats["input_i"]), -99, 0, name="input_i"),
-            "measured_lra": self._constrain(float(stats["input_lra"]), 0, 99, name="input_lra"),
-            "measured_tp": self._constrain(float(stats["input_tp"]), -99, 99, name="input_tp"),
-            "measured_thresh": self._constrain(float(stats["input_thresh"]), -99, 0, name="input_thresh"),
+            "offset": self._constrain(
+                float(stats["target_offset"]), -99, 99, name="target_offset"
+            ),
+            "measured_i": self._constrain(
+                float(stats["input_i"]), -99, 0, name="input_i"
+            ),
+            "measured_lra": self._constrain(
+                float(stats["input_lra"]), 0, 99, name="input_lra"
+            ),
+            "measured_tp": self._constrain(
+                float(stats["input_tp"]), -99, 99, name="input_tp"
+            ),
+            "measured_thresh": self._constrain(
+                float(stats["input_thresh"]), -99, 0, name="input_thresh"
+            ),
             "linear": "false" if self.media_file.ffmpeg_normalize.dynamic else "true",
             "print_format": "json",
         }
@@ -446,7 +464,10 @@ class AudioStream(MediaStream):
         Returns:
             str: ffmpeg volume filter string
         """
-        if self.loudness_statistics["max"] is None or self.loudness_statistics["mean"] is None:
+        if (
+            self.loudness_statistics["max"] is None
+            or self.loudness_statistics["mean"] is None
+        ):
             raise FFmpegNormalizeError(
                 "First pass not run, no mean/max volume to normalize to"
             )

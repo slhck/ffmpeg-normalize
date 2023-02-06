@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import logging
 import os
 import re
-import logging
 import shlex
 from shutil import move, rmtree
 from tempfile import mkdtemp

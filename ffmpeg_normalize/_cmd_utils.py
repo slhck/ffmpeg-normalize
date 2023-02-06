@@ -19,10 +19,12 @@ DUR_REGEX = re.compile(
     r"Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})"
 )
 
+
 class CommandRunner:
     """
     Wrapper for running ffmpeg commands
     """
+
     def __init__(self, dry: bool = False):
         """Create a CommandRunner object
 
@@ -65,7 +67,6 @@ class CommandRunner:
             ]
         )
 
-
     def run_ffmpeg_command(self, cmd: list[str]) -> Iterator[int]:
         """
         Run an ffmpeg command
@@ -84,7 +85,6 @@ class CommandRunner:
             _logger.debug(
                 f"ffmpeg output: {CommandRunner.prune_ffmpeg_progress_from_output(self.output)}"
             )
-
 
     def run_command(self, cmd: list[str]) -> CommandRunner:
         """

@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import json
-import os
 import logging
+import os
 from typing import TYPE_CHECKING, Literal
 
 from tqdm import tqdm
 
 from ._cmd_utils import ffmpeg_has_loudnorm, get_ffmpeg_exe
 from ._errors import FFmpegNormalizeError
-
 from ._media_file import MediaFile
 
 if TYPE_CHECKING:
