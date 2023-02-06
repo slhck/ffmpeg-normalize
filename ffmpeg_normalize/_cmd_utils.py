@@ -11,9 +11,8 @@ from typing import Iterator
 from ffmpeg_progress_yield import FfmpegProgress
 
 from ._errors import FFmpegNormalizeError
-from ._logger import setup_custom_logger
 
-logger = setup_custom_logger()
+_logger = logging.getLogger(__name__)
 
 NUL = "NUL" if system() in ("Windows", "cli") else "/dev/null"
 DUR_REGEX = re.compile(
@@ -75,14 +74,14 @@ class CommandRunner:
             int: Progress percentage
         """
         # wrapper for 'ffmpeg-progress-yield'
-        logger.debug(f"Running command: {cmd}")
+        _logger.debug(f"Running command: {cmd}")
         ff = FfmpegProgress(cmd, dry_run=self.dry)
         yield from ff.run_command_with_progress()
 
         self.output = ff.stderr
 
-        if logger.getEffectiveLevel() == logging.DEBUG and self.output is not None:
-            logger.debug(
+        if _logger.getEffectiveLevel() == logging.DEBUG and self.output is not None:
+            _logger.debug(
                 f"ffmpeg output: {CommandRunner.prune_ffmpeg_progress_from_output(self.output)}"
             )
 
@@ -97,10 +96,10 @@ class CommandRunner:
         Raises:
             RuntimeError: If command returns non-zero exit code
         """
-        logger.debug(f"Running command: {cmd}")
+        _logger.debug(f"Running command: {cmd}")
 
         if self.dry:
-            logger.debug("Dry mode specified, not actually running command")
+            _logger.debug("Dry mode specified, not actually running command")
             return self
 
         p = subprocess.Popen(
@@ -187,7 +186,7 @@ def ffmpeg_has_loudnorm() -> bool:
     output = CommandRunner().run_command([get_ffmpeg_exe(), "-filters"]).get_output()
     supports_loudnorm = "loudnorm" in output
     if not supports_loudnorm:
-        logger.error(
+        _logger.error(
             "Your ffmpeg does not support the 'loudnorm' filter. "
             "Please make sure you are running ffmpeg v4.2 or above."
         )

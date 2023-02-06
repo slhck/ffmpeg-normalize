@@ -2,19 +2,20 @@ from __future__ import annotations
 
 import json
 import os
+import logging
 from typing import TYPE_CHECKING, Literal
 
 from tqdm import tqdm
 
 from ._cmd_utils import ffmpeg_has_loudnorm, get_ffmpeg_exe
 from ._errors import FFmpegNormalizeError
-from ._logger import setup_custom_logger
+
 from ._media_file import MediaFile
 
 if TYPE_CHECKING:
     from ._streams import LoudnessStatisticsWithMetadata
 
-logger = setup_custom_logger()
+_logger = logging.getLogger(__name__)
 
 NORMALIZATION_TYPES = ("ebu", "rms", "peak")
 PCM_INCOMPATIBLE_FORMATS = {"flac", "mp3", "mp4", "ogg", "oga", "opus", "webm"}
@@ -142,7 +143,7 @@ class FFmpegNormalize:
         self.keep_loudness_range_target = keep_loudness_range_target
 
         if self.keep_loudness_range_target and loudness_range_target != 7.0:
-            logger.warning(
+            _logger.warning(
                 "Setting --keep-loudness-range-target will override your set loudness range target value! "
                 "Remove --keep-loudness-range-target or remove the --lrt/--loudness-range-target option."
             )
@@ -219,7 +220,7 @@ class FFmpegNormalize:
         for index, media_file in enumerate(
             tqdm(self.media_files, desc="File", disable=not self.progress, position=0)
         ):
-            logger.info(
+            _logger.info(
                 f"Normalizing file {media_file} ({index + 1} of {self.file_count})"
             )
 
@@ -228,7 +229,7 @@ class FFmpegNormalize:
             except Exception as e:
                 if len(self.media_files) > 1:
                     # simply warn and do not die
-                    logger.error(
+                    _logger.error(
                         f"Error processing input file {media_file}, will "
                         f"continue batch-processing. Error was: {e}"
                     )
@@ -236,7 +237,7 @@ class FFmpegNormalize:
                     # raise the error so the program will exit
                     raise e
 
-            logger.info(f"Normalized file written to {media_file.output_file}")
+            _logger.info(f"Normalized file written to {media_file.output_file}")
 
         if self.print_stats and self.stats:
             print(json.dumps(self.stats, indent=4))

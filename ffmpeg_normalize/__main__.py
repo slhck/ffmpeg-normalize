@@ -12,10 +12,10 @@ from typing import NoReturn
 
 from ._errors import FFmpegNormalizeError
 from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
-from ._logger import setup_custom_logger
+from ._logger import setup_cli_logger
 from ._version import __version__
 
-logger = setup_custom_logger()
+_logger = logging.getLogger(__name__)
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -442,19 +442,13 @@ def create_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     cli_args = create_parser().parse_args()
-
-    if cli_args.quiet:
-        logger.setLevel(logging.ERROR)
-    elif cli_args.debug:
-        logger.setLevel(logging.DEBUG)
-    elif cli_args.verbose:
-        logger.setLevel(logging.INFO)
+    setup_cli_logger(arguments=cli_args)
 
     def error(message: object) -> NoReturn:
-        if logger.getEffectiveLevel() == logging.DEBUG:
-            logger.error(f"FFmpegNormalizeError: {message}")
+        if _logger.getEffectiveLevel() == logging.DEBUG:
+            _logger.error(f"FFmpegNormalizeError: {message}")
         else:
-            logger.error(message)
+            _logger.error(message)
         sys.exit(1)
 
     def _split_options(opts: str) -> list[str]:
@@ -515,7 +509,7 @@ def main() -> None:
     )
 
     if cli_args.output and len(cli_args.input) > len(cli_args.output):
-        logger.warning(
+        _logger.warning(
             "There are more input files than output file names given. "
             "Please specify one output file name per input file using -o <output1> <output2> ... "
             "Will apply default file naming for the remaining ones."
@@ -524,7 +518,7 @@ def main() -> None:
     for index, input_file in enumerate(cli_args.input):
         if cli_args.output is not None and index < len(cli_args.output):
             if cli_args.output_folder and cli_args.output_folder != "normalized":
-                logger.warning(
+                _logger.warning(
                     f"Output folder {cli_args.output_folder} is ignored for "
                     f"input file {input_file}"
                 )
@@ -540,7 +534,7 @@ def main() -> None:
                 + cli_args.extension,
             )
             if not os.path.isdir(cli_args.output_folder) and not cli_args.dry_run:
-                logger.warning(
+                _logger.warning(
                     f"Output directory '{cli_args.output_folder}' does not exist, will create"
                 )
                 os.makedirs(cli_args.output_folder, exist_ok=True)

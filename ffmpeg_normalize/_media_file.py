@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import logging
 import shlex
 from shutil import move, rmtree
 from tempfile import mkdtemp
@@ -11,13 +12,12 @@ from tqdm import tqdm
 
 from ._cmd_utils import DUR_REGEX, NUL, CommandRunner
 from ._errors import FFmpegNormalizeError
-from ._logger import setup_custom_logger
 from ._streams import AudioStream, SubtitleStream, VideoStream
 
 if TYPE_CHECKING:
     from ffmpeg_normalize import FFmpegNormalize
 
-logger = setup_custom_logger()
+_logger = logging.getLogger(__name__)
 
 AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mp3", "mka", "oga", "ogg", "opus", "wav"}
 ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
@@ -86,7 +86,7 @@ class MediaFile:
         Raises:
             FFmpegNormalizeError: If no audio streams are found
         """
-        logger.debug(f"Parsing streams of {self.input_file}")
+        _logger.debug(f"Parsing streams of {self.input_file}")
 
         cmd = [
             self.ffmpeg_normalize.ffmpeg_exe,
@@ -105,8 +105,8 @@ class MediaFile:
 
         output = CommandRunner().run_command(cmd).get_output()
 
-        logger.debug("Stream parsing command output:")
-        logger.debug(output)
+        _logger.debug("Stream parsing command output:")
+        _logger.debug(output)
 
         output_lines = [line.strip() for line in output.split("\n")]
 
@@ -115,9 +115,9 @@ class MediaFile:
             if "Duration" in line:
                 if duration_search := DUR_REGEX.search(line):
                     duration = _to_ms(**duration_search.groupdict()) / 1000
-                    logger.debug(f"Found duration: {duration} s")
+                    _logger.debug(f"Found duration: {duration} s")
                 else:
-                    logger.warning("Could not extract duration from input file!")
+                    _logger.warning("Could not extract duration from input file!")
 
             if not line.startswith("Stream"):
                 continue
@@ -130,7 +130,7 @@ class MediaFile:
                 continue
 
             if "Audio" in line:
-                logger.debug(f"Found audio stream at index {stream_id}")
+                _logger.debug(f"Found audio stream at index {stream_id}")
                 sample_rate_match = re.search(r"(\d+) Hz", line)
                 sample_rate = (
                     int(sample_rate_match.group(1)) if sample_rate_match else None
@@ -147,13 +147,13 @@ class MediaFile:
                 )
 
             elif "Video" in line:
-                logger.debug(f"Found video stream at index {stream_id}")
+                _logger.debug(f"Found video stream at index {stream_id}")
                 self.streams["video"][stream_id] = VideoStream(
                     self.ffmpeg_normalize, self, stream_id
                 )
 
             elif "Subtitle" in line:
-                logger.debug(f"Found subtitle stream at index {stream_id}")
+                _logger.debug(f"Found subtitle stream at index {stream_id}")
                 self.streams["subtitle"][stream_id] = SubtitleStream(
                     self.ffmpeg_normalize, self, stream_id
                 )
@@ -167,7 +167,7 @@ class MediaFile:
             self.output_ext.lower() in ONE_STREAM
             and len(self.streams["audio"].values()) > 1
         ):
-            logger.warning(
+            _logger.warning(
                 "Output file only supports one stream. "
                 "Keeping only first audio stream."
             )
@@ -180,7 +180,7 @@ class MediaFile:
         """
         Run the normalization process for this file.
         """
-        logger.debug(f"Running normalization for {self.input_file}")
+        _logger.debug(f"Running normalization for {self.input_file}")
 
         # run the first pass to get loudness stats
         self._first_pass()
@@ -210,7 +210,7 @@ class MediaFile:
         """
         Run the first pass of the normalization process.
         """
-        logger.debug(f"Parsing normalization info for {self.input_file}")
+        _logger.debug(f"Parsing normalization info for {self.input_file}")
 
         for index, audio_stream in enumerate(self.streams["audio"].values()):
             if self.ffmpeg_normalize.normalization_type == "ebu":
@@ -279,7 +279,7 @@ class MediaFile:
 
         FIXME: make this method simpler
         """
-        logger.info(f"Running second pass for {self.input_file}")
+        _logger.info(f"Running second pass for {self.input_file}")
 
         # get the target output stream types depending on the options
         output_stream_types: list[Literal["audio", "video", "subtitle"]] = ["audio"]
@@ -335,7 +335,7 @@ class MediaFile:
                 cmd.extend(["-c:v", self.ffmpeg_normalize.video_codec])
             else:
                 if not self.ffmpeg_normalize.video_disable:
-                    logger.warning(
+                    _logger.warning(
                         f"The chosen output extension {self.output_ext} does not support video/cover art. It will be disabled."
                     )
 
@@ -393,10 +393,10 @@ class MediaFile:
                 yield from CommandRunner().run_ffmpeg_command(cmd)
             except Exception as e:
                 cmd_str = " ".join([shlex.quote(c) for c in cmd])
-                logger.error(f"Error while running command {cmd_str}! Error: {e}")
+                _logger.error(f"Error while running command {cmd_str}! Error: {e}")
                 raise e
             else:
-                logger.debug(
+                _logger.debug(
                     f"Moving temporary file from {temp_file} to {self.output_file}"
                 )
                 move(temp_file, self.output_file)
@@ -405,4 +405,4 @@ class MediaFile:
             rmtree(temp_dir, ignore_errors=True)
             raise e
 
-        logger.debug("Normalization finished")
+        _logger.debug("Normalization finished")
