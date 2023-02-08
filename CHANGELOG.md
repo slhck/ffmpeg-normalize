@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.26.4 (2023-02-08)
+
+* Re-add requirements.txt to (maybe) fix conda-forge builds.
+
+
 ## v1.26.3 (2023-02-08)
 
 * Fix requirements (#218)
