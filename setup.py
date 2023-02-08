@@ -33,9 +33,10 @@ setup(
         "ffmpeg_normalize": ["py.typed"],
     },
     install_requires=[
-        "tqdm>=4.38.0",
-        "colorama>=0.4.3",
+        "tqdm>=4.64.1",
+        "colorama>=0.4.6",
         "ffmpeg-progress-yield>=0.5.0",
+        "colorlog==6.7.0",
     ],
     license="MIT",
     zip_safe=False,
