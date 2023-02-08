@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.26.3 (2023-02-08)
+
+* Fix requirements (#218)
+
+* Improve types.
+
+* Docs: add @g3n35i5 as a contributor.
+
+
 ## v1.26.2 (2023-02-06)
 
 * Add ignore-revs file.
