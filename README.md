@@ -26,6 +26,7 @@ Read on for more info.
 **Contents:**
 
 - [Requirements](#requirements)
+  - [ffmpeg](#ffmpeg)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Description](#description)
@@ -59,9 +60,34 @@ Read on for more info.
 
 ## Requirements
 
--   Python 3.8 or higher
--   ffmpeg v4.2 or higher from <https://ffmpeg.org/> – static builds using the latest Git master are recommended
--   `ffmpeg` must be in your \$PATH
+You need Python 3.8 or higher.
+
+### ffmpeg
+
+- ffmpeg 5.x is required
+- Download a [static build](https://ffmpeg.org/download.html) for your system
+- Place the `ffmpeg` executable in your `$PATH`, or specify the path to the binary with the `FFMPEG_PATH` environment variable in `ffmpeg-normalize`
+
+For instance, under Linux:
+
+```bash
+wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+mkdir -p ffmpeg
+tar -xf ffmpeg-release-amd64-static.tar.xz -C ffmpeg --strip-components=1
+sudo cp ffmpeg/ffmpeg /usr/local/bin
+sudo cp ffmpeg/ffprobe /usr/local/bin
+sudo chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe
+```
+
+For Windows, follow [this guide](https://www.wikihow.com/Install-FFmpeg-on-Windows).
+
+For macOS, you can also use [Homebrew](https://brew.sh):
+
+```bash
+brew install ffmpeg
+```
+
+Note that using distribution packages (e.g., `apt install ffmpeg`) is not recommended, as these are often outdated.
 
 ## Installation
 
