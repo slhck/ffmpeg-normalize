@@ -81,7 +81,7 @@ sudo chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe
 
 For Windows, follow [this guide](https://www.wikihow.com/Install-FFmpeg-on-Windows).
 
-For macOS, you can also use [Homebrew](https://brew.sh):
+For macOS and Linux, you can also use [Homebrew](https://brew.sh):
 
 ```bash
 brew install ffmpeg
