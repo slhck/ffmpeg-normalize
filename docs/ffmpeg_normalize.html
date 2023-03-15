@@ -925,7 +925,7 @@ ffmpeg_normalize    </h1>
 </span><span id="MediaFile-290"><a href="#MediaFile-290"><span class="linenos">290</span></a>            <span class="n">output_stream_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;subtitle&quot;</span><span class="p">)</span>
 </span><span id="MediaFile-291"><a href="#MediaFile-291"><span class="linenos">291</span></a>
 </span><span id="MediaFile-292"><a href="#MediaFile-292"><span class="linenos">292</span></a>        <span class="c1"># base command, here we will add all other options</span>
-</span><span id="MediaFile-293"><a href="#MediaFile-293"><span class="linenos">293</span></a>        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ffmpeg_normalize</span><span class="o">.</span><span class="n">ffmpeg_exe</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">,</span> <span class="s2">&quot;-nostdin&quot;</span><span class="p">]</span>
+</span><span id="MediaFile-293"><a href="#MediaFile-293"><span class="linenos">293</span></a>        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ffmpeg_normalize</span><span class="o">.</span><span class="n">ffmpeg_exe</span><span class="p">,</span> <span class="s2">&quot;-hide_banner&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">]</span>
 </span><span id="MediaFile-294"><a href="#MediaFile-294"><span class="linenos">294</span></a>
 </span><span id="MediaFile-295"><a href="#MediaFile-295"><span class="linenos">295</span></a>        <span class="c1"># extra options (if any)</span>
 </span><span id="MediaFile-296"><a href="#MediaFile-296"><span class="linenos">296</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ffmpeg_normalize</span><span class="o">.</span><span class="n">extra_input_options</span><span class="p">:</span>
@@ -1406,7 +1406,7 @@ ffmpeg_normalize    </h1>
 </span><span id="AudioStream-227"><a href="#AudioStream-227"><span class="linenos">227</span></a>
 </span><span id="AudioStream-228"><a href="#AudioStream-228"><span class="linenos">228</span></a>        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="AudioStream-229"><a href="#AudioStream-229"><span class="linenos">229</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">ffmpeg_normalize</span><span class="o">.</span><span class="n">ffmpeg_exe</span><span class="p">,</span>
-</span><span id="AudioStream-230"><a href="#AudioStream-230"><span class="linenos">230</span></a>            <span class="s2">&quot;-nostdin&quot;</span><span class="p">,</span>
+</span><span id="AudioStream-230"><a href="#AudioStream-230"><span class="linenos">230</span></a>            <span class="s2">&quot;-hide_banner&quot;</span><span class="p">,</span>
 </span><span id="AudioStream-231"><a href="#AudioStream-231"><span class="linenos">231</span></a>            <span class="s2">&quot;-y&quot;</span><span class="p">,</span>
 </span><span id="AudioStream-232"><a href="#AudioStream-232"><span class="linenos">232</span></a>            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
 </span><span id="AudioStream-233"><a href="#AudioStream-233"><span class="linenos">233</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span>
@@ -1475,7 +1475,7 @@ ffmpeg_normalize    </h1>
 </span><span id="AudioStream-296"><a href="#AudioStream-296"><span class="linenos">296</span></a>
 </span><span id="AudioStream-297"><a href="#AudioStream-297"><span class="linenos">297</span></a>        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="AudioStream-298"><a href="#AudioStream-298"><span class="linenos">298</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">ffmpeg_normalize</span><span class="o">.</span><span class="n">ffmpeg_exe</span><span class="p">,</span>
-</span><span id="AudioStream-299"><a href="#AudioStream-299"><span class="linenos">299</span></a>            <span class="s2">&quot;-nostdin&quot;</span><span class="p">,</span>
+</span><span id="AudioStream-299"><a href="#AudioStream-299"><span class="linenos">299</span></a>            <span class="s2">&quot;-hide_banner&quot;</span><span class="p">,</span>
 </span><span id="AudioStream-300"><a href="#AudioStream-300"><span class="linenos">300</span></a>            <span class="s2">&quot;-y&quot;</span><span class="p">,</span>
 </span><span id="AudioStream-301"><a href="#AudioStream-301"><span class="linenos">301</span></a>            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
 </span><span id="AudioStream-302"><a href="#AudioStream-302"><span class="linenos">302</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span>
@@ -1864,7 +1864,7 @@ ffmpeg_normalize    </h1>
 </span><span id="AudioStream.parse_astats-227"><a href="#AudioStream.parse_astats-227"><span class="linenos">227</span></a>
 </span><span id="AudioStream.parse_astats-228"><a href="#AudioStream.parse_astats-228"><span class="linenos">228</span></a>        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="AudioStream.parse_astats-229"><a href="#AudioStream.parse_astats-229"><span class="linenos">229</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">ffmpeg_normalize</span><span class="o">.</span><span class="n">ffmpeg_exe</span><span class="p">,</span>
-</span><span id="AudioStream.parse_astats-230"><a href="#AudioStream.parse_astats-230"><span class="linenos">230</span></a>            <span class="s2">&quot;-nostdin&quot;</span><span class="p">,</span>
+</span><span id="AudioStream.parse_astats-230"><a href="#AudioStream.parse_astats-230"><span class="linenos">230</span></a>            <span class="s2">&quot;-hide_banner&quot;</span><span class="p">,</span>
 </span><span id="AudioStream.parse_astats-231"><a href="#AudioStream.parse_astats-231"><span class="linenos">231</span></a>            <span class="s2">&quot;-y&quot;</span><span class="p">,</span>
 </span><span id="AudioStream.parse_astats-232"><a href="#AudioStream.parse_astats-232"><span class="linenos">232</span></a>            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
 </span><span id="AudioStream.parse_astats-233"><a href="#AudioStream.parse_astats-233"><span class="linenos">233</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span>
@@ -1957,7 +1957,7 @@ ffmpeg_normalize    </h1>
 </span><span id="AudioStream.parse_loudnorm_stats-296"><a href="#AudioStream.parse_loudnorm_stats-296"><span class="linenos">296</span></a>
 </span><span id="AudioStream.parse_loudnorm_stats-297"><a href="#AudioStream.parse_loudnorm_stats-297"><span class="linenos">297</span></a>        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="AudioStream.parse_loudnorm_stats-298"><a href="#AudioStream.parse_loudnorm_stats-298"><span class="linenos">298</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">ffmpeg_normalize</span><span class="o">.</span><span class="n">ffmpeg_exe</span><span class="p">,</span>
-</span><span id="AudioStream.parse_loudnorm_stats-299"><a href="#AudioStream.parse_loudnorm_stats-299"><span class="linenos">299</span></a>            <span class="s2">&quot;-nostdin&quot;</span><span class="p">,</span>
+</span><span id="AudioStream.parse_loudnorm_stats-299"><a href="#AudioStream.parse_loudnorm_stats-299"><span class="linenos">299</span></a>            <span class="s2">&quot;-hide_banner&quot;</span><span class="p">,</span>
 </span><span id="AudioStream.parse_loudnorm_stats-300"><a href="#AudioStream.parse_loudnorm_stats-300"><span class="linenos">300</span></a>            <span class="s2">&quot;-y&quot;</span><span class="p">,</span>
 </span><span id="AudioStream.parse_loudnorm_stats-301"><a href="#AudioStream.parse_loudnorm_stats-301"><span class="linenos">301</span></a>            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
 </span><span id="AudioStream.parse_loudnorm_stats-302"><a href="#AudioStream.parse_loudnorm_stats-302"><span class="linenos">302</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span>
@@ -2354,7 +2354,7 @@ return the matching ffmpeg volume filter.</p>
                 </section>
                 <section id="__version__">
                     <div class="attr variable">
-            <span class="name">__version__</span><span class="default_value"> = &#39;1.26.4&#39;</span>
+            <span class="name">__version__</span><span class="default_value"> = &#39;1.26.5&#39;</span>
 
         
     </div>

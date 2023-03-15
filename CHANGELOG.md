@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.26.5 (2023-03-15)
+
+* Add "-hide_banner" remove "-nostdin" (#222)
+
+  The `-nostdin` option is unnessary because of the `-y` option.
+  Adding `-hide_banner` makes DEBUG statements shorter.
+
+* Homebrew works on linux too.
+
+* Explain ffmpeg installation steps.
+
+
 ## v1.26.4 (2023-02-08)
 
 * Re-add requirements.txt to (maybe) fix conda-forge builds.
