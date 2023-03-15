@@ -289,7 +289,7 @@ class MediaFile:
             output_stream_types.append("subtitle")
 
         # base command, here we will add all other options
-        cmd = [self.ffmpeg_normalize.ffmpeg_exe, "-y", "-nostdin"]
+        cmd = [self.ffmpeg_normalize.ffmpeg_exe, "-hide_banner", "-y"]
 
         # extra options (if any)
         if self.ffmpeg_normalize.extra_input_options:

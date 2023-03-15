@@ -226,7 +226,7 @@ class AudioStream(MediaStream):
 
         cmd = [
             self.media_file.ffmpeg_normalize.ffmpeg_exe,
-            "-nostdin",
+            "-hide_banner",
             "-y",
             "-i",
             self.media_file.input_file,
@@ -295,7 +295,7 @@ class AudioStream(MediaStream):
 
         cmd = [
             self.media_file.ffmpeg_normalize.ffmpeg_exe,
-            "-nostdin",
+            "-hide_banner",
             "-y",
             "-i",
             self.media_file.input_file,
