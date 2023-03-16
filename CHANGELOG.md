@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.26.6 (2023-03-16)
+
+* Production status stable.
+
+* Make install_requires more abstract.
+
+
 ## v1.26.5 (2023-03-15)
 
 * Add "-hide_banner" remove "-nostdin" (#222)
