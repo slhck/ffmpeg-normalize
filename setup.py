@@ -18,6 +18,10 @@ with open(path.join(here, "README.md")) as f:
 with open(path.join(here, "CHANGELOG.md")) as f:
     history = f.read()
 
+# Get list of deps from the requirements file
+with open(path.join(here, "requirements.txt")) as f:
+    requirements = f.read().strip().replace("\r", "").split("\n")
+
 setup(
     name="ffmpeg-normalize",
     version=version,
@@ -32,17 +36,12 @@ setup(
     package_data={
         "ffmpeg_normalize": ["py.typed"],
     },
-    install_requires=[
-        "tqdm>=4.64.1",
-        "colorama>=0.4.6",
-        "ffmpeg-progress-yield>=0.5.0",
-        "colorlog==6.7.0",
-    ],
+    install_requires=requirements,
     license="MIT",
     zip_safe=False,
     keywords="ffmpeg, normalize, audio",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Multimedia :: Sound/Audio :: Analysis",
