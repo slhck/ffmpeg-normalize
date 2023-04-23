@@ -55,6 +55,7 @@ class FFmpegNormalize:
         print_stats (bool, optional): Print loudnorm stats. Defaults to False.
         loudness_range_target (float, optional): Loudness range target. Defaults to 7.0.
         keep_loudness_range_target (bool, optional): Keep loudness range target. Defaults to False.
+        keep_lra_above_loudness_range_target (bool, optional): Keep input loudness range above loudness range target. Defaults to False.
         true_peak (float, optional): True peak. Defaults to -2.0.
         offset (float, optional): Offset. Defaults to 0.0.
         dual_mono (bool, optional): Dual mono. Defaults to False.
@@ -89,6 +90,7 @@ class FFmpegNormalize:
         # threshold=0.5,
         loudness_range_target: float = 7.0,
         keep_loudness_range_target: bool = False,
+        keep_lra_above_loudness_range_target: bool = False,
         true_peak: float = -2.0,
         offset: float = 0.0,
         dual_mono: bool = False,
@@ -145,6 +147,17 @@ class FFmpegNormalize:
             _logger.warning(
                 "Setting --keep-loudness-range-target will override your set loudness range target value! "
                 "Remove --keep-loudness-range-target or remove the --lrt/--loudness-range-target option."
+            )
+
+        self.keep_lra_above_loudness_range_target = keep_lra_above_loudness_range_target
+
+        if (
+            self.keep_loudness_range_target
+            and self.keep_lra_above_loudness_range_target
+        ):
+            raise FFmpegNormalizeError(
+                "Options --keep-loudness-range-target and --keep-lra-above-loudness-range-target are mutually exclusive! "
+                "Please choose just one of the two options."
             )
 
         self.true_peak = check_range(true_peak, -9, 0, name="true_peak")
