@@ -195,6 +195,19 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     group_ebu.add_argument(
+        "--keep-lra-above-loudness-range-target",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Keep input loudness range above loudness range target.
+        - `LOUDNESS_RANGE_TARGET` for input loudness range `<= LOUDNESS_RANGE_TARGET` or
+        - keep input loudness range target above `LOUDNESS_RANGE_TARGET`.
+        as alternative to `--keep-loudness-range-target` to allow for linear normalization.
+        """
+        ),
+    )
+
+    group_ebu.add_argument(
         "-tp",
         "--true-peak",
         type=float,
@@ -486,6 +499,7 @@ def main() -> None:
         loudness_range_target=cli_args.loudness_range_target,
         # threshold=cli_args.threshold,
         keep_loudness_range_target=cli_args.keep_loudness_range_target,
+        keep_lra_above_loudness_range_target=cli_args.keep_lra_above_loudness_range_target,
         true_peak=cli_args.true_peak,
         offset=cli_args.offset,
         dual_mono=cli_args.dual_mono,
