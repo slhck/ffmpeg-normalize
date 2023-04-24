@@ -407,8 +407,15 @@ class AudioStream(MediaStream):
             _logger.debug(
                 "Keeping target loudness range in second pass loudnorm filter"
             )
-            self.media_file.ffmpeg_normalize.loudness_range_target = (
-                self.loudness_statistics["ebu"]["input_lra"]
+            input_lra = self.loudness_statistics["ebu"]["input_lra"]
+            if input_lra < 1 or input_lra > 7:
+                _logger.warning(
+                    "Input file had measured loudness range outside of [1,7] "
+                    f"({input_lra}), capping to allowed range"
+                )
+
+            self.media_file.ffmpeg_normalize.loudness_range_target = self._constrain(
+                self.loudness_statistics["ebu"]["input_lra"], 1, 7
             )
 
         if self.media_file.ffmpeg_normalize.keep_lra_above_loudness_range_target:
