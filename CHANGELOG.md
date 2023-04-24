@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.27.0 (2023-04-24)
+
+* Constrain input LRA for second pass, addresses #227.
+
+* Feat: add linear loudnorm option to set lra up to target, then keep input lra.
+
+* Update question template.
+
+
 ## v1.26.6 (2023-03-16)
 
 * Production status stable.
