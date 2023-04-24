@@ -64,7 +64,7 @@ You need Python 3.8 or higher.
 
 ### ffmpeg
 
-- ffmpeg 5.x is required
+- ffmpeg 5.x is required, ffmpeg 6.x is recommended (it fixes [a bug for short files](https://github.com/slhck/ffmpeg-normalize/issues/87))
 - Download a [static build](https://ffmpeg.org/download.html) for your system
 - Place the `ffmpeg` executable in your `$PATH`, or specify the path to the binary with the `FFMPEG_PATH` environment variable in `ffmpeg-normalize`
 
@@ -351,7 +351,7 @@ For more information see the [API documentation](https://htmlpreview.github.io/?
 
 ### The program doesn't work because the "loudnorm" filter can't be found
 
-Make sure you run ffmpeg v3.1 or higher and that `loudnorm` is part of the output when you run `ffmpeg -filters`. Many distributions package outdated ffmpeg 2.x versions, or (even worse), Libav's `ffmpeg` disguising as a real `ffmpeg` from the FFmpeg project.
+Make sure you run a recent ffmpeg version and that `loudnorm` is part of the output when you run `ffmpeg -filters`. Many distributions package outdated ffmpeg versions, or (even worse), Libav's `ffmpeg` disguising as a real `ffmpeg` from the FFmpeg project.
 
 Some ffmpeg builds also do not have the `loudnorm` filter enabled.
 
