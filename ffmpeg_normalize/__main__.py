@@ -28,6 +28,7 @@ def create_parser() -> argparse.ArgumentParser:
                 __version__
             )
         ),
+        # usage="%(prog)s INPUT [INPUT ...] [-o OUTPUT [OUTPUT ...]] [options]",
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=textwrap.dedent(
             """\

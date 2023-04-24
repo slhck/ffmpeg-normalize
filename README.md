@@ -101,23 +101,17 @@ Or download this repository, then run `pip3 install .`.
 
 ## Usage
 
-```
-ffmpeg-normalize [-h]
-    [-o OUTPUT [OUTPUT ...]] [-of OUTPUT_FOLDER]
-    [-f] [-d] [-v] [-q] [-n] [-pr]
-    [--version]
-    [-nt {ebu,rms,peak}]
-    [-t TARGET_LEVEL] [-p] [-lrt LOUDNESS_RANGE_TARGET] [-tp TRUE_PEAK] [--offset OFFSET] [--dual-mono] [--dynamic]
-    [-c:a AUDIO_CODEC] [-b:a AUDIO_BITRATE] [-ar SAMPLE_RATE] [-koa]
-    [-prf PRE_FILTER] [-pof POST_FILTER]
-    [-vn] [-c:v VIDEO_CODEC]
-    [-sn] [-mn] [-cn]
-    [-ei EXTRA_INPUT_OPTIONS] [-e EXTRA_OUTPUT_OPTIONS]
-    [-ofmt OUTPUT_FORMAT] [-ext EXTENSION]
-    input [input ...]
+```bash
+ffmpeg-normalize input [input ...][-h][-o OUTPUT [OUTPUT ...]] [options]
 ```
 
-For more information, run `ffmpeg-normalize -h`, or read on.
+Example:
+
+```bash
+ffmpeg-normalize 1.wav 2.wav -o 1-normalized.m4a 2-normalized.m4a -c:a aac -b:a 192k
+```
+
+For more information on the options (`[options]`) available, run `ffmpeg-normalize -h`, or read on.
 
 ## Description
 
