@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.27.1 (2023-04-25)
+
+* Fix capping to [1, 50] instead of [1, 7] (#230)
+
+* Clarify usage, output/input order.
+
+* Add note on ffmpeg 6.0.
+
+* Docs: add @mjhalwa as a contributor.
+
+
 ## v1.27.0 (2023-04-24)
 
 * Constrain input LRA for second pass, addresses #227.
