@@ -155,7 +155,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
 ## Examples
 
-[Read the examples on the the wiki.](https://github.com/slhck/ffmpeg-normalize/wiki/examples)
+[Read the examples on the wiki.](https://github.com/slhck/ffmpeg-normalize/wiki/examples)
 
 ## Detailed Options
 
