@@ -1,7 +1,7 @@
 # ffmpeg-normalize
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://pypi.org/project/ffmpeg-normalize)
@@ -451,6 +451,9 @@ If you found this program useful and feel like giving back, feel free to send a 
       <td align="center" valign="top" width="14.28%"><a href="http://auto-editor.com"><img src="https://avatars.githubusercontent.com/u/57511737?v=4?s=100" width="100px;" alt="WyattBlue"/><br /><sub><b>WyattBlue</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=WyattBlue" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/g3n35i5"><img src="https://avatars.githubusercontent.com/u/17593457?v=4?s=100" width="100px;" alt="Jan-Frederik Schmidt"/><br /><sub><b>Jan-Frederik Schmidt</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=g3n35i5" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/mjhalwa"><img src="https://avatars.githubusercontent.com/u/8994014?v=4?s=100" width="100px;" alt="mjhalwa"/><br /><sub><b>mjhalwa</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=mjhalwa" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/07416"><img src="https://avatars.githubusercontent.com/u/14923168?v=4?s=100" width="100px;" alt="07416"/><br /><sub><b>07416</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=07416" title="Documentation">📖</a></td>
     </tr>
   </tbody>
   <tfoot>
