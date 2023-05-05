@@ -273,7 +273,7 @@ class MediaFile:
 
         return filter_complex_cmd, output_labels
 
-    def _second_pass(self) -> Iterator[int]:
+    def _second_pass(self) -> Iterator[float]:
         """
         Construct the second pass command and run it.
 

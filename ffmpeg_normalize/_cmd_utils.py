@@ -67,12 +67,12 @@ class CommandRunner:
             ]
         )
 
-    def run_ffmpeg_command(self, cmd: list[str]) -> Iterator[int]:
+    def run_ffmpeg_command(self, cmd: list[str]) -> Iterator[float]:
         """
         Run an ffmpeg command
 
         Yields:
-            int: Progress percentage
+            float: Progress percentage
         """
         # wrapper for 'ffmpeg-progress-yield'
         _logger.debug(f"Running command: {cmd}")

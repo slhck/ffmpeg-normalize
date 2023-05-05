@@ -211,12 +211,12 @@ class AudioStream(MediaStream):
         filter_str = input_label + ",".join(filter_chain)
         return filter_str
 
-    def parse_astats(self) -> Iterator[int]:
+    def parse_astats(self) -> Iterator[float]:
         """
         Use ffmpeg with astats filter to get the mean (RMS) and max (peak) volume of the input file.
 
         Yields:
-            int: The progress of the command.
+            float: The progress of the command.
         """
         _logger.info(f"Running first pass astats filter for stream {self.stream_id}")
 
@@ -269,12 +269,12 @@ class AudioStream(MediaStream):
                 f"Could not get max volume for {self.media_file.input_file}"
             )
 
-    def parse_loudnorm_stats(self) -> Iterator[int]:
+    def parse_loudnorm_stats(self) -> Iterator[float]:
         """
         Run a first pass loudnorm filter to get measured data.
 
         Yields:
-            int: The progress of the command.
+            float: The progress of the command.
         """
         _logger.info(f"Running first pass loudnorm filter for stream {self.stream_id}")
 
