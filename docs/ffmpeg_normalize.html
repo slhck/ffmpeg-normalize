@@ -935,7 +935,7 @@ ffmpeg_normalize    </h1>
 </span><span id="MediaFile-274"><a href="#MediaFile-274"><span class="linenos">274</span></a>
 </span><span id="MediaFile-275"><a href="#MediaFile-275"><span class="linenos">275</span></a>        <span class="k">return</span> <span class="n">filter_complex_cmd</span><span class="p">,</span> <span class="n">output_labels</span>
 </span><span id="MediaFile-276"><a href="#MediaFile-276"><span class="linenos">276</span></a>
-</span><span id="MediaFile-277"><a href="#MediaFile-277"><span class="linenos">277</span></a>    <span class="k">def</span> <span class="nf">_second_pass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+</span><span id="MediaFile-277"><a href="#MediaFile-277"><span class="linenos">277</span></a>    <span class="k">def</span> <span class="nf">_second_pass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 </span><span id="MediaFile-278"><a href="#MediaFile-278"><span class="linenos">278</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="MediaFile-279"><a href="#MediaFile-279"><span class="linenos">279</span></a><span class="sd">        Construct the second pass command and run it.</span>
 </span><span id="MediaFile-280"><a href="#MediaFile-280"><span class="linenos">280</span></a>
@@ -1417,12 +1417,12 @@ ffmpeg_normalize    </h1>
 </span><span id="AudioStream-212"><a href="#AudioStream-212"><span class="linenos">212</span></a>        <span class="n">filter_str</span> <span class="o">=</span> <span class="n">input_label</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filter_chain</span><span class="p">)</span>
 </span><span id="AudioStream-213"><a href="#AudioStream-213"><span class="linenos">213</span></a>        <span class="k">return</span> <span class="n">filter_str</span>
 </span><span id="AudioStream-214"><a href="#AudioStream-214"><span class="linenos">214</span></a>
-</span><span id="AudioStream-215"><a href="#AudioStream-215"><span class="linenos">215</span></a>    <span class="k">def</span> <span class="nf">parse_astats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+</span><span id="AudioStream-215"><a href="#AudioStream-215"><span class="linenos">215</span></a>    <span class="k">def</span> <span class="nf">parse_astats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 </span><span id="AudioStream-216"><a href="#AudioStream-216"><span class="linenos">216</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="AudioStream-217"><a href="#AudioStream-217"><span class="linenos">217</span></a><span class="sd">        Use ffmpeg with astats filter to get the mean (RMS) and max (peak) volume of the input file.</span>
 </span><span id="AudioStream-218"><a href="#AudioStream-218"><span class="linenos">218</span></a>
 </span><span id="AudioStream-219"><a href="#AudioStream-219"><span class="linenos">219</span></a><span class="sd">        Yields:</span>
-</span><span id="AudioStream-220"><a href="#AudioStream-220"><span class="linenos">220</span></a><span class="sd">            int: The progress of the command.</span>
+</span><span id="AudioStream-220"><a href="#AudioStream-220"><span class="linenos">220</span></a><span class="sd">            float: The progress of the command.</span>
 </span><span id="AudioStream-221"><a href="#AudioStream-221"><span class="linenos">221</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="AudioStream-222"><a href="#AudioStream-222"><span class="linenos">222</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running first pass astats filter for stream </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="AudioStream-223"><a href="#AudioStream-223"><span class="linenos">223</span></a>
@@ -1475,12 +1475,12 @@ ffmpeg_normalize    </h1>
 </span><span id="AudioStream-270"><a href="#AudioStream-270"><span class="linenos">270</span></a>                <span class="sa">f</span><span class="s2">&quot;Could not get max volume for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">media_file</span><span class="o">.</span><span class="n">input_file</span><span class="si">}</span><span class="s2">&quot;</span>
 </span><span id="AudioStream-271"><a href="#AudioStream-271"><span class="linenos">271</span></a>            <span class="p">)</span>
 </span><span id="AudioStream-272"><a href="#AudioStream-272"><span class="linenos">272</span></a>
-</span><span id="AudioStream-273"><a href="#AudioStream-273"><span class="linenos">273</span></a>    <span class="k">def</span> <span class="nf">parse_loudnorm_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+</span><span id="AudioStream-273"><a href="#AudioStream-273"><span class="linenos">273</span></a>    <span class="k">def</span> <span class="nf">parse_loudnorm_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 </span><span id="AudioStream-274"><a href="#AudioStream-274"><span class="linenos">274</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="AudioStream-275"><a href="#AudioStream-275"><span class="linenos">275</span></a><span class="sd">        Run a first pass loudnorm filter to get measured data.</span>
 </span><span id="AudioStream-276"><a href="#AudioStream-276"><span class="linenos">276</span></a>
 </span><span id="AudioStream-277"><a href="#AudioStream-277"><span class="linenos">277</span></a><span class="sd">        Yields:</span>
-</span><span id="AudioStream-278"><a href="#AudioStream-278"><span class="linenos">278</span></a><span class="sd">            int: The progress of the command.</span>
+</span><span id="AudioStream-278"><a href="#AudioStream-278"><span class="linenos">278</span></a><span class="sd">            float: The progress of the command.</span>
 </span><span id="AudioStream-279"><a href="#AudioStream-279"><span class="linenos">279</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="AudioStream-280"><a href="#AudioStream-280"><span class="linenos">280</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running first pass loudnorm filter for stream </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="AudioStream-281"><a href="#AudioStream-281"><span class="linenos">281</span></a>
@@ -1893,18 +1893,18 @@ ffmpeg_normalize    </h1>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">parse_astats</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">parse_astats</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="AudioStream.parse_astats-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#AudioStream.parse_astats"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AudioStream.parse_astats-215"><a href="#AudioStream.parse_astats-215"><span class="linenos">215</span></a>    <span class="k">def</span> <span class="nf">parse_astats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AudioStream.parse_astats-215"><a href="#AudioStream.parse_astats-215"><span class="linenos">215</span></a>    <span class="k">def</span> <span class="nf">parse_astats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 </span><span id="AudioStream.parse_astats-216"><a href="#AudioStream.parse_astats-216"><span class="linenos">216</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="AudioStream.parse_astats-217"><a href="#AudioStream.parse_astats-217"><span class="linenos">217</span></a><span class="sd">        Use ffmpeg with astats filter to get the mean (RMS) and max (peak) volume of the input file.</span>
 </span><span id="AudioStream.parse_astats-218"><a href="#AudioStream.parse_astats-218"><span class="linenos">218</span></a>
 </span><span id="AudioStream.parse_astats-219"><a href="#AudioStream.parse_astats-219"><span class="linenos">219</span></a><span class="sd">        Yields:</span>
-</span><span id="AudioStream.parse_astats-220"><a href="#AudioStream.parse_astats-220"><span class="linenos">220</span></a><span class="sd">            int: The progress of the command.</span>
+</span><span id="AudioStream.parse_astats-220"><a href="#AudioStream.parse_astats-220"><span class="linenos">220</span></a><span class="sd">            float: The progress of the command.</span>
 </span><span id="AudioStream.parse_astats-221"><a href="#AudioStream.parse_astats-221"><span class="linenos">221</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="AudioStream.parse_astats-222"><a href="#AudioStream.parse_astats-222"><span class="linenos">222</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running first pass astats filter for stream </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="AudioStream.parse_astats-223"><a href="#AudioStream.parse_astats-223"><span class="linenos">223</span></a>
@@ -1964,7 +1964,7 @@ ffmpeg_normalize    </h1>
 <h6 id="yields">Yields:</h6>
 
 <blockquote>
-  <p>int: The progress of the command.</p>
+  <p>float: The progress of the command.</p>
 </blockquote>
 </div>
 
@@ -1975,18 +1975,18 @@ ffmpeg_normalize    </h1>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">parse_loudnorm_stats</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">parse_loudnorm_stats</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="AudioStream.parse_loudnorm_stats-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#AudioStream.parse_loudnorm_stats"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AudioStream.parse_loudnorm_stats-273"><a href="#AudioStream.parse_loudnorm_stats-273"><span class="linenos">273</span></a>    <span class="k">def</span> <span class="nf">parse_loudnorm_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AudioStream.parse_loudnorm_stats-273"><a href="#AudioStream.parse_loudnorm_stats-273"><span class="linenos">273</span></a>    <span class="k">def</span> <span class="nf">parse_loudnorm_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 </span><span id="AudioStream.parse_loudnorm_stats-274"><a href="#AudioStream.parse_loudnorm_stats-274"><span class="linenos">274</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="AudioStream.parse_loudnorm_stats-275"><a href="#AudioStream.parse_loudnorm_stats-275"><span class="linenos">275</span></a><span class="sd">        Run a first pass loudnorm filter to get measured data.</span>
 </span><span id="AudioStream.parse_loudnorm_stats-276"><a href="#AudioStream.parse_loudnorm_stats-276"><span class="linenos">276</span></a>
 </span><span id="AudioStream.parse_loudnorm_stats-277"><a href="#AudioStream.parse_loudnorm_stats-277"><span class="linenos">277</span></a><span class="sd">        Yields:</span>
-</span><span id="AudioStream.parse_loudnorm_stats-278"><a href="#AudioStream.parse_loudnorm_stats-278"><span class="linenos">278</span></a><span class="sd">            int: The progress of the command.</span>
+</span><span id="AudioStream.parse_loudnorm_stats-278"><a href="#AudioStream.parse_loudnorm_stats-278"><span class="linenos">278</span></a><span class="sd">            float: The progress of the command.</span>
 </span><span id="AudioStream.parse_loudnorm_stats-279"><a href="#AudioStream.parse_loudnorm_stats-279"><span class="linenos">279</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="AudioStream.parse_loudnorm_stats-280"><a href="#AudioStream.parse_loudnorm_stats-280"><span class="linenos">280</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running first pass loudnorm filter for stream </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="AudioStream.parse_loudnorm_stats-281"><a href="#AudioStream.parse_loudnorm_stats-281"><span class="linenos">281</span></a>
@@ -2041,7 +2041,7 @@ ffmpeg_normalize    </h1>
 <h6 id="yields">Yields:</h6>
 
 <blockquote>
-  <p>int: The progress of the command.</p>
+  <p>float: The progress of the command.</p>
 </blockquote>
 </div>
 
@@ -2428,7 +2428,7 @@ return the matching ffmpeg volume filter.</p>
                 </section>
                 <section id="__version__">
                     <div class="attr variable">
-            <span class="name">__version__</span><span class="default_value"> = &#39;1.27.1&#39;</span>
+            <span class="name">__version__</span><span class="default_value"> = &#39;1.27.2&#39;</span>
 
         
     </div>

@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.27.2 (2023-05-05)
+
+* Bump ffmpeg-progress-yield, output progress in percent.
+
+* Docs: add @07416 as a contributor.
+
+* A typo in README (#231)
+
+
 ## v1.27.1 (2023-04-25)
 
 * Fix capping to [1, 50] instead of [1, 7] (#230)
