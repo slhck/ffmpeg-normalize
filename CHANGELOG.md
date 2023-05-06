@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.27.3 (2023-05-06)
+
+* Bump ffmpeg-progress-yield, round percentage output.
+
+* Fix test for progress.
+
+  seems flaky, worked locally?
+
+
 ## v1.27.2 (2023-05-05)
 
 * Bump ffmpeg-progress-yield, output progress in percent.
