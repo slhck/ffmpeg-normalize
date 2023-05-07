@@ -144,6 +144,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "sian1468",
+      "name": "sian1468",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58017832?v=4",
+      "profile": "https://github.com/sian1468",
+      "contributions": [
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
