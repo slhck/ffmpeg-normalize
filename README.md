@@ -25,38 +25,36 @@ Read on for more info.
 
 **Contents:**
 
-- [ffmpeg-normalize](#ffmpeg-normalize)
-  - [Requirements](#requirements)
-    - [ffmpeg](#ffmpeg)
-  - [Installation](#installation)
-  - [Docker Build](#docker-build)
-  - [Usage](#usage)
-  - [Description](#description)
-  - [Examples](#examples)
-  - [Detailed Options](#detailed-options)
-    - [File Input/Output](#file-inputoutput)
-    - [General](#general)
-    - [Normalization](#normalization)
-    - [EBU R128 Normalization](#ebu-r128-normalization)
-    - [Audio Encoding](#audio-encoding)
-    - [Other Encoding Options](#other-encoding-options)
-    - [Input/Output Format](#inputoutput-format)
-    - [Environment Variables](#environment-variables)
-  - [API](#api)
-  - [FAQ](#faq)
-    - [The program doesn't work because the "loudnorm" filter can't be found](#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found)
-    - [Should I use this to normalize my music collection?](#should-i-use-this-to-normalize-my-music-collection)
-    - [Why are my output files MKV?](#why-are-my-output-files-mkv)
-    - ["Could not write header for output file" error](#could-not-write-header-for-output-file-error)
-    - [The conversion does not work and I get a cryptic ffmpeg error!](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error)
-    - [What are the different normalization algorithms?](#what-are-the-different-normalization-algorithms)
-    - [Couldn't I just run `loudnorm` with ffmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
-    - [What about speech?](#what-about-speech)
-    - [After updating, this program does not work as expected anymore!](#after-updating-this-program-does-not-work-as-expected-anymore)
-    - [Can I buy you a beer / coffee / random drink?](#can-i-buy-you-a-beer--coffee--random-drink)
-  - [Related Tools and Articles](#related-tools-and-articles)
-  - [Contributors](#contributors)
-  - [License](#license)
+- [Requirements](#requirements)
+  - [ffmpeg](#ffmpeg)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Description](#description)
+- [Examples](#examples)
+- [Detailed Options](#detailed-options)
+  - [File Input/Output](#file-inputoutput)
+  - [General](#general)
+  - [Normalization](#normalization)
+  - [EBU R128 Normalization](#ebu-r128-normalization)
+  - [Audio Encoding](#audio-encoding)
+  - [Other Encoding Options](#other-encoding-options)
+  - [Input/Output Format](#inputoutput-format)
+  - [Environment Variables](#environment-variables)
+- [API](#api)
+- [FAQ](#faq)
+  - [The program doesn't work because the "loudnorm" filter can't be found](#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found)
+  - [Should I use this to normalize my music collection?](#should-i-use-this-to-normalize-my-music-collection)
+  - [Why are my output files MKV?](#why-are-my-output-files-mkv)
+  - ["Could not write header for output file" error](#could-not-write-header-for-output-file-error)
+  - [The conversion does not work and I get a cryptic ffmpeg error!](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error)
+  - [What are the different normalization algorithms?](#what-are-the-different-normalization-algorithms)
+  - [Couldn't I just run `loudnorm` with ffmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
+  - [What about speech?](#what-about-speech)
+  - [After updating, this program does not work as expected anymore!](#after-updating-this-program-does-not-work-as-expected-anymore)
+  - [Can I buy you a beer / coffee / random drink?](#can-i-buy-you-a-beer--coffee--random-drink)
+- [Related Tools and Articles](#related-tools-and-articles)
+- [Contributors](#contributors)
+- [License](#license)
 
 -------------
 
@@ -110,7 +108,7 @@ docker build -t ffmpeg-normalize .
 
 Run using Windows Powershell or Linux:
 ```
-docker run  -v "$(pwd):/tmp" -it docker.io/library/ffmpeg-normalize /bin/sh
+docker run  -v "$(pwd):/tmp" -it ffmpeg-normalize /bin/sh
 ```
 This will mount your current folder to the /tmp directory inside the container
 
