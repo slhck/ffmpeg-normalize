@@ -153,6 +153,15 @@
       "contributions": [
         "test"
       ]
+    },
+    {
+      "login": "psavva",
+      "name": "Panayiotis Savva",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1454758?v=4",
+      "profile": "https://github.com/psavva",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
