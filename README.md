@@ -99,6 +99,35 @@ pip3 install ffmpeg-normalize
 
 Or download this repository, then run `pip3 install .`.
 
+## Docker Build
+Download this repository and run
+
+```
+docker build -t ffmpeg-normalize .
+```
+
+Run using Windows Powershell or Linux:
+```
+docker run  -v "$(pwd):/tmp" -it ffmpeg-normalize /bin/sh
+```
+This will mount your current folder to the /tmp directory inside the container
+
+Note: The container will run in interactive mode.
+
+Example Usage:
+
+```
+PS C:\yonkers> docker run  -v "$(pwd):/tmp" -it ffmpeg-normalize /bin/sh
+/ # cd /tmp
+/tmp # ls
+01. Goblin.mp3
+/tmp # ffmpeg-normalize "01. Goblin.mp3" -f -c:a libmp3lame -b:a 320k --target-level -13 --output "01. Goblin normalized.mp3"
+WARNING: The chosen output extension mp3 does not support video/cover art. It will be disabled.
+/tmp # ls
+01. Goblin normalized.mp3
+01. Goblin.mp3
+```
+
 ## Usage
 
 ```bash
