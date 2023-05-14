@@ -1,7 +1,7 @@
 # ffmpeg-normalize
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://pypi.org/project/ffmpeg-normalize)
@@ -484,6 +484,7 @@ If you found this program useful and feel like giving back, feel free to send a 
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/07416"><img src="https://avatars.githubusercontent.com/u/14923168?v=4?s=100" width="100px;" alt="07416"/><br /><sub><b>07416</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=07416" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sian1468"><img src="https://avatars.githubusercontent.com/u/58017832?v=4?s=100" width="100px;" alt="sian1468"/><br /><sub><b>sian1468</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=sian1468" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/psavva"><img src="https://avatars.githubusercontent.com/u/1454758?v=4?s=100" width="100px;" alt="Panayiotis Savva"/><br /><sub><b>Panayiotis Savva</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=psavva" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
