@@ -174,7 +174,7 @@ By default, all streams from the input file will be written to the output file. 
 
 **How will the normalization be done?**
 
-The normalization will be performed with the [`loudnorm` filter](http://ffmpeg.org/ffmpeg-filters.html#loudnorm) from FFmpeg, which was [originally written by Kyle Swanson](https://k.ylo.ph/2016/04/04/loudnorm.html). It will bring the audio to a specified target level. This ensures that multiple files normalized with this filter will have the same perceived loudness.
+The normalization will be performed with the [`loudnorm` filter](https://ffmpeg.org/ffmpeg-filters.html#loudnorm) from FFmpeg, which was [originally written by Kyle Swanson](https://k.ylo.ph/2016/04/04/loudnorm.html). It will bring the audio to a specified target level. This ensures that multiple files normalized with this filter will have the same perceived loudness.
 
 **What codec is chosen?**
 
