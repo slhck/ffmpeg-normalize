@@ -558,7 +558,11 @@ def main() -> None:
             error(
                 f"Output file {output_file} already exists, skipping. Use -f to force overwriting."
             )
-
+          
+        if os.path.isdir(input_file):
+            _logger.warning(f"Folder {input_file} is not a file, skipping.")
+            continue
+          
         try:
             ffmpeg_normalize.add_media_file(input_file, output_file)
         except FFmpegNormalizeError as e:
