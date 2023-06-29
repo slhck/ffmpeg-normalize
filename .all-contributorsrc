@@ -162,8 +162,18 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "HighMans",
+      "name": "HighMans",
+      "avatar_url": "https://avatars.githubusercontent.com/u/42877729?v=4",
+      "profile": "https://github.com/HighMans",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "linkToUsage": true
+  "linkToUsage": true,
+  "commitType": "docs"
 }
