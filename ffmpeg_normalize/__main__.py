@@ -555,9 +555,18 @@ def main() -> None:
                 os.makedirs(cli_args.output_folder, exist_ok=True)
 
         if os.path.exists(output_file) and not cli_args.force:
-            error(
-                f"Output file {output_file} already exists, skipping. Use -f to force overwriting."
+            _logger.warning(
+                f"Output file '{output_file}' already exists, skipping. Use -f to force overwriting."
             )
+            continue
+
+        if not os.path.exists(input_file):
+            _logger.warning(f"Input file '{input_file}' does not exist, skipping")
+            continue
+
+        if not os.path.isfile(input_file):
+            _logger.warning(f"Input file '{input_file}' is not a file, skipping")
+            continue
 
         try:
             ffmpeg_normalize.add_media_file(input_file, output_file)
