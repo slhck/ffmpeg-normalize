@@ -1,6 +1,37 @@
 # Changelog
 
 
+## v1.27.4 (2023-06-29)
+
+* Docs: add HighMans as a contributor for code (#242)
+
+  * docs: update README.md
+
+  * docs: update .all-contributorsrc
+
+  ---------
+
+* Properly handle non-existing input files and skipping.
+
+* Fix: Dockerfile used wrong path.
+
+* Use `https` rather than `http` (#238)
+
+* Docs: add psavva as a contributor for code (#236)
+
+  * docs: update README.md
+
+  * docs: update .all-contributorsrc
+
+  ---------
+
+* Add Docker support (#235)
+
+* Docs: add @sian1468 as a contributor.
+
+* Round percentage in test (#234)
+
+
 ## v1.27.3 (2023-05-06)
 
 * Bump ffmpeg-progress-yield, round percentage output.
