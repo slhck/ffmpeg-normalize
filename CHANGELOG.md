@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.27.5 (2023-07-12)
+
+* Building on Windows failed due to character conversion (#244)
+
+
 ## v1.27.4 (2023-06-29)
 
 * Docs: add HighMans as a contributor for code (#242)
