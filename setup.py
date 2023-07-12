@@ -11,11 +11,11 @@ with open(path.join(here, "ffmpeg_normalize", "_version.py")) as version_file:
     version = eval(version_file.read().split("=")[1].strip())
 
 # Get the long description from the README file
-with open(path.join(here, "README.md")) as f:
+with open(path.join(here, "README.md"), encoding="utf8") as f:
     long_description = f.read()
 
 # Get the history from the CHANGELOG file
-with open(path.join(here, "CHANGELOG.md")) as f:
+with open(path.join(here, "CHANGELOG.md"), encoding="utf8") as f:
     history = f.read()
 
 setup(
