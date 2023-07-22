@@ -117,17 +117,6 @@ class AudioStream(MediaStream):
 
         self.duration = duration
 
-        if (
-            self.ffmpeg_normalize.normalization_type == "ebu"
-            and self.duration
-            and self.duration <= 3
-        ):
-            _logger.warning(
-                "Audio stream has a duration of less than 3 seconds. "
-                "Normalization may not work. "
-                "See https://github.com/slhck/ffmpeg-normalize/issues/87 for more info."
-            )
-
     @staticmethod
     def _constrain(
         number: float, min_range: float, max_range: float, name: str | None = None
