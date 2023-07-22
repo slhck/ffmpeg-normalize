@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.27.6 (2023-07-22)
+
+* Remove warning for short files (#87)
+
+
 ## v1.27.5 (2023-07-12)
 
 * Building on Windows failed due to character conversion (#244)
