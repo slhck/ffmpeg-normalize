@@ -19,7 +19,9 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
-AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mp3", "mka", "oga", "ogg", "opus", "wav"}
+# Note: this does not contain MP3, see https://github.com/slhck/ffmpeg-normalize/issues/246
+# We may need to remove other formats as well, to be checked.
+AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mka", "oga", "ogg", "opus", "wav"}
 ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
 
 
