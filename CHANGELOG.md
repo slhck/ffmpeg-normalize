@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.27.7 (2023-09-26)
+
+* Allow cover art in MP3.
+
+
 ## v1.27.6 (2023-07-22)
 
 * Remove warning for short files (#87)
