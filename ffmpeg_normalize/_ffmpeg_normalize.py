@@ -60,6 +60,7 @@ class FFmpegNormalize:
         offset (float, optional): Offset. Defaults to 0.0.
         dual_mono (bool, optional): Dual mono. Defaults to False.
         dynamic (bool, optional): Dynamic. Defaults to False.
+        batch (bool, optional): Batch mode. Defaults to False.
         audio_codec (str, optional): Audio codec. Defaults to "pcm_s16le".
         audio_bitrate (float, optional): Audio bitrate. Defaults to None.
         sample_rate (int, optional): Sample rate. Defaults to None.
@@ -95,6 +96,7 @@ class FFmpegNormalize:
         offset: float = 0.0,
         dual_mono: bool = False,
         dynamic: bool = False,
+        batch: bool = False,
         audio_codec: str = "pcm_s16le",
         audio_bitrate: float | None = None,
         sample_rate: float | int | None = None,
@@ -166,9 +168,11 @@ class FFmpegNormalize:
         # Ensure library user is passing correct types
         assert isinstance(dual_mono, bool), "dual_mono must be bool"
         assert isinstance(dynamic, bool), "dynamic must be bool"
+        assert isinstance(batch, bool), "batch must be bool"
 
         self.dual_mono = dual_mono
         self.dynamic = dynamic
+        self.batch = batch
         self.sample_rate = None if sample_rate is None else int(sample_rate)
 
         self.audio_codec = audio_codec
@@ -225,10 +229,65 @@ class FFmpegNormalize:
         self.media_files.append(MediaFile(self, input_file, output_file))
         self.file_count += 1
 
-    def run_normalization(self) -> None:
+    def run_normalization(self, pass_=None) -> None:
         """
         Run the normalization procedures
         """
+        if self.batch and pass_ is None:
+            # run first pass on all files
+            self.run_normalization(pass_=1)
+
+            # TODO average first passes
+            # or run first pass on concat of all input files?
+            # for mp3, this should work: cat *.mp3 | ffmpeg -i - ...
+            # but then its hard to say what input file is broken
+            for index, media_file in enumerate(self.media_files):
+                stats = [
+                    audio_stream.get_stats()
+                    for audio_stream in media_file.streams["audio"].values()
+                ]
+                # TODO handle multiple audio streams
+                # average stream 0 of all files
+                # average stream 1 of all files
+                # ...
+
+            # run second pass on all files
+            self.run_normalization(pass_=2)
+            return
+
+        for index, media_file in enumerate(
+            tqdm(self.media_files, desc="File", disable=not self.progress, position=0)
+        ):
+            _logger.info(
+                f"Normalizing file {media_file} ({index + 1} of {self.file_count})"
+            )
+
+            try:
+                media_file.run_normalization(pass_)
+            except Exception as e:
+                if len(self.media_files) > 1:
+                    if self.batch:
+                        # in batch mode we need all files
+                        raise e
+                    # simply warn and do not die
+                    _logger.error(
+                        f"Error processing input file {media_file}, will "
+                        f"continue batch-processing. Error was: {e}"
+                    )
+                else:
+                    # raise the error so the program will exit
+                    raise e
+
+            _logger.info(f"Normalized file written to {media_file.output_file}")
+
+        if self.print_stats and self.stats:
+            print(json.dumps(self.stats, indent=4))
+
+    def run_normalization_batch(self) -> None:
+        """
+        Run the normalization procedures in batch mode
+        """
+        # run first pass on all files
         for index, media_file in enumerate(
             tqdm(self.media_files, desc="File", disable=not self.progress, position=0)
         ):

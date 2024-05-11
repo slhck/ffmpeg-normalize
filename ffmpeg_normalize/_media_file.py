@@ -178,14 +178,43 @@ class MediaFile:
             self.streams["video"] = {}
             self.streams["subtitle"] = {}
 
-    def run_normalization(self) -> None:
+    def run_normalization(self, pass_=None) -> None:
         """
         Run the normalization process for this file.
         """
+
+        if pass_ == 1:
+            # run the first pass to get loudness stats
+            _logger.debug(f"Running first pass for {self.input_file}")
+            self._first_pass()
+            return
+
+        if pass_ == 2:
+            # run the second pass as a whole
+            _logger.debug(f"Running second pass for {self.input_file}")
+            if self.ffmpeg_normalize.progress:
+                with tqdm(total=100, position=1, desc="Second Pass") as pbar:
+                    for progress in self._second_pass():
+                        pbar.update(progress - pbar.n)
+            else:
+                for _ in self._second_pass():
+                    pass
+
+            return
+
         _logger.debug(f"Running normalization for {self.input_file}")
 
         # run the first pass to get loudness stats
         self._first_pass()
+
+        # no. this would only work in async code
+        """
+        if self.ffmpeg_normalize.batch:
+            # TODO
+            # wait for all files to finish their first pass
+            # then average all first passes
+            # dual_mono
+        """
 
         # run the second pass as a whole
         if self.ffmpeg_normalize.progress:
