@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.28.0 (2024-05-13)
+
+* Warn if dynamic mode is used but linear specified (#256)
+
+* Print debug commands in shell-escaped form.
+
+
 ## v1.27.7 (2023-09-26)
 
 * Allow cover art in MP3.
