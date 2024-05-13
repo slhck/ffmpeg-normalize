@@ -1,5 +1,6 @@
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -14,6 +15,7 @@ def ffmpeg_normalize_call(args: List[str]) -> Tuple[str, str]:
     cmd = [sys.executable, "-m", "ffmpeg_normalize"]
     cmd.extend(args)
 
+    print(shlex.join(cmd))
     try:
         p = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
@@ -28,6 +30,9 @@ def ffmpeg_normalize_call(args: List[str]) -> Tuple[str, str]:
 def _get_stats(
     input_file: str, normalization_type: Literal["ebu", "rms", "peak"] = "ebu"
 ) -> Dict:
+    """
+    Get the statistics from an existing output file without converting it.
+    """
     stdout, _ = ffmpeg_normalize_call(
         [input_file, "-f", "-n", "--print-stats", "-nt", normalization_type]
     )
@@ -192,7 +197,8 @@ class TestFFmpegNormalize:
                     "input_file": "normalized/test.mkv",
                     "output_file": "normalized/test.mkv",
                     "stream_id": 1,
-                    "ebu": None,
+                    "ebu_pass1": None,
+                    "ebu_pass2": None,
                     "mean": -14.8,
                     "max": -0.0,
                 },
@@ -200,7 +206,8 @@ class TestFFmpegNormalize:
                     "input_file": "normalized/test.mkv",
                     "output_file": "normalized/test.mkv",
                     "stream_id": 2,
-                    "ebu": None,
+                    "ebu_pass1": None,
+                    "ebu_pass2": None,
                     "mean": -19.3,
                     "max": -0.0,
                 },
@@ -217,7 +224,8 @@ class TestFFmpegNormalize:
                     "input_file": "normalized/test.mkv",
                     "output_file": "normalized/test.mkv",
                     "stream_id": 1,
-                    "ebu": None,
+                    "ebu_pass1": None,
+                    "ebu_pass2": None,
                     "mean": -15.0,
                     "max": -0.2,
                 },
@@ -225,7 +233,8 @@ class TestFFmpegNormalize:
                     "input_file": "normalized/test.mkv",
                     "output_file": "normalized/test.mkv",
                     "stream_id": 2,
-                    "ebu": None,
+                    "ebu_pass1": None,
+                    "ebu_pass2": None,
                     "mean": -15.1,
                     "max": 0.0,
                 },
@@ -242,7 +251,7 @@ class TestFFmpegNormalize:
                     "input_file": "normalized/test.mkv",
                     "output_file": "normalized/test.mkv",
                     "stream_id": 1,
-                    "ebu": {
+                    "ebu_pass1": {
                         "input_i": -23.00,
                         "input_tp": -10.32,
                         "input_lra": 2.40,
@@ -254,6 +263,7 @@ class TestFFmpegNormalize:
                         "normalization_type": "dynamic",
                         "target_offset": -0.97,
                     },
+                    "ebu_pass2": None,
                     "mean": None,
                     "max": None,
                 },
@@ -261,7 +271,7 @@ class TestFFmpegNormalize:
                     "input_file": "normalized/test.mkv",
                     "output_file": "normalized/test.mkv",
                     "stream_id": 2,
-                    "ebu": {
+                    "ebu_pass1": {
                         "input_i": -22.98,
                         "input_tp": -10.72,
                         "input_lra": 2.10,
@@ -273,6 +283,7 @@ class TestFFmpegNormalize:
                         "normalization_type": "dynamic",
                         "target_offset": -0.84,
                     },
+                    "ebu_pass2": None,
                     "mean": None,
                     "max": None,
                 },
@@ -388,7 +399,7 @@ class TestFFmpegNormalize:
                     "input_file": "normalized/test2.wav",
                     "output_file": "normalized/test2.mkv",
                     "stream_id": 0,
-                    "ebu": {
+                    "ebu_pass1": {
                         "input_i": -23.01,
                         "input_tp": -10.75,
                         "input_lra": 2.20,
@@ -400,6 +411,7 @@ class TestFFmpegNormalize:
                         "normalization_type": "dynamic",
                         "target_offset": -0.84,
                     },
+                    "ebu_pass2": None,
                     "mean": None,
                     "max": None,
                 }
@@ -424,7 +436,7 @@ class TestFFmpegNormalize:
                     "input_file": "normalized/test2.wav",
                     "output_file": "normalized/test2.mkv",
                     "stream_id": 0,
-                    "ebu": {
+                    "ebu_pass1": {
                         "input_i": -35.02,
                         "input_tp": -22.76,
                         "input_lra": 2.20,
@@ -436,6 +448,7 @@ class TestFFmpegNormalize:
                         "normalization_type": "dynamic",
                         "target_offset": -0.84,
                     },
+                    "ebu_pass2": None,
                     "mean": None,
                     "max": None,
                 }

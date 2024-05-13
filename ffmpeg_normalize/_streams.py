@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import re
-from typing import TYPE_CHECKING, Iterator, Literal, TypedDict, cast
+from typing import TYPE_CHECKING, Iterator, List, Literal, Optional, TypedDict, cast
 
 from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
 from ._errors import FFmpegNormalizeError
@@ -26,10 +26,12 @@ class EbuLoudnessStatistics(TypedDict):
     output_lra: float
     output_thresh: float
     target_offset: float
+    normalization_type: str
 
 
 class LoudnessStatistics(TypedDict):
-    ebu: EbuLoudnessStatistics | None
+    ebu_pass1: EbuLoudnessStatistics | None
+    ebu_pass2: EbuLoudnessStatistics | None
     mean: float | None
     max: float | None
 
@@ -107,7 +109,8 @@ class AudioStream(MediaStream):
         super().__init__(ffmpeg_normalize, media_file, "audio", stream_id)
 
         self.loudness_statistics: LoudnessStatistics = {
-            "ebu": None,
+            "ebu_pass1": None,
+            "ebu_pass2": None,
             "mean": None,
             "max": None,
         }
@@ -156,11 +159,21 @@ class AudioStream(MediaStream):
             "input_file": self.media_file.input_file,
             "output_file": self.media_file.output_file,
             "stream_id": self.stream_id,
-            "ebu": self.loudness_statistics["ebu"],
+            "ebu_pass1": self.loudness_statistics["ebu_pass1"],
+            "ebu_pass2": self.loudness_statistics["ebu_pass2"],
             "mean": self.loudness_statistics["mean"],
             "max": self.loudness_statistics["max"],
         }
         return stats
+
+    def set_second_pass_stats(self, stats: EbuLoudnessStatistics):
+        """
+        Set the EBU loudness statistics for the second pass.
+
+        Args:
+            stats (dict): The EBU loudness statistics.
+        """
+        self.loudness_statistics["ebu_pass2"] = stats
 
     def get_pcm_codec(self) -> str:
         """
@@ -288,6 +301,8 @@ class AudioStream(MediaStream):
             "-y",
             "-i",
             self.media_file.input_file,
+            "-map",
+            f"0:{self.stream_id}",
             "-filter_complex",
             filter_str,
             "-vn",
@@ -305,30 +320,69 @@ class AudioStream(MediaStream):
             f"Loudnorm first pass command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}"
         )
 
-        output_lines = [line.strip() for line in output.split("\n")]
-
-        self.loudness_statistics["ebu"] = AudioStream._parse_loudnorm_output(
-            output_lines
+        self.loudness_statistics["ebu_pass1"] = (
+            AudioStream.prune_and_parse_loudnorm_output(
+                output, num_stats=1
+            )[0]  # only one stream
         )
 
     @staticmethod
-    def _parse_loudnorm_output(output_lines: list[str]) -> EbuLoudnessStatistics:
+    def prune_and_parse_loudnorm_output(
+        output: str, num_stats: int = 1
+    ) -> List[EbuLoudnessStatistics]:
+        """
+        Prune ffmpeg progress lines from output and parse the loudnorm filter output.
+        There may be multiple outputs if multiple streams were processed.
+
+        Args:
+            output (str): The output from ffmpeg.
+            num_stats (int): The number of loudnorm statistics to parse.
+
+        Returns:
+            list: The EBU loudness statistics.
+        """
+        pruned_output = CommandRunner.prune_ffmpeg_progress_from_output(output)
+        output_lines = [line.strip() for line in pruned_output.split("\n")]
+
+        ret = []
+        idx = 0
+        while True:
+            _logger.debug(f"Parsing loudnorm stats for stream {idx}")
+            loudnorm_stats = AudioStream._parse_loudnorm_output(
+                output_lines, stream_index=idx
+            )
+            idx += 1
+
+            if loudnorm_stats is None:
+                continue
+            ret.append(loudnorm_stats)
+
+            if len(ret) >= num_stats:
+                break
+
+        return ret
+
+    @staticmethod
+    def _parse_loudnorm_output(
+        output_lines: list[str], stream_index: Optional[int] = None
+    ) -> Optional[EbuLoudnessStatistics]:
         """
         Parse the output of a loudnorm filter to get the EBU loudness statistics.
 
         Args:
             output_lines (list[str]): The output lines of the loudnorm filter.
+            stream_index (int): The stream index, optional to filter out the correct stream. If unset, the first stream is used.
 
         Raises:
             FFmpegNormalizeError: When the output could not be parsed.
 
         Returns:
-            EbuLoudnessStatistics: The EBU loudness statistics.
+            EbuLoudnessStatistics: The EBU loudness statistics, if found.
         """
         loudnorm_start = 0
         loudnorm_end = 0
         for index, line in enumerate(output_lines):
-            if line.startswith("[Parsed_loudnorm"):
+            if line.startswith(f"[Parsed_loudnorm_{stream_index}"):
                 loudnorm_start = index + 1
                 continue
             if loudnorm_start and line.startswith("}"):
@@ -336,6 +390,10 @@ class AudioStream(MediaStream):
                 break
 
         if not (loudnorm_start and loudnorm_end):
+            if stream_index is not None:
+                # not an error
+                return None
+
             raise FFmpegNormalizeError(
                 "Could not parse loudnorm stats; no loudnorm-related output found"
             )
@@ -345,7 +403,9 @@ class AudioStream(MediaStream):
                 "\n".join(output_lines[loudnorm_start:loudnorm_end])
             )
 
-            _logger.debug(f"Loudnorm stats parsed: {json.dumps(loudnorm_stats)}")
+            _logger.debug(
+                f"Loudnorm stats for stream {stream_index} parsed: {json.dumps(loudnorm_stats)}"
+            )
 
             for key in [
                 "input_i",
@@ -357,9 +417,14 @@ class AudioStream(MediaStream):
                 "output_lra",
                 "output_thresh",
                 "target_offset",
+                "normalization_type",
             ]:
+                if key not in loudnorm_stats:
+                    continue
+                if key == "normalization_type":
+                    loudnorm_stats[key] = loudnorm_stats[key].lower()
                 # handle infinite values
-                if float(loudnorm_stats[key]) == -float("inf"):
+                elif float(loudnorm_stats[key]) == -float("inf"):
                     loudnorm_stats[key] = -99
                 elif float(loudnorm_stats[key]) == float("inf"):
                     loudnorm_stats[key] = 0
@@ -378,17 +443,17 @@ class AudioStream(MediaStream):
         Return second pass loudnorm filter options string for ffmpeg
         """
 
-        if not self.loudness_statistics["ebu"]:
+        if not self.loudness_statistics["ebu_pass1"]:
             raise FFmpegNormalizeError(
                 "First pass not run, you must call parse_loudnorm_stats first"
             )
 
-        if float(self.loudness_statistics["ebu"]["input_i"]) > 0:
+        if float(self.loudness_statistics["ebu_pass1"]["input_i"]) > 0:
             _logger.warning(
                 "Input file had measured input loudness greater than zero "
-                f"({self.loudness_statistics['ebu']['input_i']}), capping at 0"
+                f"({self.loudness_statistics['ebu_pass1']['input_i']}), capping at 0"
             )
-            self.loudness_statistics["ebu"]["input_i"] = 0
+            self.loudness_statistics["ebu_pass1"]["input_i"] = 0
 
         will_use_dynamic_mode = self.media_file.ffmpeg_normalize.dynamic
 
@@ -396,7 +461,7 @@ class AudioStream(MediaStream):
             _logger.debug(
                 "Keeping target loudness range in second pass loudnorm filter"
             )
-            input_lra = self.loudness_statistics["ebu"]["input_lra"]
+            input_lra = self.loudness_statistics["ebu_pass1"]["input_lra"]
             if input_lra < 1 or input_lra > 50:
                 _logger.warning(
                     "Input file had measured loudness range outside of [1,50] "
@@ -404,12 +469,12 @@ class AudioStream(MediaStream):
                 )
 
             self.media_file.ffmpeg_normalize.loudness_range_target = self._constrain(
-                self.loudness_statistics["ebu"]["input_lra"], 1, 50
+                self.loudness_statistics["ebu_pass1"]["input_lra"], 1, 50
             )
 
         if self.media_file.ffmpeg_normalize.keep_lra_above_loudness_range_target:
             if (
-                self.loudness_statistics["ebu"]["input_lra"]
+                self.loudness_statistics["ebu_pass1"]["input_lra"]
                 <= self.media_file.ffmpeg_normalize.loudness_range_target
             ):
                 _logger.debug(
@@ -417,7 +482,7 @@ class AudioStream(MediaStream):
                 )
             else:
                 self.media_file.ffmpeg_normalize.loudness_range_target = (
-                    self.loudness_statistics["ebu"]["input_lra"]
+                    self.loudness_statistics["ebu_pass1"]["input_lra"]
                 )
                 _logger.debug(
                     "Keeping target loudness range in second pass loudnorm filter"
@@ -425,11 +490,11 @@ class AudioStream(MediaStream):
 
         if (
             self.media_file.ffmpeg_normalize.loudness_range_target
-            < self.loudness_statistics["ebu"]["input_lra"]
+            < self.loudness_statistics["ebu_pass1"]["input_lra"]
             and not will_use_dynamic_mode
         ):
             _logger.warning(
-                f"Input file had loudness range of {self.loudness_statistics['ebu']['input_lra']}. "
+                f"Input file had loudness range of {self.loudness_statistics['ebu_pass1']['input_lra']}. "
                 f"This is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
                 "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization. "
                 "Alternatively, use the --keep-loudness-range-target or --keep-lra-above-loudness-range-target option to keep the target loudness range from "
@@ -443,7 +508,7 @@ class AudioStream(MediaStream):
                 "Specify -ar/--sample-rate to override it."
             )
 
-        stats = self.loudness_statistics["ebu"]
+        stats = self.loudness_statistics["ebu_pass1"]
 
         opts = {
             "i": self.media_file.ffmpeg_normalize.target_level,

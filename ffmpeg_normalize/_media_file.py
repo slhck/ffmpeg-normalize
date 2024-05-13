@@ -232,12 +232,10 @@ class MediaFile:
                 for _ in fun():
                     pass
 
-        if self.ffmpeg_normalize.print_stats:
-            stats = [
-                audio_stream.get_stats()
-                for audio_stream in self.streams["audio"].values()
-            ]
-            self.ffmpeg_normalize.stats.extend(stats)
+        # set initial stats (for dry-runs, this is the only thing we need to do)
+        self.ffmpeg_normalize.stats = [
+            audio_stream.get_stats() for audio_stream in self.streams["audio"].values()
+        ]
 
     def _get_audio_filter_cmd(self) -> tuple[str, list[str]]:
         """
@@ -390,12 +388,14 @@ class MediaFile:
         temp_file = os.path.join(temp_dir, f"out.{self.output_ext}")
         cmd.append(temp_file)
 
+        cmd_runner = CommandRunner()
         try:
             try:
-                yield from CommandRunner().run_ffmpeg_command(cmd)
+                yield from cmd_runner.run_ffmpeg_command(cmd)
             except Exception as e:
-                cmd_str = " ".join([shlex.quote(c) for c in cmd])
-                _logger.error(f"Error while running command {cmd_str}! Error: {e}")
+                _logger.error(
+                    f"Error while running command {shlex.join(cmd)}! Error: {e}"
+                )
                 raise e
             else:
                 _logger.debug(
@@ -406,5 +406,33 @@ class MediaFile:
         except Exception as e:
             rmtree(temp_dir, ignore_errors=True)
             raise e
+
+        output = cmd_runner.get_output()
+        # in the second pass, we do not normalize stream-by-stream, so we set the stats based on the
+        # overall output (which includes multiple loudnorm stats)
+        if self.ffmpeg_normalize.normalization_type == "ebu":
+            all_stats = AudioStream.prune_and_parse_loudnorm_output(
+                output, num_stats=len(self.streams["audio"])
+            )
+            for idx, audio_stream in self.streams["audio"].items():
+                audio_stream.set_second_pass_stats(all_stats[idx])
+
+        # collect all stats for the final report, again (overwrite the input)
+        self.ffmpeg_normalize.stats = [
+            audio_stream.get_stats() for audio_stream in self.streams["audio"].values()
+        ]
+
+        # warn if self.media_file.ffmpeg_normalize.dynamic == False and any of the second pass stats contain "normalization_type" == "dynamic"
+        if self.ffmpeg_normalize.dynamic is False:
+            for audio_stream in self.streams["audio"].values():
+                pass2_stats = audio_stream.get_stats()["ebu_pass2"]
+                if pass2_stats is None:
+                    continue
+                if pass2_stats["normalization_type"] == "dynamic":
+                    _logger.warning(
+                        "You specified linear normalization, but the loudnorm filter reverted to dynamic normalization. "
+                        "This may lead to unexpected results."
+                        "Consider your input settings, e.g. choose a lower target level or higher target loudness range."
+                    )
 
         _logger.debug("Normalization finished")
