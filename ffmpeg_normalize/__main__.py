@@ -24,9 +24,7 @@ def create_parser() -> argparse.ArgumentParser:
         description=textwrap.dedent(
             """\
             ffmpeg-normalize v{} -- command line tool for normalizing audio files
-            """.format(
-                __version__
-            )
+            """.format(__version__)
         ),
         # usage="%(prog)s INPUT [INPUT ...] [-o OUTPUT [OUTPUT ...]] [options]",
         formatter_class=argparse.RawTextHelpFormatter,
@@ -157,7 +155,7 @@ def create_parser() -> argparse.ArgumentParser:
         "-p",
         "--print-stats",
         action="store_true",
-        help="Print first pass loudness statistics formatted as JSON to stdout",
+        help="Print loudness statistics for both passes formatted as JSON to stdout.",
     )
 
     # group_normalization.add_argument(

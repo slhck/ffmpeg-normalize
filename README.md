@@ -28,6 +28,7 @@ Read on for more info.
 - [Requirements](#requirements)
   - [ffmpeg](#ffmpeg)
 - [Installation](#installation)
+- [Docker Build](#docker-build)
 - [Usage](#usage)
 - [Description](#description)
 - [Examples](#examples)
@@ -237,7 +238,7 @@ Some containers (like MP4) also cannot handle PCM audio. If you want to use such
 
     Otherwise, the range is -99 to 0.
 
-- `-p, --print-stats`: Print first pass loudness statistics formatted as JSON to stdout.
+- `-p, --print-stats`: Print loudness statistics for both passes formatted as JSON to stdout.
 
 ### EBU R128 Normalization
 
