@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import re
+import shlex
 import subprocess
 from platform import system
 from shutil import which
@@ -75,7 +76,7 @@ class CommandRunner:
             float: Progress percentage
         """
         # wrapper for 'ffmpeg-progress-yield'
-        _logger.debug(f"Running command: {cmd}")
+        _logger.debug(f"Running command: {shlex.join(cmd)}")
         ff = FfmpegProgress(cmd, dry_run=self.dry)
         yield from ff.run_command_with_progress()
 
@@ -96,7 +97,7 @@ class CommandRunner:
         Raises:
             RuntimeError: If command returns non-zero exit code
         """
-        _logger.debug(f"Running command: {cmd}")
+        _logger.debug(f"Running command: {shlex.join(cmd)}")
 
         if self.dry:
             _logger.debug("Dry mode specified, not actually running command")
@@ -116,7 +117,7 @@ class CommandRunner:
         stderr = stderr_bytes.decode("utf8", errors="replace")
 
         if p.returncode != 0:
-            raise RuntimeError(f"Error running command {cmd}: {stderr}")
+            raise RuntimeError(f"Error running command {shlex.join(cmd)}: {stderr}")
 
         self.output = stdout + stderr
         return self
