@@ -1557,7 +1557,7 @@ ffmpeg_normalize    </h1>
 </span><span id="MediaFile-415"><a href="#MediaFile-415"><span class="linenos">415</span></a>            <span class="n">all_stats</span> <span class="o">=</span> <span class="n">AudioStream</span><span class="o">.</span><span class="n">prune_and_parse_loudnorm_output</span><span class="p">(</span>
 </span><span id="MediaFile-416"><a href="#MediaFile-416"><span class="linenos">416</span></a>                <span class="n">output</span><span class="p">,</span> <span class="n">num_stats</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">[</span><span class="s2">&quot;audio&quot;</span><span class="p">])</span>
 </span><span id="MediaFile-417"><a href="#MediaFile-417"><span class="linenos">417</span></a>            <span class="p">)</span>
-</span><span id="MediaFile-418"><a href="#MediaFile-418"><span class="linenos">418</span></a>            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">audio_stream</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">[</span><span class="s2">&quot;audio&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="MediaFile-418"><a href="#MediaFile-418"><span class="linenos">418</span></a>            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">audio_stream</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">[</span><span class="s2">&quot;audio&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
 </span><span id="MediaFile-419"><a href="#MediaFile-419"><span class="linenos">419</span></a>                <span class="n">audio_stream</span><span class="o">.</span><span class="n">set_second_pass_stats</span><span class="p">(</span><span class="n">all_stats</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
 </span><span id="MediaFile-420"><a href="#MediaFile-420"><span class="linenos">420</span></a>
 </span><span id="MediaFile-421"><a href="#MediaFile-421"><span class="linenos">421</span></a>        <span class="c1"># collect all stats for the final report, again (overwrite the input)</span>
@@ -3277,7 +3277,7 @@ return the matching ffmpeg volume filter.</p>
                 <section id="__version__">
                     <div class="attr variable">
             <span class="name">__version__</span>        =
-<span class="default_value">&#39;1.28.0&#39;</span>
+<span class="default_value">&#39;1.28.1&#39;</span>
 
         
     </div>

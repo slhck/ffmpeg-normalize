@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.28.1 (2024-05-15)
+
+* Fix assignment of audio statistics, fixes #257.
+
+
 ## v1.28.0 (2024-05-13)
 
 * Warn if dynamic mode is used but linear specified (#256)
