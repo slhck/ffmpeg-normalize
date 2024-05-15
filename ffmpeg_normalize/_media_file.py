@@ -414,7 +414,7 @@ class MediaFile:
             all_stats = AudioStream.prune_and_parse_loudnorm_output(
                 output, num_stats=len(self.streams["audio"])
             )
-            for idx, audio_stream in self.streams["audio"].items():
+            for idx, audio_stream in enumerate(self.streams["audio"].values()):
                 audio_stream.set_second_pass_stats(all_stats[idx])
 
         # collect all stats for the final report, again (overwrite the input)
