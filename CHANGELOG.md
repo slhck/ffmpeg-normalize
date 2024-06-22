@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.28.2 (2024-06-22)
+
+* Provide an entrypoint for the Docker image.
+
+* Add docker push (#261)
+
+
 ## v1.28.1 (2024-05-15)
 
 * Fix assignment of audio statistics, fixes #257.
