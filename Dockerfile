@@ -1,4 +1,4 @@
-FROM python:3.12.0a7-alpine3.17 as base
+FROM python:3.12-alpine as base
 
 FROM base as builder
 RUN mkdir /ffmpeg
@@ -11,3 +11,5 @@ COPY --from=builder /ffmpeg/ffmpeg /usr/local/bin
 COPY --from=builder /ffmpeg/ffprobe /usr/local/bin
 RUN pip3 install ffmpeg-normalize
 RUN chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe
+
+ENTRYPOINT ["ffmpeg-normalize"]

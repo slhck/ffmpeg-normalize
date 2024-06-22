@@ -28,7 +28,8 @@ Read on for more info.
 - [Requirements](#requirements)
   - [ffmpeg](#ffmpeg)
 - [Installation](#installation)
-- [Docker Build](#docker-build)
+- [Usage with Docker](#usage-with-docker)
+  - [From Docker Hub](#from-docker-hub)
 - [Usage](#usage)
 - [Description](#description)
 - [Examples](#examples)
@@ -100,34 +101,35 @@ pip3 install ffmpeg-normalize
 
 Or download this repository, then run `pip3 install .`.
 
-## Docker Build
-Download this repository and run
+## Usage with Docker
+
+### From Docker Hub
+
+You can use the pre-built image from Docker Hub:
+
+```bash
+docker run -v "$(pwd):/tmp" -it slhck/ffmpeg-normalize
+```
+
+Alternatively, download this repository and run
 
 ```
 docker build -t ffmpeg-normalize .
 ```
 
-Run using Windows Powershell or Linux:
-```
-docker run  -v "$(pwd):/tmp" -it ffmpeg-normalize /bin/sh
-```
-This will mount your current folder to the /tmp directory inside the container
+Then run the container with:
 
-Note: The container will run in interactive mode.
-
-Example Usage:
-
+```bash
+docker run  -v "$(pwd):/tmp" -it ffmpeg-normalize
 ```
-PS C:\yonkers> docker run  -v "$(pwd):/tmp" -it ffmpeg-normalize /bin/sh
-/ # cd /tmp
-/tmp # ls
-01. Goblin.mp3
-/tmp # ffmpeg-normalize "01. Goblin.mp3" -f -c:a libmp3lame -b:a 320k --target-level -13 --output "01. Goblin normalized.mp3"
-WARNING: The chosen output extension mp3 does not support video/cover art. It will be disabled.
-/tmp # ls
-01. Goblin normalized.mp3
-01. Goblin.mp3
+
+This will mount your current directory to the `/tmp` directory inside the container. Everything else works the same way as if you had installed the program locally. For example, to normalize a file:
+
+```bash
+docker run  -v "$(pwd):/tmp" -it ffmpeg-normalize /tmp/yourfile.mp4 -o /tmp/yourfile-normalized.wav
 ```
+
+You will then find the normalized file in your current directory.
 
 ## Usage
 
