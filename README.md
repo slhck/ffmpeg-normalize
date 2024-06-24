@@ -29,9 +29,8 @@ Read on for more info.
   - [ffmpeg](#ffmpeg)
 - [Installation](#installation)
 - [Usage with Docker](#usage-with-docker)
-  - [From Docker Hub](#from-docker-hub)
-- [Usage](#usage)
-- [Description](#description)
+- [High LeveL Introduction](#high-level-introduction)
+- [Basic Usage](#basic-usage)
 - [Examples](#examples)
 - [Detailed Options](#detailed-options)
   - [File Input/Output](#file-inputoutput)
@@ -44,10 +43,11 @@ Read on for more info.
   - [Environment Variables](#environment-variables)
 - [API](#api)
 - [FAQ](#faq)
+  - [What options should I choose for the EBU R128 filter? What is linear and dynamic mode?](#what-options-should-i-choose-for-the-ebu-r128-filter-what-is-linear-and-dynamic-mode)
   - [The program doesn't work because the "loudnorm" filter can't be found](#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found)
   - [Should I use this to normalize my music collection?](#should-i-use-this-to-normalize-my-music-collection)
   - [Why are my output files MKV?](#why-are-my-output-files-mkv)
-  - ["Could not write header for output file" error](#could-not-write-header-for-output-file-error)
+  - [I get a "Could not write header for output file" error](#i-get-a-could-not-write-header-for-output-file-error)
   - [The conversion does not work and I get a cryptic ffmpeg error!](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error)
   - [What are the different normalization algorithms?](#what-are-the-different-normalization-algorithms)
   - [Couldn't I just run `loudnorm` with ffmpeg?](#couldnt-i-just-run-loudnorm-with-ffmpeg)
@@ -62,7 +62,7 @@ Read on for more info.
 
 ## Requirements
 
-You need Python 3.8 or higher.
+You need Python 3.8 or higher, and ffmpeg.
 
 ### ffmpeg
 
@@ -101,9 +101,9 @@ pip3 install ffmpeg-normalize
 
 Or download this repository, then run `pip3 install .`.
 
-## Usage with Docker
+To later upgrade to the latest version, run `pip3 install --upgrade ffmpeg-normalize`.
 
-### From Docker Hub
+## Usage with Docker
 
 You can use the pre-built image from Docker Hub:
 
@@ -113,7 +113,7 @@ docker run -v "$(pwd):/tmp" -it slhck/ffmpeg-normalize
 
 Alternatively, download this repository and run
 
-```
+```bash
 docker build -t ffmpeg-normalize .
 ```
 
@@ -131,7 +131,49 @@ docker run  -v "$(pwd):/tmp" -it ffmpeg-normalize /tmp/yourfile.mp4 -o /tmp/your
 
 You will then find the normalized file in your current directory.
 
-## Usage
+## High LeveL Introduction
+
+Please read this section for a high level introduction.
+
+**What does the program do?**
+
+The program takes one or more input files and, by default, writes them to a folder called `normalized`, using an `.mkv` container. All audio streams will be normalized so that they have the same (perceived) volume according to the EBU R128 standard. This is done by analyzing the audio streams and applying a filter to bring them to a target level. Under the hood, the program uses ffmpeg's `loudnorm` filter to do this.
+
+**How do I specify the input?**
+
+Just give the program one or more input files as arguments. It works with most media files, including video files.
+
+**How do I specify the output?**
+
+You don't have to specify an output file name (the default is `normalized/<input>.mkv`), but if you want to override it, you can specify one output file name for each input file with the `-o` option. In this case, the container format (e.g. `.wav`) will be inferred from the file name extension that you've given.
+
+Example:
+
+```bash
+ffmpeg-normalize 1.wav 2.wav -o 1-normalized.wav 2-normalized.wav
+```
+
+Note that if you don't specify the output file name for an input file, the container format will be MKV, and the output will be written to `normalized/<input>.mkv`. The reason for choosing the MKV container is that it can handle almost any codec combination.
+
+Using the `-ext` option, you can supply a different output extension common to all output files, e.g. `-ext m4a`. However, you need to make sure that the container supports the codecs used for the output (see below).
+
+**What will get normalized?**
+
+By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently. The video and subtitle tracks will be copied over to the output file.
+
+**How will the normalization be done?**
+
+The normalization will be performed according to the EBU R128 algorithm with the [`loudnorm` filter](https://ffmpeg.org/ffmpeg-filters.html#loudnorm) from FFmpeg, which was [originally written by Kyle Swanson](https://k.ylo.ph/2016/04/04/loudnorm.html). It will bring the audio to a specified target level. This ensures that multiple files normalized with this filter will have the same perceived loudness.
+
+**What codec is chosen?**
+
+The default audio encoding method is uncompressed PCM (`pcm_s16le`) to avoid introducing compression artifacts. This will result in a much higher bitrate than you might want, for example if your input files are MP3s.
+
+Some containers (like MP4) also cannot handle PCM audio. If you want to use such containers and/or keep the file size down, use `-c:a` and specify an audio codec (e.g., `-c:a aac` for ffmpeg's built-in AAC encoder).
+
+## Basic Usage
+
+Supply one or more input files, and optionally, output file names:
 
 ```bash
 ffmpeg-normalize input [input ...][-h][-o OUTPUT [OUTPUT ...]] [options]
@@ -144,46 +186,6 @@ ffmpeg-normalize 1.wav 2.wav -o 1-normalized.m4a 2-normalized.m4a -c:a aac -b:a 
 ```
 
 For more information on the options (`[options]`) available, run `ffmpeg-normalize -h`, or read on.
-
-## Description
-
-Please read this section for a high level introduction.
-
-**What does the program do?**
-
-The program takes one or more input files and, by default, writes them to a folder called `normalized`, using an `.mkv` container. All audio streams will be normalized so that they have the same (perceived) volume.
-
-**How do I specify the input?**
-
-Just give the program one or more input files as arguments. It works with most media files.
-
-**How do I specify the output?**
-
-You can specify one output file name for each input file with the `-o` option. In this case, the container format (e.g. `.wav`) will be inferred from the file name extension that you've given.
-
-Example:
-
-```
-ffmpeg-normalize 1.wav 2.wav -o 1n.wav 2n.wav
-```
-
-If you don't specify the output file name for an input file, the container format will be MKV, and the output will be written to `normalized/<input>.mkv`.
-
-Using the `-ext` option, you can supply a different output extension common to all output files, e.g. `-ext m4a`.
-
-**What will get normalized?**
-
-By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently. The video and subtitle tracks will be copied over to the output file.
-
-**How will the normalization be done?**
-
-The normalization will be performed with the [`loudnorm` filter](https://ffmpeg.org/ffmpeg-filters.html#loudnorm) from FFmpeg, which was [originally written by Kyle Swanson](https://k.ylo.ph/2016/04/04/loudnorm.html). It will bring the audio to a specified target level. This ensures that multiple files normalized with this filter will have the same perceived loudness.
-
-**What codec is chosen?**
-
-The default audio encoding method is uncompressed PCM (`pcm_s16le`) to avoid introducing compression artifacts. This will result in a much higher bitrate than you might want, for example if your input files are MP3s.
-
-Some containers (like MP4) also cannot handle PCM audio. If you want to use such containers and/or keep the file size down, use `-c:a` and specify an audio codec (e.g., `-c:a aac` for ffmpeg's built-in AAC encoder).
 
 ## Examples
 
@@ -375,6 +377,32 @@ For more information see the [API documentation](https://htmlpreview.github.io/?
 
 ## FAQ
 
+### What options should I choose for the EBU R128 filter? What is linear and dynamic mode?
+
+EBU R128 is a method for normalizing audio loudness across different tracks or programs. It works by analyzing the audio content and adjusting it to meet specific loudness targets. The main components are:
+
+* Integrated Loudness (I): The overall loudness of the entire audio.
+* Loudness Range (LRA): The variation in loudness over time.
+* True Peak (TP): The maximum level of the audio signal.
+
+The normalization process involves measuring these values (input) and then applying gain adjustments to meet target levels (output), typically -23 LUFS for integrated loudness. You can also specify a target loudness range (LRA) and true peak level (TP).
+
+**Linear mode** applies a constant gain adjustment across the entire audio file. This is generally preferred because:
+
+* It preserves the original dynamic range of the audio.
+* It maintains the relative loudness between different parts of the audio.
+* It avoids potential artifacts or pumping effects that can occur with dynamic processing.
+
+**Dynamic mode**, on the other hand, can change the volume dynamically throughout the file. While this can achieve more consistent loudness, it may alter the original artistic intent and potentially introduce audible artifacts (possibly due to some bugs in the ffmpeg filter).
+
+For most cases, linear mode is recommended. Dynamic mode should only be used when linear mode is not suitable or when a specific effect is desired. In some cases, `loudnorm` will still fall back to dynamic mode, and a warning will be printed to the console. Here's when this can happen:
+
+* When the input loudness range (LRA) is larger than the target loudness range: If the input file has a loudness range that exceeds the specified loudness range target, the loudnorm filter will automatically switch to dynamic mode. This is because linear normalization alone cannot reduce the loudness range without dynamic processing (limiting). The `--keep-loudness-range-target` option can be used to keep the input loudness range target above the specified target.
+
+* When the required gain adjustment to meet the integrated loudness target would result in the true peak exceeding the specified true peak limit. This is because linear processing alone cannot reduce peaks without affecting the entire signal. For example, if a file needs to be amplified by 6 dB to reach the target integrated loudness, but doing so would push the true peak above the specified limit, the filter might switch to dynamic mode to handle this situation. If your content allows for it, you can increase the true peak target to give more headroom for linear processing. If you're consistently running into true peak issues, you might also consider lowering your target integrated loudness level.
+
+At this time, the `loudnorm` filter in ffmpeg does not provide a way to force linear mode when the input loudness range exceeds the target or when the true peak would be exceeded. The `--keep-loudness-range-target` option can be used to keep the input loudness range target above the specified target, but it will not force linear mode in all cases. We are working on a solution to handle this automatically!
+
 ### The program doesn't work because the "loudnorm" filter can't be found
 
 Make sure you run a recent ffmpeg version and that `loudnorm` is part of the output when you run `ffmpeg -filters`. Many distributions package outdated ffmpeg versions, or (even worse), Libav's `ffmpeg` disguising as a real `ffmpeg` from the FFmpeg project.
@@ -387,13 +415,15 @@ If you have to use an outdated ffmpeg version, you can only use `rms` or `peak` 
 
 ### Should I use this to normalize my music collection?
 
+Generally, no.
+
 When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this on your precious music collection, unless you have a backup of the originals or accept potential quality reduction. If you just want to normalize the subjective volume of the files without changing the actual content, consider using [MP3Gain](http://mp3gain.sourceforge.net/) and [aacgain](http://aacgain.altosdesign.com/).
 
 ### Why are my output files MKV?
 
 I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.
 
-### "Could not write header for output file" error
+### I get a "Could not write header for output file" error
 
 See the [next section](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error).
 
