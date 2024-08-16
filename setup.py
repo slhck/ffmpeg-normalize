@@ -34,7 +34,7 @@ setup(
     },
     install_requires=[
         "tqdm",
-        "colorama",
+        "colorama;platform_system=='Windows'",
         "ffmpeg-progress-yield",
         "colorlog",
     ],
