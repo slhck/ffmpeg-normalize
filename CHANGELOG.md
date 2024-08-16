@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.28.3 (2024-08-16)
+
+* Make colorama dependency windows-only.
+
+* Update.
+
+* Update badges.
+
+* Docs: add @kanjieater as a contributor.
+
+
 ## v1.28.2 (2024-06-22)
 
 * Provide an entrypoint for the Docker image.
