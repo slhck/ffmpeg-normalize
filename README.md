@@ -295,6 +295,8 @@ For more information on the options (`[options]`) available, run `ffmpeg-normali
 
     Will use input sample rate by default, except for EBU normalization, which will change the input sample rate to 192 kHz.
 
+- `-ac`, `--audio-channels`: Set the number of audio channels. If not specified, the input channel layout will be used. This is equivalent to `-ac` in ffmpeg.
+
 - `-koa, --keep-original-audio`: Copy original, non-normalized audio streams to output file
 
 - `-prf PRE_FILTER, --pre-filter PRE_FILTER`: Add an audio filter chain before applying normalization.

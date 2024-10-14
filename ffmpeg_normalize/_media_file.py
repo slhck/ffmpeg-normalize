@@ -355,6 +355,8 @@ class MediaFile:
             cmd.extend(["-b:a", str(self.ffmpeg_normalize.audio_bitrate)])
         if self.ffmpeg_normalize.sample_rate:
             cmd.extend(["-ar", str(self.ffmpeg_normalize.sample_rate)])
+        if self.ffmpeg_normalize.audio_channels:
+            cmd.extend(["-ac", str(self.ffmpeg_normalize.audio_channels)])
 
         # ... and subtitles
         if not self.ffmpeg_normalize.subtitle_disable:

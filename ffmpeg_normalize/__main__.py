@@ -304,6 +304,17 @@ def create_parser() -> argparse.ArgumentParser:
         ),
     )
     group_acodec.add_argument(
+        "-ac",
+        "--audio-channels",
+        type=int,
+        help=textwrap.dedent(
+            """\
+        Set the number of audio channels.
+        If not specified, the input channel layout will be used.
+        """
+        ),
+    )
+    group_acodec.add_argument(
         "-koa",
         "--keep-original-audio",
         action="store_true",
@@ -506,6 +517,7 @@ def main() -> None:
         audio_codec=cli_args.audio_codec,
         audio_bitrate=cli_args.audio_bitrate,
         sample_rate=cli_args.sample_rate,
+        audio_channels=cli_args.audio_channels,
         keep_original_audio=cli_args.keep_original_audio,
         pre_filter=cli_args.pre_filter,
         post_filter=cli_args.post_filter,

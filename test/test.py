@@ -460,3 +460,18 @@ class TestFFmpegNormalize:
             ["test/test.mp4", "-ext", "wav", "-vn", "-f", "q"]
         )
         assert "only supports one stream" not in stderr
+
+    def test_audio_channels(self):
+        ffmpeg_normalize_call(
+            ["test/test.mp4", "-ac", "1", "-o", "normalized/test.wav"]
+        )
+        assert os.path.isfile("normalized/test.wav")
+        stream_info = _get_stream_info("normalized/test.wav")[0]
+        assert stream_info["channels"] == 1
+
+        ffmpeg_normalize_call(
+            ["test/test.mp4", "-ac", "2", "-o", "normalized/test2.wav"]
+        )
+        assert os.path.isfile("normalized/test2.wav")
+        stream_info = _get_stream_info("normalized/test2.wav")[0]
+        assert stream_info["channels"] == 2

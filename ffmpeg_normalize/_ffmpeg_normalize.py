@@ -63,6 +63,7 @@ class FFmpegNormalize:
         audio_codec (str, optional): Audio codec. Defaults to "pcm_s16le".
         audio_bitrate (float, optional): Audio bitrate. Defaults to None.
         sample_rate (int, optional): Sample rate. Defaults to None.
+        audio_channels (int | None, optional): Audio channels. Defaults to None.
         keep_original_audio (bool, optional): Keep original audio. Defaults to False.
         pre_filter (str, optional): Pre filter. Defaults to None.
         post_filter (str, optional): Post filter. Defaults to None.
@@ -98,6 +99,7 @@ class FFmpegNormalize:
         audio_codec: str = "pcm_s16le",
         audio_bitrate: float | None = None,
         sample_rate: float | int | None = None,
+        audio_channels: int | None = None,
         keep_original_audio: bool = False,
         pre_filter: str | None = None,
         post_filter: str | None = None,
@@ -170,6 +172,7 @@ class FFmpegNormalize:
         self.dual_mono = dual_mono
         self.dynamic = dynamic
         self.sample_rate = None if sample_rate is None else int(sample_rate)
+        self.audio_channels = None if audio_channels is None else int(audio_channels)
 
         self.audio_codec = audio_codec
         self.audio_bitrate = audio_bitrate
