@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.29.0 (2024-10-14)
+
+* Add option to set audio channels directly.
+
+
 ## v1.28.3 (2024-08-16)
 
 * Make colorama dependency windows-only.
