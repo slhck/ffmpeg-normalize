@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.29.1 (2024-10-22)
+
+* Fix: override argparse usage.
+
+
 ## v1.29.0 (2024-10-14)
 
 * Add option to set audio channels directly.
