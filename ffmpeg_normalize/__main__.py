@@ -26,7 +26,9 @@ def create_parser() -> argparse.ArgumentParser:
             ffmpeg-normalize v{} -- command line tool for normalizing audio files
             """.format(__version__)
         ),
-        # usage="%(prog)s INPUT [INPUT ...] [-o OUTPUT [OUTPUT ...]] [options]",
+        # manually overridden because argparse generates the wrong order of arguments, see:
+        # https://github.com/slhck/ffmpeg-normalize/issues/132#issuecomment-662516535
+        usage="%(prog)s INPUT [INPUT ...] [-o OUTPUT [OUTPUT ...]] [options]",
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=textwrap.dedent(
             """\
