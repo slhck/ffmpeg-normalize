@@ -24,6 +24,8 @@ _logger = logging.getLogger(__name__)
 AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mka", "oga", "ogg", "opus", "wav"}
 ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
 
+TQDM_BAR_FORMAT = "{desc}: {percentage:3.2f}% |{bar}{r_bar}"
+
 
 def _to_ms(**kwargs: str) -> int:
     hour = int(kwargs.get("hour", 0))
@@ -189,7 +191,12 @@ class MediaFile:
 
         # run the second pass as a whole
         if self.ffmpeg_normalize.progress:
-            with tqdm(total=100, position=1, desc="Second Pass") as pbar:
+            with tqdm(
+                total=100,
+                position=1,
+                desc="Second Pass",
+                bar_format=TQDM_BAR_FORMAT,
+            ) as pbar:
                 for progress in self._second_pass():
                     pbar.update(progress - pbar.n)
         else:
@@ -225,6 +232,7 @@ class MediaFile:
                     total=100,
                     position=1,
                     desc=f"Stream {index + 1}/{len(self.streams['audio'].values())}",
+                    bar_format=TQDM_BAR_FORMAT,
                 ) as pbar:
                     for progress in fun():
                         pbar.update(progress - pbar.n)
