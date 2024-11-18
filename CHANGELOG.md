@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.29.2 (2024-11-18)
+
+* Fix: show percentage with two decimal digits in progress.
+
+* Chore: add python 12.
+
+
 ## v1.29.1 (2024-10-22)
 
 * Fix: override argparse usage.
