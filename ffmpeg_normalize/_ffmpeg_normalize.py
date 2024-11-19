@@ -60,6 +60,7 @@ class FFmpegNormalize:
         keep_lra_above_loudness_range_target (bool, optional): Keep input loudness range above loudness range target. Defaults to False.
         true_peak (float, optional): True peak. Defaults to -2.0.
         offset (float, optional): Offset. Defaults to 0.0.
+        lower_only (bool, optional): Whether the audio should not increase in loudness. Defaults to False.
         dual_mono (bool, optional): Dual mono. Defaults to False.
         dynamic (bool, optional): Dynamic. Defaults to False.
         audio_codec (str, optional): Audio codec. Defaults to "pcm_s16le".
@@ -96,6 +97,7 @@ class FFmpegNormalize:
         keep_lra_above_loudness_range_target: bool = False,
         true_peak: float = -2.0,
         offset: float = 0.0,
+        lower_only: bool = False,
         dual_mono: bool = False,
         dynamic: bool = False,
         audio_codec: str = "pcm_s16le",
@@ -166,6 +168,7 @@ class FFmpegNormalize:
 
         self.true_peak = check_range(true_peak, -9, 0, name="true_peak")
         self.offset = check_range(offset, -99, 99, name="offset")
+        self.lower_only = lower_only
 
         # Ensure library user is passing correct types
         assert isinstance(dual_mono, bool), "dual_mono must be bool"

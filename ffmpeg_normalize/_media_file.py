@@ -251,10 +251,35 @@ class MediaFile:
         output_labels = []
 
         for audio_stream in self.streams["audio"].values():
-            if self.ffmpeg_normalize.normalization_type == "ebu":
-                normalization_filter = audio_stream.get_second_pass_opts_ebu()
+            skip_normalization = False
+            if self.ffmpeg_normalize.lower_only:
+                if self.ffmpeg_normalize.normalization_type == "ebu":
+                    if (
+                        audio_stream.loudness_statistics["ebu_pass1"] is not None and
+                        audio_stream.loudness_statistics["ebu_pass1"]["input_i"] < self.ffmpeg_normalize.target_level
+                    ):
+                        skip_normalization = True
+                elif self.ffmpeg_normalize.normalization_type == "peak":
+                    if (
+                        audio_stream.loudness_statistics["max"] is not None and
+                        audio_stream.loudness_statistics["max"] < self.ffmpeg_normalize.target_level
+                    ):
+                        skip_normalization = True
+                elif self.ffmpeg_normalize.normalization_type == "rms":
+                    if (
+                        audio_stream.loudness_statistics["mean"] is not None and
+                        audio_stream.loudness_statistics["mean"] < self.ffmpeg_normalize.target_level
+                    ):
+                        skip_normalization = True
+
+            if skip_normalization:
+                _logger.info(f"Stream {audio_stream.stream_id} had measured input loudness lower than target, skipping normalization.")
+                normalization_filter = "acopy"
             else:
-                normalization_filter = audio_stream.get_second_pass_opts_peakrms()
+                if self.ffmpeg_normalize.normalization_type == "ebu":
+                    normalization_filter = audio_stream.get_second_pass_opts_ebu()
+                else:
+                    normalization_filter = audio_stream.get_second_pass_opts_peakrms()
 
             input_label = f"[0:{audio_stream.stream_id}]"
             output_label = f"[norm{audio_stream.stream_id}]"
