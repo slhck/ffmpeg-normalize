@@ -6,13 +6,13 @@ import re
 import shlex
 from shutil import move, rmtree
 from tempfile import mkdtemp
-from typing import TYPE_CHECKING, Iterator, Literal, TypedDict
+from typing import TYPE_CHECKING, Iterable, Iterator, Literal, TypedDict
 
 from tqdm import tqdm
 
 from ._cmd_utils import DUR_REGEX, NUL, CommandRunner
 from ._errors import FFmpegNormalizeError
-from ._streams import AudioStream, SubtitleStream, VideoStream
+from ._streams import AudioStream, SubtitleStream, VideoStream, LoudnessStatisticsWithMetadata
 
 if TYPE_CHECKING:
     from ffmpeg_normalize import FFmpegNormalize
@@ -240,11 +240,6 @@ class MediaFile:
                 for _ in fun():
                     pass
 
-        # set initial stats (for dry-runs, this is the only thing we need to do)
-        self.ffmpeg_normalize.stats = [
-            audio_stream.get_stats() for audio_stream in self.streams["audio"].values()
-        ]
-
     def _get_audio_filter_cmd(self) -> tuple[str, list[str]]:
         """
         Return the audio filter command and output labels needed.
@@ -426,11 +421,6 @@ class MediaFile:
                 if stream_id in all_stats:
                     audio_stream.set_second_pass_stats(all_stats[stream_id])
 
-        # collect all stats for the final report, again (overwrite the input)
-        self.ffmpeg_normalize.stats = [
-            audio_stream.get_stats() for audio_stream in self.streams["audio"].values()
-        ]
-
         # warn if self.media_file.ffmpeg_normalize.dynamic == False and any of the second pass stats contain "normalization_type" == "dynamic"
         if self.ffmpeg_normalize.dynamic is False:
             for audio_stream in self.streams["audio"].values():
@@ -445,3 +435,6 @@ class MediaFile:
                     )
 
         _logger.debug("Normalization finished")
+
+    def get_stats(self) -> Iterable[LoudnessStatisticsWithMetadata]:
+        return (audio_stream.get_stats() for audio_stream in self.streams["audio"].values())
