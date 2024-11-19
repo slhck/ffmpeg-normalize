@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import logging
 import os
+import sys
+from itertools import chain
 from typing import TYPE_CHECKING, Literal
 
 from tqdm import tqdm
@@ -254,5 +256,6 @@ class FFmpegNormalize:
 
             _logger.info(f"Normalized file written to {media_file.output_file}")
 
-        if self.print_stats and self.stats:
-            print(json.dumps(self.stats, indent=4))
+        if self.print_stats:
+            json.dump(list(chain.from_iterable(media_file.get_stats() for media_file in self.media_files)), sys.stdout, indent=4)
+            print()
