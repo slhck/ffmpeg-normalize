@@ -236,6 +236,20 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     group_ebu.add_argument(
+        "--lower-only",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Whether the audio should not increase in loudness.
+
+        If the measured loudness from the first pass is lower than the target
+        loudness then normalization pass will be skipped for the measured audio
+        source.
+        """
+        ),
+    )
+
+    group_ebu.add_argument(
         "--dual-mono",
         action="store_true",
         help=textwrap.dedent(
@@ -514,6 +528,7 @@ def main() -> None:
         keep_lra_above_loudness_range_target=cli_args.keep_lra_above_loudness_range_target,
         true_peak=cli_args.true_peak,
         offset=cli_args.offset,
+        lower_only=cli_args.lower_only,
         dual_mono=cli_args.dual_mono,
         dynamic=cli_args.dynamic,
         audio_codec=cli_args.audio_codec,
