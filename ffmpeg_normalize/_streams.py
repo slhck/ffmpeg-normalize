@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+_loudnorm_pattern = re.compile(r"\[Parsed_loudnorm_(\d+)")
 
 class EbuLoudnessStatistics(TypedDict):
     input_i: float
@@ -320,58 +321,36 @@ class AudioStream(MediaStream):
             f"Loudnorm first pass command output: {CommandRunner.prune_ffmpeg_progress_from_output(output)}"
         )
 
-        self.loudness_statistics["ebu_pass1"] = (
-            AudioStream.prune_and_parse_loudnorm_output(
-                output, num_stats=1
-            )[0]  # only one stream
-        )
+        # only one stream
+        self.loudness_statistics["ebu_pass1"] = next(iter(AudioStream.prune_and_parse_loudnorm_output(output).values()))
 
     @staticmethod
     def prune_and_parse_loudnorm_output(
-        output: str, num_stats: int = 1
-    ) -> List[EbuLoudnessStatistics]:
+        output: str
+    ) -> dict[int, EbuLoudnessStatistics]:
         """
         Prune ffmpeg progress lines from output and parse the loudnorm filter output.
         There may be multiple outputs if multiple streams were processed.
 
         Args:
             output (str): The output from ffmpeg.
-            num_stats (int): The number of loudnorm statistics to parse.
 
         Returns:
             list: The EBU loudness statistics.
         """
         pruned_output = CommandRunner.prune_ffmpeg_progress_from_output(output)
         output_lines = [line.strip() for line in pruned_output.split("\n")]
-
-        ret = []
-        idx = 0
-        while True:
-            _logger.debug(f"Parsing loudnorm stats for stream {idx}")
-            loudnorm_stats = AudioStream._parse_loudnorm_output(
-                output_lines, stream_index=idx
-            )
-            idx += 1
-
-            if loudnorm_stats is None:
-                continue
-            ret.append(loudnorm_stats)
-
-            if len(ret) >= num_stats:
-                break
-
-        return ret
+        return AudioStream._parse_loudnorm_output(output_lines)
 
     @staticmethod
     def _parse_loudnorm_output(
-        output_lines: list[str], stream_index: Optional[int] = None
-    ) -> Optional[EbuLoudnessStatistics]:
+        output_lines: list[str]
+    ) -> dict[int, EbuLoudnessStatistics]:
         """
         Parse the output of a loudnorm filter to get the EBU loudness statistics.
 
         Args:
             output_lines (list[str]): The output lines of the loudnorm filter.
-            stream_index (int): The stream index, optional to filter out the correct stream. If unset, the first stream is used.
 
         Raises:
             FFmpegNormalizeError: When the output could not be parsed.
@@ -379,64 +358,58 @@ class AudioStream(MediaStream):
         Returns:
             EbuLoudnessStatistics: The EBU loudness statistics, if found.
         """
+        result = dict[int, EbuLoudnessStatistics]()
+        stream_index = -1
         loudnorm_start = 0
-        loudnorm_end = 0
         for index, line in enumerate(output_lines):
-            if line.startswith(f"[Parsed_loudnorm_{stream_index}"):
-                loudnorm_start = index + 1
-                continue
-            if loudnorm_start and line.startswith("}"):
-                loudnorm_end = index + 1
-                break
+            if stream_index < 0:
+                if m := _loudnorm_pattern.match(line):
+                    loudnorm_start = index + 1
+                    stream_index = int(m.group(1))
+            else:
+                if line.startswith("}"):
+                    loudnorm_end = index + 1
+                    loudnorm_data = "\n".join(output_lines[loudnorm_start:loudnorm_end])
 
-        if not (loudnorm_start and loudnorm_end):
-            if stream_index is not None:
-                # not an error
-                return None
+                    try:
+                        loudnorm_stats = json.loads(loudnorm_data)
 
-            raise FFmpegNormalizeError(
-                "Could not parse loudnorm stats; no loudnorm-related output found"
-            )
+                        _logger.debug(
+                            f"Loudnorm stats for stream {stream_index} parsed: {loudnorm_data}"
+                        )
 
-        try:
-            loudnorm_stats = json.loads(
-                "\n".join(output_lines[loudnorm_start:loudnorm_end])
-            )
+                        for key in [
+                            "input_i",
+                            "input_tp",
+                            "input_lra",
+                            "input_thresh",
+                            "output_i",
+                            "output_tp",
+                            "output_lra",
+                            "output_thresh",
+                            "target_offset",
+                            "normalization_type",
+                        ]:
+                            if key not in loudnorm_stats:
+                                continue
+                            if key == "normalization_type":
+                                loudnorm_stats[key] = loudnorm_stats[key].lower()
+                            # handle infinite values
+                            elif float(loudnorm_stats[key]) == -float("inf"):
+                                loudnorm_stats[key] = -99
+                            elif float(loudnorm_stats[key]) == float("inf"):
+                                loudnorm_stats[key] = 0
+                            else:
+                                # convert to floats
+                                loudnorm_stats[key] = float(loudnorm_stats[key])
 
-            _logger.debug(
-                f"Loudnorm stats for stream {stream_index} parsed: {json.dumps(loudnorm_stats)}"
-            )
-
-            for key in [
-                "input_i",
-                "input_tp",
-                "input_lra",
-                "input_thresh",
-                "output_i",
-                "output_tp",
-                "output_lra",
-                "output_thresh",
-                "target_offset",
-                "normalization_type",
-            ]:
-                if key not in loudnorm_stats:
-                    continue
-                if key == "normalization_type":
-                    loudnorm_stats[key] = loudnorm_stats[key].lower()
-                # handle infinite values
-                elif float(loudnorm_stats[key]) == -float("inf"):
-                    loudnorm_stats[key] = -99
-                elif float(loudnorm_stats[key]) == float("inf"):
-                    loudnorm_stats[key] = 0
-                else:
-                    # convert to floats
-                    loudnorm_stats[key] = float(loudnorm_stats[key])
-
-            return cast(EbuLoudnessStatistics, loudnorm_stats)
-        except Exception as e:
-            raise FFmpegNormalizeError(
-                f"Could not parse loudnorm stats; wrong JSON format in string: {e}"
-            )
+                        result[stream_index] = cast(EbuLoudnessStatistics, loudnorm_stats)
+                        stream_index = -1
+                    except Exception as e:
+                        raise FFmpegNormalizeError(
+                            f"Could not parse loudnorm stats; wrong JSON format in string: {e}"
+                        )
+        return result
 
     def get_second_pass_opts_ebu(self) -> str:
         """

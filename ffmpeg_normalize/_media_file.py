@@ -421,11 +421,10 @@ class MediaFile:
         # in the second pass, we do not normalize stream-by-stream, so we set the stats based on the
         # overall output (which includes multiple loudnorm stats)
         if self.ffmpeg_normalize.normalization_type == "ebu":
-            all_stats = AudioStream.prune_and_parse_loudnorm_output(
-                output, num_stats=len(self.streams["audio"])
-            )
-            for idx, audio_stream in enumerate(self.streams["audio"].values()):
-                audio_stream.set_second_pass_stats(all_stats[idx])
+            all_stats = AudioStream.prune_and_parse_loudnorm_output(output)
+            for stream_id, audio_stream in self.streams["audio"].items():
+                if stream_id in all_stats:
+                    audio_stream.set_second_pass_stats(all_stats[stream_id])
 
         # collect all stats for the final report, again (overwrite the input)
         self.ffmpeg_normalize.stats = [
