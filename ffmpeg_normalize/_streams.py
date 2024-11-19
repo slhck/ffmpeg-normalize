@@ -515,19 +515,19 @@ class AudioStream(MediaStream):
             "lra": self.media_file.ffmpeg_normalize.loudness_range_target,
             "tp": self.media_file.ffmpeg_normalize.true_peak,
             "offset": self._constrain(
-                float(stats["target_offset"]), -99, 99, name="target_offset"
+                stats["target_offset"], -99, 99, name="target_offset"
             ),
             "measured_i": self._constrain(
-                float(stats["input_i"]), -99, 0, name="input_i"
+                stats["input_i"], -99, 0, name="input_i"
             ),
             "measured_lra": self._constrain(
-                float(stats["input_lra"]), 0, 99, name="input_lra"
+                stats["input_lra"], 0, 99, name="input_lra"
             ),
             "measured_tp": self._constrain(
-                float(stats["input_tp"]), -99, 99, name="input_tp"
+                stats["input_tp"], -99, 99, name="input_tp"
             ),
             "measured_thresh": self._constrain(
-                float(stats["input_thresh"]), -99, 0, name="input_thresh"
+                stats["input_thresh"], -99, 0, name="input_thresh"
             ),
             "linear": "false" if self.media_file.ffmpeg_normalize.dynamic else "true",
             "print_format": "json",
