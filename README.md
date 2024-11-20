@@ -43,6 +43,7 @@ Read on for more info.
   - [Environment Variables](#environment-variables)
 - [API](#api)
 - [FAQ](#faq)
+  - [My output file is too large?](#my-output-file-is-too-large)
   - [What options should I choose for the EBU R128 filter? What is linear and dynamic mode?](#what-options-should-i-choose-for-the-ebu-r128-filter-what-is-linear-and-dynamic-mode)
   - [The program doesn't work because the "loudnorm" filter can't be found](#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found)
   - [Should I use this to normalize my music collection?](#should-i-use-this-to-normalize-my-music-collection)
@@ -378,6 +379,16 @@ This program has a simple API that can be used to integrate it into other Python
 For more information see the [API documentation](https://htmlpreview.github.io/?https://github.com/slhck/ffmpeg-normalize/blob/master/docs/ffmpeg_normalize.html).
 
 ## FAQ
+
+### My output file is too large?
+
+This is because the default output codec is PCM, which is uncompressed. If you want to reduce the file size, you can specify an audio codec with `-c:a` (e.g., `-c:a aac` for ffmpeg's built-in AAC encoder), and optionally a bitrate with `-b:a`.
+
+For example:
+
+```bash
+ffmpeg-normalize input.wav -o output.m4a -c:a aac -b:a 192k
+```
 
 ### What options should I choose for the EBU R128 filter? What is linear and dynamic mode?
 
