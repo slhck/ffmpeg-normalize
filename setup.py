@@ -19,7 +19,7 @@ with open(path.join(here, "CHANGELOG.md"), encoding="utf8") as f:
     history = f.read()
 
 setup(
-    name="ffmpeg-normalize",
+    name="ffmpeg_normalize",
     version=version,
     description="Normalize audio via ffmpeg",
     long_description=long_description + "\n\n" + history,
