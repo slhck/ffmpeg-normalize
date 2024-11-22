@@ -12,7 +12,12 @@ from tqdm import tqdm
 
 from ._cmd_utils import DUR_REGEX, NUL, CommandRunner
 from ._errors import FFmpegNormalizeError
-from ._streams import AudioStream, SubtitleStream, VideoStream, LoudnessStatisticsWithMetadata
+from ._streams import (
+    AudioStream,
+    LoudnessStatisticsWithMetadata,
+    SubtitleStream,
+    VideoStream,
+)
 
 if TYPE_CHECKING:
     from ffmpeg_normalize import FFmpegNormalize
@@ -255,25 +260,30 @@ class MediaFile:
             if self.ffmpeg_normalize.lower_only:
                 if self.ffmpeg_normalize.normalization_type == "ebu":
                     if (
-                        audio_stream.loudness_statistics["ebu_pass1"] is not None and
-                        audio_stream.loudness_statistics["ebu_pass1"]["input_i"] < self.ffmpeg_normalize.target_level
+                        audio_stream.loudness_statistics["ebu_pass1"] is not None
+                        and audio_stream.loudness_statistics["ebu_pass1"]["input_i"]
+                        < self.ffmpeg_normalize.target_level
                     ):
                         skip_normalization = True
                 elif self.ffmpeg_normalize.normalization_type == "peak":
                     if (
-                        audio_stream.loudness_statistics["max"] is not None and
-                        audio_stream.loudness_statistics["max"] < self.ffmpeg_normalize.target_level
+                        audio_stream.loudness_statistics["max"] is not None
+                        and audio_stream.loudness_statistics["max"]
+                        < self.ffmpeg_normalize.target_level
                     ):
                         skip_normalization = True
                 elif self.ffmpeg_normalize.normalization_type == "rms":
                     if (
-                        audio_stream.loudness_statistics["mean"] is not None and
-                        audio_stream.loudness_statistics["mean"] < self.ffmpeg_normalize.target_level
+                        audio_stream.loudness_statistics["mean"] is not None
+                        and audio_stream.loudness_statistics["mean"]
+                        < self.ffmpeg_normalize.target_level
                     ):
                         skip_normalization = True
 
             if skip_normalization:
-                _logger.info(f"Stream {audio_stream.stream_id} had measured input loudness lower than target, skipping normalization.")
+                _logger.warn(
+                    f"Stream {audio_stream.stream_id} had measured input loudness lower than target, skipping normalization."
+                )
                 normalization_filter = "acopy"
             else:
                 if self.ffmpeg_normalize.normalization_type == "ebu":
@@ -462,4 +472,6 @@ class MediaFile:
         _logger.debug("Normalization finished")
 
     def get_stats(self) -> Iterable[LoudnessStatisticsWithMetadata]:
-        return (audio_stream.get_stats() for audio_stream in self.streams["audio"].values())
+        return (
+            audio_stream.get_stats() for audio_stream in self.streams["audio"].values()
+        )
