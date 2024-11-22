@@ -63,7 +63,7 @@ Read on for more info.
 
 ## Requirements
 
-You need Python 3.8 or higher, and ffmpeg.
+You need Python 3.9 or higher, and ffmpeg.
 
 ### ffmpeg
 
