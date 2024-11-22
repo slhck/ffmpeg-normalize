@@ -1,6 +1,29 @@
 # Changelog
 
 
+## v1.30.0 (2024-11-22)
+
+* Change lower-only message to warning.
+
+* Make setup name PEP 625 compliant.
+
+* Docs: add @ahmetsait as a contributor.
+
+* Implement `--lower-only`
+
+* Fix: `--print-stats` only outputs the last stream.
+
+* More robust `loudnorm` output parsing.
+
+* Remove unnecessary conversions.
+
+* Update .editorconfig.
+
+* Remove python 3.8, add python 3.12, 3.13.
+
+* Add README on file size.
+
+
 ## v1.29.2 (2024-11-18)
 
 * Fix: show percentage with two decimal digits in progress.
