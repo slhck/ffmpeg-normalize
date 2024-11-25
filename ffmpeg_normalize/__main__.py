@@ -280,6 +280,23 @@ def create_parser() -> argparse.ArgumentParser:
         ),
     )
 
+    # https://manpages.ubuntu.com/manpages/trusty/man1/normalize-audio.1.html
+    # https://normalize.nongnu.org/
+    group_ebu.add_argument(
+        "--batch",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Enable batch mode.
+
+        In  batch  mode, all the specified files are considered to be part of a single album
+        and their relative volumes are preserved.  This is done by averaging the  volumes  of  all
+        the  files,  computing  a single adjustment from that, and applying the same adjustment to
+        all the files.
+        """
+        ),
+    )
+
     group_acodec = parser.add_argument_group("Audio Encoding")
     group_acodec.add_argument(
         "-c:a",
@@ -531,6 +548,7 @@ def main() -> None:
         lower_only=cli_args.lower_only,
         dual_mono=cli_args.dual_mono,
         dynamic=cli_args.dynamic,
+        batch=cli_args.batch,
         audio_codec=cli_args.audio_codec,
         audio_bitrate=cli_args.audio_bitrate,
         sample_rate=cli_args.sample_rate,
