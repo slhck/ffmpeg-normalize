@@ -248,6 +248,23 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     group_ebu.add_argument(
+        "--safe-ebu",
+        metavar="MARGIN",
+        type=float,
+        help=textwrap.dedent(
+            """\
+        Automatically lower EBU Integrated Loudness Target to prevent falling
+        back to dynamic filtering. (default: 0.0)
+
+        Makes sure target loudness is lower than measured loudness minus peak
+        loudness (input_i - input_tp) by the given amount. A value of 0 means
+        disabled.
+        """
+        ),
+        default=0.0,
+    )
+
+    group_ebu.add_argument(
         "--dual-mono",
         action="store_true",
         help=textwrap.dedent(
@@ -527,6 +544,7 @@ def main() -> None:
         true_peak=cli_args.true_peak,
         offset=cli_args.offset,
         lower_only=cli_args.lower_only,
+        safe_ebu=cli_args.safe_ebu,
         dual_mono=cli_args.dual_mono,
         dynamic=cli_args.dynamic,
         audio_codec=cli_args.audio_codec,
