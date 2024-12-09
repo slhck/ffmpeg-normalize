@@ -248,6 +248,20 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     group_ebu.add_argument(
+        "--auto-lower-loudness-target",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Automatically lower EBU Integrated Loudness Target to prevent falling
+        back to dynamic filtering.
+
+        Makes sure target loudness is lower than measured loudness minus peak
+        loudness (input_i - input_tp) by a small amount.
+        """
+        ),
+    )
+
+    group_ebu.add_argument(
         "--dual-mono",
         action="store_true",
         help=textwrap.dedent(
@@ -527,6 +541,7 @@ def main() -> None:
         true_peak=cli_args.true_peak,
         offset=cli_args.offset,
         lower_only=cli_args.lower_only,
+        auto_lower_loudness_target=cli_args.auto_lower_loudness_target,
         dual_mono=cli_args.dual_mono,
         dynamic=cli_args.dynamic,
         audio_codec=cli_args.audio_codec,

@@ -320,6 +320,12 @@ For more information on the options (`[options]`) available, run `ffmpeg-normali
 
     If the measured loudness from the first pass is lower than the target loudness then normalization pass will be skipped for the measured audio source.
 
+- `--auto-lower-loudness-target`: Automatically lower EBU Integrated Loudness Target.
+
+    Automatically lower EBU Integrated Loudness Target to prevent falling back to dynamic filtering.
+
+    Makes sure target loudness is lower than measured loudness minus peak loudness (input_i - input_tp) by a small amount.
+
 - `--dual-mono`: Treat mono input files as "dual-mono".
 
     If a mono file is intended for playback on a stereo system, its EBU R128 measurement will be perceptually incorrect. If set, this option will compensate for this effect. Multi-channel input files are not affected by this option.

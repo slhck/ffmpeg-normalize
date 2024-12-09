@@ -481,10 +481,24 @@ class AudioStream(MediaStream):
                 "Specify -ar/--sample-rate to override it."
             )
 
+        target_level = self.ffmpeg_normalize.target_level
+        if self.ffmpeg_normalize.auto_lower_loudness_target:
+            safe_target = (
+                self.loudness_statistics["ebu_pass1"]["input_i"]
+                - self.loudness_statistics["ebu_pass1"]["input_tp"]
+                + self.ffmpeg_normalize.true_peak
+                - 0.1
+            )
+            if safe_target < self.ffmpeg_normalize.target_level:
+                target_level = safe_target
+                _logger.warning(
+                    f"Using loudness target {target_level} because --auto-lower-loudness-target given.",
+                )
+
         stats = self.loudness_statistics["ebu_pass1"]
 
         opts = {
-            "i": self.media_file.ffmpeg_normalize.target_level,
+            "i": target_level,
             "lra": self.media_file.ffmpeg_normalize.loudness_range_target,
             "tp": self.media_file.ffmpeg_normalize.true_peak,
             "offset": self._constrain(
