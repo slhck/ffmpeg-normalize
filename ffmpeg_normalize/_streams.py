@@ -167,7 +167,7 @@ class AudioStream(MediaStream):
         }
         return stats
 
-    def set_second_pass_stats(self, stats: EbuLoudnessStatistics):
+    def set_second_pass_stats(self, stats: EbuLoudnessStatistics) -> None:
         """
         Set the EBU loudness statistics for the second pass.
 
@@ -481,10 +481,26 @@ class AudioStream(MediaStream):
                 "Specify -ar/--sample-rate to override it."
             )
 
+        target_level = self.ffmpeg_normalize.target_level
+        if self.ffmpeg_normalize.safe_ebu > 0:
+            safe_target = (
+                self.loudness_statistics["ebu_pass1"]["input_i"]
+                - self.loudness_statistics["ebu_pass1"]["input_tp"]
+                + self.ffmpeg_normalize.true_peak
+                - self.ffmpeg_normalize.safe_ebu
+            )
+            if safe_target < self.ffmpeg_normalize.target_level:
+                _logger.warning(
+                    "Using loudness target %s because --safe-ebu=%s.",
+                    safe_target,
+                    self.ffmpeg_normalize.safe_ebu,
+                )
+                target_level = safe_target
+
         stats = self.loudness_statistics["ebu_pass1"]
 
         opts = {
-            "i": self.media_file.ffmpeg_normalize.target_level,
+            "i": target_level,
             "lra": self.media_file.ffmpeg_normalize.loudness_range_target,
             "tp": self.media_file.ffmpeg_normalize.true_peak,
             "offset": self._constrain(
