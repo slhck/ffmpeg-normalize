@@ -281,7 +281,7 @@ class MediaFile:
                         skip_normalization = True
 
             if skip_normalization:
-                _logger.warn(
+                _logger.warning(
                     f"Stream {audio_stream.stream_id} had measured input loudness lower than target, skipping normalization."
                 )
                 normalization_filter = "acopy"

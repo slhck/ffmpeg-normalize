@@ -7,7 +7,7 @@ import shlex
 import subprocess
 from platform import system
 from shutil import which
-from typing import Iterator
+from typing import Iterator, Any
 
 from ffmpeg_progress_yield import FfmpegProgress
 
@@ -128,12 +128,12 @@ class CommandRunner:
         return self.output
 
 
-def dict_to_filter_opts(opts: dict[str, object]) -> str:
+def dict_to_filter_opts(opts: dict[str, Any]) -> str:
     """
     Convert a dictionary to a ffmpeg filter option string
 
     Args:
-        opts (dict[str, object]): Dictionary of options
+        opts (dict[str, Any]): Dictionary of options
 
     Returns:
         str: Filter option string
