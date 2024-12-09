@@ -167,7 +167,7 @@ class AudioStream(MediaStream):
         }
         return stats
 
-    def set_second_pass_stats(self, stats: EbuLoudnessStatistics):
+    def set_second_pass_stats(self, stats: EbuLoudnessStatistics) -> None:
         """
         Set the EBU loudness statistics for the second pass.
 
