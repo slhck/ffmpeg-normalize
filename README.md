@@ -279,7 +279,7 @@ For more information on the options (`[options]`) available, run `ffmpeg-normali
 
     Instead of applying linear EBU R128 normalization, choose a dynamic normalization. This is not usually recommended.
 
-    Dynamic mode will automatically change the sample rate to 192 kHz. Use -ar/--sample-rate to specify a different output sample rate.
+    Dynamic mode will automatically change the sample rate to 192 kHz. Use `-ar`/`--sample-rate` to specify a different output sample rate.
 
 ### Audio Encoding
 
@@ -415,7 +415,11 @@ For most cases, linear mode is recommended. Dynamic mode should only be used whe
 
 * When the required gain adjustment to meet the integrated loudness target would result in the true peak exceeding the specified true peak limit. This is because linear processing alone cannot reduce peaks without affecting the entire signal. For example, if a file needs to be amplified by 6 dB to reach the target integrated loudness, but doing so would push the true peak above the specified limit, the filter might switch to dynamic mode to handle this situation. If your content allows for it, you can increase the true peak target to give more headroom for linear processing. If you're consistently running into true peak issues, you might also consider lowering your target integrated loudness level.
 
-At this time, the `loudnorm` filter in ffmpeg does not provide a way to force linear mode when the input loudness range exceeds the target or when the true peak would be exceeded. The `--keep-loudness-range-target` option can be used to keep the input loudness range target above the specified target, but it will not force linear mode in all cases. We are working on a solution to handle this automatically!
+At this time, the `loudnorm` filter in ffmpeg does not provide a way to force linear mode when the input loudness range exceeds the target or when the true peak would be exceeded. There are some options to mitigate this:
+
+- The `--keep-lra-above-loudness-range-target` option can be used to keep the input loudness range above the specified target, but it will not force linear mode in all cases.
+- Similarly, the `--keep-loudness-range-target` option can be used to keep the input loudness range target.
+- The `--lower-only` option can be used to skip the normalization pass completely if the measured loudness is lower than the target loudness.
 
 ### The program doesn't work because the "loudnorm" filter can't be found
 
