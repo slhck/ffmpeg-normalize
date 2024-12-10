@@ -201,9 +201,7 @@ def create_parser() -> argparse.ArgumentParser:
         help=textwrap.dedent(
             """\
         Keep input loudness range above loudness range target.
-        - `LOUDNESS_RANGE_TARGET` for input loudness range `<= LOUDNESS_RANGE_TARGET` or
-        - keep input loudness range target above `LOUDNESS_RANGE_TARGET`.
-        as alternative to `--keep-loudness-range-target` to allow for linear normalization.
+        Can be used as an alternative to `--keep-loudness-range-target` to allow for linear normalization.
         """
         ),
     )

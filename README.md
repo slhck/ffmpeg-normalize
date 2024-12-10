@@ -255,10 +255,7 @@ For more information on the options (`[options]`) available, run `ffmpeg-normali
 
 - `--keep-lra-above-loudness-range-target`: Keep input loudness range above loudness range target.
 
-  - `LOUDNESS_RANGE_TARGET` for input loudness range `<= LOUDNESS_RANGE_TARGET` or
-  - keep input loudness range target above `LOUDNESS_RANGE_TARGET`.
-
-  as alternative to `--keep-loudness-range-target` to allow for linear normalization.
+    Can be used as an alternative to `--keep-loudness-range-target` to allow for linear normalization.
 
 - `-tp TRUE_PEAK, --true-peak TRUE_PEAK`: EBU Maximum True Peak in dBTP (default: -2.0).
 
@@ -269,6 +266,10 @@ For more information on the options (`[options]`) available, run `ffmpeg-normali
     The gain is applied before the true-peak limiter in the first pass only. The offset for the second pass will be automatically determined based on the first pass statistics.
 
     Range is -99.0 - +99.0.
+
+- `--lower-only`: Whether the audio should not increase in loudness.
+
+    If the measured loudness from the first pass is lower than the target loudness then normalization pass will be skipped for the measured audio source.
 
 - `--dual-mono`: Treat mono input files as "dual-mono".
 
