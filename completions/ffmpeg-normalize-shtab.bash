@@ -2,7 +2,7 @@
 
 
 
-_shtab_ffmpeg_normalize_option_strings=('-h' '--help' '-o' '--output' '-of' '--output-folder' '-f' '--force' '-d' '--debug' '-v' '--verbose' '-q' '--quiet' '-n' '--dry-run' '-pr' '--progress' '--version' '-nt' '--normalization-type' '-t' '--target-level' '-p' '--print-stats' '-lrt' '--loudness-range-target' '--keep-loudness-range-target' '--keep-lra-above-loudness-range-target' '-tp' '--true-peak' '--offset' '--lower-only' '--dual-mono' '--dynamic' '-c:a' '--audio-codec' '-b:a' '--audio-bitrate' '-ar' '--sample-rate' '-ac' '--audio-channels' '-koa' '--keep-original-audio' '-prf' '--pre-filter' '-pof' '--post-filter' '-vn' '--video-disable' '-c:v' '--video-codec' '-sn' '--subtitle-disable' '-mn' '--metadata-disable' '-cn' '--chapters-disable' '-ei' '--extra-input-options' '-e' '--extra-output-options' '-ofmt' '--output-format' '-ext' '--extension')
+_shtab_ffmpeg_normalize_option_strings=('-h' '--help' '-o' '--output' '-of' '--output-folder' '-f' '--force' '-d' '--debug' '-v' '--verbose' '-q' '--quiet' '-n' '--dry-run' '-pr' '--progress' '--version' '-nt' '--normalization-type' '-t' '--target-level' '-p' '--print-stats' '-lrt' '--loudness-range-target' '--keep-loudness-range-target' '--keep-lra-above-loudness-range-target' '-tp' '--true-peak' '--offset' '--lower-only' '--auto-lower-loudness-target' '--dual-mono' '--dynamic' '-c:a' '--audio-codec' '-b:a' '--audio-bitrate' '-ar' '--sample-rate' '-ac' '--audio-channels' '-koa' '--keep-original-audio' '-prf' '--pre-filter' '-pof' '--post-filter' '-vn' '--video-disable' '-c:v' '--video-codec' '-sn' '--subtitle-disable' '-mn' '--metadata-disable' '-cn' '--chapters-disable' '-ei' '--extra-input-options' '-e' '--extra-output-options' '-ofmt' '--output-format' '-ext' '--extension')
 
 
 
@@ -32,6 +32,7 @@ _shtab_ffmpeg_normalize___print_stats_nargs=0
 _shtab_ffmpeg_normalize___keep_loudness_range_target_nargs=0
 _shtab_ffmpeg_normalize___keep_lra_above_loudness_range_target_nargs=0
 _shtab_ffmpeg_normalize___lower_only_nargs=0
+_shtab_ffmpeg_normalize___auto_lower_loudness_target_nargs=0
 _shtab_ffmpeg_normalize___dual_mono_nargs=0
 _shtab_ffmpeg_normalize___dynamic_nargs=0
 _shtab_ffmpeg_normalize__koa_nargs=0

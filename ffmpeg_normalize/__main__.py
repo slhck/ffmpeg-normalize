@@ -256,7 +256,7 @@ def create_parser() -> argparse.ArgumentParser:
         back to dynamic filtering.
 
         Makes sure target loudness is lower than measured loudness minus peak
-        loudness (input_i - input_tp) by a small amount.
+        loudness (input_i - input_tp) by a small amount (0.1 LUFS).
         """
         ),
     )

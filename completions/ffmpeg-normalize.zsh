@@ -28,6 +28,7 @@ _ffmpeg_normalize() {
     '(-lrt --loudness-range-target)'{-lrt,--loudness-range-target}'[EBU Loudness Range Target in LUFS]:range:'
     '--keep-loudness-range-target[Keep input loudness range target]'
     '--keep-lra-above-loudness-range-target[Keep input loudness range above target]'
+    '--auto-lower-loudness-target[Automatically lower EBU Integrated Loudness Target]'
     '(-tp --true-peak)'{-tp,--true-peak}'[EBU Maximum True Peak in dBTP]:peak:'
     '--offset[EBU Offset Gain]:offset:'
     '--lower-only[Do not increase loudness]'

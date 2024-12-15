@@ -22,6 +22,7 @@ _ffmpeg_normalize()
           -lrt --loudness-range-target \
           --keep-loudness-range-target \
           --keep-lra-above-loudness-range-target \
+          --auto-lower-loudness-target \
           -tp --true-peak \
           --offset \
           --lower-only \
