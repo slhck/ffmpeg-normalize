@@ -1,6 +1,21 @@
 # Changelog
 
 
+## v1.31.0 (2024-12-15)
+
+* Update docs and completions.
+
+* Implement `--auto-lower-loudness-target`
+
+* Fix deprecations and mypy --strict errors.
+
+* Feat: add completions.
+
+* Docs: update explainer.
+
+* Docs: update docs to include lower-only.
+
+
 ## v1.30.0 (2024-11-22)
 
 * Change lower-only message to warning.
