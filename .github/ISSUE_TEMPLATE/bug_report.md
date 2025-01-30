@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: I ran across an error or bug in the program
+about: I ran across an error or bug in the program, or something is not working as expected
 
 ---
 
