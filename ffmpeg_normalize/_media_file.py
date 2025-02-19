@@ -177,8 +177,7 @@ class MediaFile:
             and len(self.streams["audio"].values()) > 1
         ):
             _logger.warning(
-                "Output file only supports one stream. "
-                "Keeping only first audio stream."
+                "Output file only supports one stream. Keeping only first audio stream."
             )
             first_stream = list(self.streams["audio"].values())[0]
             self.streams["audio"] = {first_stream.stream_id: first_stream}
@@ -390,7 +389,12 @@ class MediaFile:
 
         # other audio options (if any)
         if self.ffmpeg_normalize.audio_bitrate:
-            cmd.extend(["-b:a", str(self.ffmpeg_normalize.audio_bitrate)])
+            if self.ffmpeg_normalize.audio_codec == "libvorbis":
+                # libvorbis takes just a "-b" option, for some reason
+                # https://github.com/slhck/ffmpeg-normalize/issues/277
+                cmd.extend(["-b", str(self.ffmpeg_normalize.audio_bitrate)])
+            else:
+                cmd.extend(["-b:a", str(self.ffmpeg_normalize.audio_bitrate)])
         if self.ffmpeg_normalize.sample_rate:
             cmd.extend(["-ar", str(self.ffmpeg_normalize.sample_rate)])
         if self.ffmpeg_normalize.audio_channels:
