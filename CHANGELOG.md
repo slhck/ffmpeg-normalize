@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.31.1 (2025-02-19)
+
+* Fix bitrate setting for libvorbis, fixes #277.
+
+* Update issue templates.
+
+* Prevent blank issues.
+
+
 ## v1.31.0 (2024-12-15)
 
 * Update docs and completions.
