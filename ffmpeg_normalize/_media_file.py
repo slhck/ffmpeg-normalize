@@ -67,7 +67,12 @@ class MediaFile:
         self.skip = False
         self.input_file = input_file
         self.output_file = output_file
-        self.output_ext = os.path.splitext(output_file)[1][1:]
+        current_ext = os.path.splitext(output_file)[1][1:]
+        # we need to check if it's empty, e.g. /dev/null or NUL
+        if current_ext == "" or self.output_file == NUL:
+            self.output_ext = self.ffmpeg_normalize.extension
+        else:
+            self.output_ext = current_ext
         self.streams: StreamDict = {"audio": {}, "video": {}, "subtitle": {}}
 
         self.parse_streams()
@@ -424,13 +429,18 @@ class MediaFile:
         # if dry run, only show sample command
         if self.ffmpeg_normalize.dry_run:
             cmd.append(self.output_file)
+            _logger.warning("Dry run used, not actually running second-pass command")
             CommandRunner(dry=True).run_command(cmd)
             yield 100
             return
 
-        temp_dir = mkdtemp()
-        temp_file = os.path.join(temp_dir, f"out.{self.output_ext}")
-        cmd.append(temp_file)
+        # special case: if output is a null device, write directly to it
+        if self.output_file == NUL:
+            cmd.append(self.output_file)
+        else:
+            temp_dir = mkdtemp()
+            temp_file = os.path.join(temp_dir, f"out.{self.output_ext}")
+            cmd.append(temp_file)
 
         cmd_runner = CommandRunner()
         try:
@@ -442,13 +452,15 @@ class MediaFile:
                 )
                 raise e
             else:
-                _logger.debug(
-                    f"Moving temporary file from {temp_file} to {self.output_file}"
-                )
-                move(temp_file, self.output_file)
-                rmtree(temp_dir, ignore_errors=True)
+                if self.output_file != NUL:
+                    _logger.debug(
+                        f"Moving temporary file from {temp_file} to {self.output_file}"
+                    )
+                    move(temp_file, self.output_file)
+                    rmtree(temp_dir, ignore_errors=True)
         except Exception as e:
-            rmtree(temp_dir, ignore_errors=True)
+            if self.output_file != NUL:
+                rmtree(temp_dir, ignore_errors=True)
             raise e
 
         output = cmd_runner.get_output()

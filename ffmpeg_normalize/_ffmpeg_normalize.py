@@ -79,6 +79,7 @@ class FFmpegNormalize:
         extra_input_options (list, optional): Extra input options. Defaults to None.
         extra_output_options (list, optional): Extra output options. Defaults to None.
         output_format (str, optional): Output format. Defaults to None.
+        extension (str, optional): Output file extension to use for output files that were not explicitly specified. Defaults to "mkv".
         dry_run (bool, optional): Dry run. Defaults to False.
         debug (bool, optional): Debug. Defaults to False.
         progress (bool, optional): Progress. Defaults to False.
@@ -117,6 +118,7 @@ class FFmpegNormalize:
         extra_input_options: list[str] | None = None,
         extra_output_options: list[str] | None = None,
         output_format: str | None = None,
+        extension: str = "mkv",
         dry_run: bool = False,
         debug: bool = False,
         progress: bool = False,
@@ -197,6 +199,7 @@ class FFmpegNormalize:
         self.post_filter = post_filter
 
         self.output_format = output_format
+        self.extension = extension
         self.dry_run = dry_run
         self.debug = debug
         self.progress = progress

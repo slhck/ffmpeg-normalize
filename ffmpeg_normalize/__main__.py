@@ -559,6 +559,7 @@ def main() -> None:
         extra_input_options=extra_input_options,
         extra_output_options=extra_output_options,
         output_format=cli_args.output_format,
+        extension=cli_args.extension,
         dry_run=cli_args.dry_run,
         progress=cli_args.progress,
     )
