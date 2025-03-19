@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.31.2 (2025-03-19)
+
+* Fix: special handling of /dev/null.
+
+
 ## v1.31.1 (2025-02-19)
 
 * Fix bitrate setting for libvorbis, fixes #277.
