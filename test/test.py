@@ -475,3 +475,15 @@ class TestFFmpegNormalize:
         assert os.path.isfile("normalized/test2.wav")
         stream_info = _get_stream_info("normalized/test2.wav")[0]
         assert stream_info["channels"] == 2
+
+    def test_replaygain(self):
+        for file in [
+            "test/test.mp4",
+            "test/test.mp3",
+            "test/test.ogg",
+            "test/test.opus",
+        ]:
+            original_mtime = os.path.getmtime(file)
+            ffmpeg_normalize_call([file, "--replaygain"])
+            assert os.path.isfile(file)
+            assert os.path.getmtime(file) > original_mtime

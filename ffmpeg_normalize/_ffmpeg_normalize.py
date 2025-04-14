@@ -83,6 +83,7 @@ class FFmpegNormalize:
         dry_run (bool, optional): Dry run. Defaults to False.
         debug (bool, optional): Debug. Defaults to False.
         progress (bool, optional): Progress. Defaults to False.
+        replaygain (bool, optional): Write ReplayGain tags without normalizing. Defaults to False.
 
     Raises:
         FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
@@ -122,6 +123,7 @@ class FFmpegNormalize:
         dry_run: bool = False,
         debug: bool = False,
         progress: bool = False,
+        replaygain: bool = False,
     ):
         self.ffmpeg_exe = get_ffmpeg_exe()
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
@@ -203,6 +205,7 @@ class FFmpegNormalize:
         self.dry_run = dry_run
         self.debug = debug
         self.progress = progress
+        self.replaygain = replaygain
 
         if (
             self.audio_codec is None or "pcm" in self.audio_codec
@@ -210,6 +213,12 @@ class FFmpegNormalize:
             raise FFmpegNormalizeError(
                 f"Output format {self.output_format} does not support PCM audio. "
                 "Please choose a suitable audio codec with the -c:a option."
+            )
+
+        # replaygain only works for EBU for now
+        if self.replaygain and self.normalization_type != "ebu":
+            raise FFmpegNormalizeError(
+                "ReplayGain only works for EBU normalization type for now."
             )
 
         self.stats: list[LoudnessStatisticsWithMetadata] = []
@@ -263,8 +272,14 @@ class FFmpegNormalize:
                     # raise the error so the program will exit
                     raise e
 
-            _logger.info(f"Normalized file written to {media_file.output_file}")
-
         if self.print_stats:
-            json.dump(list(chain.from_iterable(media_file.get_stats() for media_file in self.media_files)), sys.stdout, indent=4)
+            json.dump(
+                list(
+                    chain.from_iterable(
+                        media_file.get_stats() for media_file in self.media_files
+                    )
+                ),
+                sys.stdout,
+                indent=4,
+            )
             print()

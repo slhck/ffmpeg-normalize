@@ -294,6 +294,12 @@ For more information on the options (`[options]`) available, run `ffmpeg-normali
 
 - `-p, --print-stats`: Print loudness statistics for both passes formatted as JSON to stdout.
 
+- `--replaygain`: Write [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) tags to the original file without normalizing.
+
+    This mode will overwrite the input file and ignore other options.
+
+    Only works with EBU normalization, and only with .mp3, .mp4/.m4a, .ogg, .opus for now.
+
 ### EBU R128 Normalization
 
 - `-lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET`: EBU Loudness Range Target in LUFS (default: 7.0).
@@ -488,9 +494,9 @@ If you have to use an outdated ffmpeg version, you can only use `rms` or `peak` 
 
 ### Should I use this to normalize my music collection?
 
-Generally, no.
+You can use the `--replaygain` option to write ReplayGain tags to the original file without normalizing. This makes most music players understand the loudness difference and adjust the volume accordingly.
 
-When you run `ffmpeg-normalize` and re-encode files with MP3 or AAC, you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this on your precious music collection, unless you have a backup of the originals or accept potential quality reduction. If you just want to normalize the subjective volume of the files without changing the actual content, consider using [MP3Gain](http://mp3gain.sourceforge.net/) and [aacgain](http://aacgain.altosdesign.com/).
+If you decide to run `ffmpeg-normalize` with the default options, it will encode the audio with PCM audio (the default), and the resulting files will be very large. You can also choose to re-encode the files with MP3 or AAC, but you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this kind of destructive operation on your precious music collection, unless you have a backup of the originals or accept potential quality reduction.
 
 ### Why are my output files MKV?
 

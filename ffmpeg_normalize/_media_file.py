@@ -8,6 +8,11 @@ from shutil import move, rmtree
 from tempfile import mkdtemp
 from typing import TYPE_CHECKING, Iterable, Iterator, Literal, TypedDict
 
+from mutagen.id3 import ID3, TXXX
+from mutagen.mp3 import MP3
+from mutagen.mp4 import MP4
+from mutagen.oggopus import OggOpus
+from mutagen.oggvorbis import OggVorbis
 from tqdm import tqdm
 
 from ._cmd_utils import DUR_REGEX, CommandRunner
@@ -198,6 +203,11 @@ class MediaFile:
         # run the first pass to get loudness stats
         self._first_pass()
 
+        # shortcut to apply replaygain
+        if self.ffmpeg_normalize.replaygain:
+            self._run_replaygain()
+            return
+
         # run the second pass as a whole
         if self.ffmpeg_normalize.progress:
             with tqdm(
@@ -211,6 +221,103 @@ class MediaFile:
         else:
             for _ in self._second_pass():
                 pass
+
+        _logger.info(f"Normalized file written to {self.output_file}")
+
+    def _run_replaygain(self) -> None:
+        """
+        Run the replaygain process for this file.
+        """
+        _logger.debug(f"Running replaygain for {self.input_file}")
+
+        # get the audio streams
+        audio_streams = list(self.streams["audio"].values())
+
+        # get the loudnorm stats from the first pass
+        loudnorm_stats = audio_streams[0].loudness_statistics["ebu_pass1"]
+
+        if loudnorm_stats is None:
+            _logger.error("no loudnorm stats available in first pass stats!")
+            return
+
+        # apply the replaygain tag from the first audio stream (to all audio streams)
+        if len(audio_streams) > 1:
+            _logger.warning(
+                f"Your input file has {len(audio_streams)} audio streams. "
+                "Only the first audio stream's replaygain tag will be applied. "
+                "All audio streams will receive the same tag."
+            )
+
+        target_level = self.ffmpeg_normalize.target_level
+        input_i = loudnorm_stats["input_i"]  # Integrated loudness
+        input_tp = loudnorm_stats["input_tp"]  # True peak
+
+        if input_i is None or input_tp is None:
+            _logger.error("no input_i or input_tp available in first pass stats!")
+            return
+
+        track_gain = -(input_i - target_level)  # dB
+        track_peak = 10 ** (input_tp / 20)  # linear scale
+
+        _logger.debug(f"Track gain: {track_gain} dB")
+        _logger.debug(f"Track peak: {track_peak}")
+
+        self._write_replaygain_tags(track_gain, track_peak)
+
+    def _write_replaygain_tags(self, track_gain: float, track_peak: float) -> None:
+        """
+        Write the replaygain tags to the input file.
+
+        This is based on the code from bohning/usdb_syncer, licensed under the MIT license.
+        See: https://github.com/bohning/usdb_syncer/blob/2fa638c4f487dffe9f5364f91e156ba54cb20233/src/usdb_syncer/resource_dl.py
+        """
+        _logger.debug(f"Writing ReplayGain tags to {self.input_file}")
+
+        input_file_ext = os.path.splitext(self.input_file)[1]
+        if input_file_ext == ".mp3":
+            mp3 = MP3(self.input_file, ID3=ID3)
+            if not mp3.tags:
+                return
+            mp3.tags.add(
+                TXXX(desc="REPLAYGAIN_TRACK_GAIN", text=[f"{track_gain:.2f} dB"])
+            )
+            mp3.tags.add(TXXX(desc="REPLAYGAIN_TRACK_PEAK", text=[f"{track_peak:.6f}"]))
+            mp3.save()
+        elif input_file_ext in [".mp4", ".m4a", ".m4v", ".mov"]:
+            mp4 = MP4(self.input_file)
+            if not mp4.tags:
+                mp4.add_tags()
+            if not mp4.tags:
+                return
+            mp4.tags["----:com.apple.iTunes:REPLAYGAIN_TRACK_GAIN"] = [
+                f"{track_gain:.2f} dB".encode()
+            ]
+            mp4.tags["----:com.apple.iTunes:REPLAYGAIN_TRACK_PEAK"] = [
+                f"{track_peak:.6f}".encode()
+            ]
+            mp4.save()
+        elif input_file_ext == ".ogg":
+            ogg = OggVorbis(self.input_file)
+            ogg["REPLAYGAIN_TRACK_GAIN"] = [f"{track_gain:.2f} dB"]
+            ogg["REPLAYGAIN_TRACK_PEAK"] = [f"{track_peak:.6f}"]
+            ogg.save()
+        elif input_file_ext == ".opus":
+            opus = OggOpus(self.input_file)
+            # See https://datatracker.ietf.org/doc/html/rfc7845#section-5.2.1
+            opus["R128_TRACK_GAIN"] = [str(round(256 * track_gain))]
+            opus.save()
+        else:
+            _logger.error(
+                f"Unsupported input file extension: {input_file_ext} for writing replaygain tags."
+                "Only .mp3, .mp4/.m4a, .ogg, .opus are supported."
+                "If you think this should support more formats, please let me know at "
+                "https://github.com/slhck/ffmpeg-normalize/issues"
+            )
+            return
+
+        _logger.info(
+            f"Successfully wrote replaygain tags to input file {self.input_file}"
+        )
 
     def _can_write_output_video(self) -> bool:
         """

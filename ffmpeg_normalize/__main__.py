@@ -159,6 +159,17 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print loudness statistics for both passes formatted as JSON to stdout.",
     )
+    group_normalization.add_argument(
+        "--replaygain",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Write ReplayGain tags to the original file without normalizing.
+        This mode will overwrite the input file and ignore other options.
+        Only works with EBU normalization, and only with .mp3, .mp4/.m4a, .ogg, .opus for now.
+        """
+        ),
+    )
 
     # group_normalization.add_argument(
     #     '--threshold',
@@ -562,6 +573,7 @@ def main() -> None:
         extension=cli_args.extension,
         dry_run=cli_args.dry_run,
         progress=cli_args.progress,
+        replaygain=cli_args.replaygain,
     )
 
     if cli_args.output and len(cli_args.input) > len(cli_args.output):
@@ -595,7 +607,11 @@ def main() -> None:
                 )
                 os.makedirs(cli_args.output_folder, exist_ok=True)
 
-        if os.path.exists(output_file) and not cli_args.force:
+        if (
+            os.path.exists(output_file)
+            and not cli_args.force
+            and not cli_args.replaygain
+        ):
             _logger.warning(
                 f"Output file '{output_file}' already exists, skipping. Use -f to force overwriting."
             )
