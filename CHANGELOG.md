@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.31.3 (2025-04-14)
+
+* Swap NUL to os.devnull.
+
+
 ## v1.31.2 (2025-03-19)
 
 * Fix: special handling of /dev/null.
