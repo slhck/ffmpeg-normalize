@@ -4,9 +4,9 @@ import json
 import logging
 import os
 import re
-from typing import TYPE_CHECKING, Iterator, List, Literal, Optional, TypedDict, cast
+from typing import TYPE_CHECKING, Iterator, Literal, TypedDict, cast
 
-from ._cmd_utils import NUL, CommandRunner, dict_to_filter_opts
+from ._cmd_utils import CommandRunner, dict_to_filter_opts
 from ._errors import FFmpegNormalizeError
 
 if TYPE_CHECKING:
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 _loudnorm_pattern = re.compile(r"\[Parsed_loudnorm_(\d+)")
+
 
 class EbuLoudnessStatistics(TypedDict):
     input_i: float
@@ -239,7 +240,7 @@ class AudioStream(MediaStream):
             "-sn",
             "-f",
             "null",
-            NUL,
+            os.devnull,
         ]
 
         cmd_runner = CommandRunner()
@@ -310,7 +311,7 @@ class AudioStream(MediaStream):
             "-sn",
             "-f",
             "null",
-            NUL,
+            os.devnull,
         ]
 
         cmd_runner = CommandRunner()
@@ -322,11 +323,13 @@ class AudioStream(MediaStream):
         )
 
         # only one stream
-        self.loudness_statistics["ebu_pass1"] = next(iter(AudioStream.prune_and_parse_loudnorm_output(output).values()))
+        self.loudness_statistics["ebu_pass1"] = next(
+            iter(AudioStream.prune_and_parse_loudnorm_output(output).values())
+        )
 
     @staticmethod
     def prune_and_parse_loudnorm_output(
-        output: str
+        output: str,
     ) -> dict[int, EbuLoudnessStatistics]:
         """
         Prune ffmpeg progress lines from output and parse the loudnorm filter output.
@@ -344,7 +347,7 @@ class AudioStream(MediaStream):
 
     @staticmethod
     def _parse_loudnorm_output(
-        output_lines: list[str]
+        output_lines: list[str],
     ) -> dict[int, EbuLoudnessStatistics]:
         """
         Parse the output of a loudnorm filter to get the EBU loudness statistics.
@@ -403,7 +406,9 @@ class AudioStream(MediaStream):
                                 # convert to floats
                                 loudnorm_stats[key] = float(loudnorm_stats[key])
 
-                        result[stream_index] = cast(EbuLoudnessStatistics, loudnorm_stats)
+                        result[stream_index] = cast(
+                            EbuLoudnessStatistics, loudnorm_stats
+                        )
                         stream_index = -1
                     except Exception as e:
                         raise FFmpegNormalizeError(
@@ -504,15 +509,11 @@ class AudioStream(MediaStream):
             "offset": self._constrain(
                 stats["target_offset"], -99, 99, name="target_offset"
             ),
-            "measured_i": self._constrain(
-                stats["input_i"], -99, 0, name="input_i"
-            ),
+            "measured_i": self._constrain(stats["input_i"], -99, 0, name="input_i"),
             "measured_lra": self._constrain(
                 stats["input_lra"], 0, 99, name="input_lra"
             ),
-            "measured_tp": self._constrain(
-                stats["input_tp"], -99, 99, name="input_tp"
-            ),
+            "measured_tp": self._constrain(stats["input_tp"], -99, 99, name="input_tp"),
             "measured_thresh": self._constrain(
                 stats["input_thresh"], -99, 0, name="input_thresh"
             ),

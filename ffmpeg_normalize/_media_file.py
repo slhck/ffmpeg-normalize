@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Iterable, Iterator, Literal, TypedDict
 
 from tqdm import tqdm
 
-from ._cmd_utils import DUR_REGEX, NUL, CommandRunner
+from ._cmd_utils import DUR_REGEX, CommandRunner
 from ._errors import FFmpegNormalizeError
 from ._streams import (
     AudioStream,
@@ -69,7 +69,7 @@ class MediaFile:
         self.output_file = output_file
         current_ext = os.path.splitext(output_file)[1][1:]
         # we need to check if it's empty, e.g. /dev/null or NUL
-        if current_ext == "" or self.output_file == NUL:
+        if current_ext == "" or self.output_file == os.devnull:
             self.output_ext = self.ffmpeg_normalize.extension
         else:
             self.output_ext = current_ext
@@ -114,7 +114,7 @@ class MediaFile:
             "0",
             "-f",
             "null",
-            NUL,
+            os.devnull,
         ]
 
         output = CommandRunner().run_command(cmd).get_output()
@@ -435,7 +435,7 @@ class MediaFile:
             return
 
         # special case: if output is a null device, write directly to it
-        if self.output_file == NUL:
+        if self.output_file == os.devnull:
             cmd.append(self.output_file)
         else:
             temp_dir = mkdtemp()
@@ -452,14 +452,14 @@ class MediaFile:
                 )
                 raise e
             else:
-                if self.output_file != NUL:
+                if self.output_file != os.devnull:
                     _logger.debug(
                         f"Moving temporary file from {temp_file} to {self.output_file}"
                     )
                     move(temp_file, self.output_file)
                     rmtree(temp_dir, ignore_errors=True)
         except Exception as e:
-            if self.output_file != NUL:
+            if self.output_file != os.devnull:
                 rmtree(temp_dir, ignore_errors=True)
             raise e
 

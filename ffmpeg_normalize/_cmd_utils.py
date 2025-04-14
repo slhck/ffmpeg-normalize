@@ -5,9 +5,8 @@ import os
 import re
 import shlex
 import subprocess
-from platform import system
 from shutil import which
-from typing import Iterator, Any
+from typing import Any, Iterator
 
 from ffmpeg_progress_yield import FfmpegProgress
 
@@ -15,7 +14,6 @@ from ._errors import FFmpegNormalizeError
 
 _logger = logging.getLogger(__name__)
 
-NUL = "NUL" if system() in ("Windows", "cli") else "/dev/null"
 DUR_REGEX = re.compile(
     r"Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})"
 )
