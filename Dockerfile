@@ -1,4 +1,4 @@
-FROM python:3.12-alpine as base
+FROM python:3.13-alpine as base
 
 FROM base as builder
 RUN mkdir /ffmpeg
