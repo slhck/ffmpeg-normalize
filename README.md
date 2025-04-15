@@ -622,7 +622,7 @@ If you found this program useful and feel like giving back, feel free to send a 
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2022 Werner Robitza
+Copyright (c) Werner Robitza
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
