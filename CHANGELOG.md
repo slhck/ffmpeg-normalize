@@ -1,6 +1,31 @@
 # Changelog
 
 
+## v1.32.0 (2025-05-07)
+
+* Docs: update contributing guide.
+
+* Docs: convert options to headlines.
+
+* Docs: update ffmpeg guide.
+
+* Fix: do not write replaygain tags if dry run is used.
+
+* Fix: flake8 no longer used.
+
+* Fix docs links.
+
+* Add mkdocs documentation.
+
+* Update python in dockerfile.
+
+* Remove years from copyright.
+
+* Dev stuff.
+
+* Add replaygain support.
+
+
 ## v1.31.3 (2025-04-14)
 
 * Swap NUL to os.devnull.
