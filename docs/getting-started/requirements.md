@@ -4,7 +4,7 @@ You need Python 3.9 or higher, and ffmpeg.
 
 ## ffmpeg
 
-- ffmpeg 5.x is required, ffmpeg 6.x is recommended (it fixes [a bug for short files](https://github.com/slhck/ffmpeg-normalize/issues/87))
+- ffmpeg 7.x is recommended, although it works with 5.x and above (these may contain already solved bugs with regard to loudness normalization)
 - Download a [static build](https://ffmpeg.org/download.html) for your system
 - Place the `ffmpeg` executable in your `$PATH`, or specify the path to the binary with the `FFMPEG_PATH` environment variable in `ffmpeg-normalize`
 
@@ -32,6 +32,10 @@ Follow [this guide](https://www.wikihow.com/Install-FFmpeg-on-Windows).
 
 #### macOS and Linux (Homebrew)
 
+You can use [Homebrew](https://brew.sh/) to install ffmpeg:
+
 ```bash
 brew install ffmpeg
 ```
+
+However, this might install a lot of dependencies and take some time. If you don't want to use Homebrew, you can use a static build from [evermeet.cx](https://evermeet.cx/ffmpeg/).
