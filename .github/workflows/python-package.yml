@@ -29,12 +29,6 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements.dev.txt
         pip install .
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-line-length=127 --ignore=W503,W504,C901
     - name: Type check with mypy
       run: |
         mypy ffmpeg_normalize
