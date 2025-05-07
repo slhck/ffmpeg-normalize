@@ -904,7 +904,7 @@
 <p>You need Python 3.9 or higher, and ffmpeg.</p>
 <h2 id="ffmpeg">ffmpeg</h2>
 <ul>
-<li>ffmpeg 5.x is required, ffmpeg 6.x is recommended (it fixes <a href="https://github.com/slhck/ffmpeg-normalize/issues/87">a bug for short files</a>)</li>
+<li>ffmpeg 7.x is recommended, although it works with 5.x and above (these may contain already solved bugs with regard to loudness normalization)</li>
 <li>Download a <a href="https://ffmpeg.org/download.html">static build</a> for your system</li>
 <li>Place the <code>ffmpeg</code> executable in your <code>$PATH</code>, or specify the path to the binary with the <code>FFMPEG_PATH</code> environment variable in <code>ffmpeg-normalize</code></li>
 </ul>
@@ -925,8 +925,10 @@ sudo<span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </sp
 <h4 id="windows">Windows</h4>
 <p>Follow <a href="https://www.wikihow.com/Install-FFmpeg-on-Windows">this guide</a>.</p>
 <h4 id="macos-and-linux-homebrew">macOS and Linux (Homebrew)</h4>
+<p>You can use <a href="https://brew.sh/">Homebrew</a> to install ffmpeg:</p>
 <div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>ffmpeg
 </code></pre></div>
+<p>However, this might install a lot of dependencies and take some time. If you don't want to use Homebrew, you can use a static build from <a href="https://evermeet.cx/ffmpeg/">evermeet.cx</a>.</p>
 
 
 
