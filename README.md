@@ -34,6 +34,8 @@ Check out our [documentation](https://slhck.info/ffmpeg-normalize/) for more inf
 
 ## 🤝 Contributors
 
+The only reason this project exists in its current form is because [@benjaoming](https://github.com/slhck/ffmpeg-normalize/issues?q=is%3Apr+author%3Abenjaoming)'s initial PRs. Thanks for everyone's support!
+
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->

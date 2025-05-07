@@ -1,7 +1,5 @@
 # Contributing
 
-The only reason this project exists in its current form is because [@benjaoming](https://github.com/slhck/ffmpeg-normalize/issues?q=is%3Apr+author%3Abenjaoming)'s PRs. Thanks for everyone's support!
-
 ## Features and Bugfixes
 
 If you want to contribute a new feature or fix, please:
