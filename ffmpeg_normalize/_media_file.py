@@ -262,7 +262,10 @@ class MediaFile:
         _logger.debug(f"Track gain: {track_gain} dB")
         _logger.debug(f"Track peak: {track_peak}")
 
-        self._write_replaygain_tags(track_gain, track_peak)
+        if not self.ffmpeg_normalize.dry_run:
+            self._write_replaygain_tags(track_gain, track_peak)
+        else:
+            _logger.warning("Dry run used, not actually writing replaygain tags")
 
     def _write_replaygain_tags(self, track_gain: float, track_peak: float) -> None:
         """
@@ -308,8 +311,8 @@ class MediaFile:
             opus.save()
         else:
             _logger.error(
-                f"Unsupported input file extension: {input_file_ext} for writing replaygain tags."
-                "Only .mp3, .mp4/.m4a, .ogg, .opus are supported."
+                f"Unsupported input file extension: {input_file_ext} for writing replaygain tags. "
+                "Only .mp3, .mp4/.m4a, .ogg, .opus are supported. "
                 "If you think this should support more formats, please let me know at "
                 "https://github.com/slhck/ffmpeg-normalize/issues"
             )
