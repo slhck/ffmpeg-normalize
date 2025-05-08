@@ -37,6 +37,7 @@ setup(
         "colorama;platform_system=='Windows'",
         "ffmpeg-progress-yield",
         "colorlog",
+        "mutagen",
     ],
     license="MIT",
     zip_safe=False,
