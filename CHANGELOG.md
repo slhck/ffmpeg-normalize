@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.32.1 (2025-05-08)
+
+* Fix missing mutagen requirement, fixes #283.
+
+* Docs: docs.
+
+
 ## v1.32.0 (2025-05-07)
 
 * Docs: update contributing guide.
