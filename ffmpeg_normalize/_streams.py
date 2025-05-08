@@ -65,6 +65,9 @@ class MediaStream:
         self.media_file = media_file
         self.stream_type = stream_type
         self.stream_id = stream_id
+        _logger.debug(
+            f"Created MediaStream for {self.media_file.input_file}, {self.stream_type} stream {self.stream_id}"
+        )
 
     def __repr__(self) -> str:
         return (
@@ -175,6 +178,9 @@ class AudioStream(MediaStream):
         Args:
             stats (dict): The EBU loudness statistics.
         """
+        _logger.debug(
+            f"Setting second pass stats for stream {self.stream_id} from {stats}"
+        )
         self.loudness_statistics["ebu_pass2"] = stats
 
     def get_pcm_codec(self) -> str:
@@ -339,8 +345,9 @@ class AudioStream(MediaStream):
             output (str): The output from ffmpeg.
 
         Returns:
-            list: The EBU loudness statistics.
+            dict[int, EbuLoudnessStatistics]: The EBU loudness statistics.
         """
+        _logger.debug("Parsing loudnorm stats from output")
         pruned_output = CommandRunner.prune_ffmpeg_progress_from_output(output)
         output_lines = [line.strip() for line in pruned_output.split("\n")]
         return AudioStream._parse_loudnorm_output(output_lines)
@@ -359,7 +366,7 @@ class AudioStream(MediaStream):
             FFmpegNormalizeError: When the output could not be parsed.
 
         Returns:
-            EbuLoudnessStatistics: The EBU loudness statistics, if found.
+            dict[int, EbuLoudnessStatistics]: stream index and the EBU loudness statistics, if found.
         """
         result = dict[int, EbuLoudnessStatistics]()
         stream_index = -1

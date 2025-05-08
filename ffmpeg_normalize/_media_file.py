@@ -6,7 +6,7 @@ import re
 import shlex
 from shutil import move, rmtree
 from tempfile import mkdtemp
-from typing import TYPE_CHECKING, Iterable, Iterator, Literal, TypedDict
+from typing import TYPE_CHECKING, Iterable, Iterator, Literal, TypedDict, Union
 
 from mutagen.id3 import ID3, TXXX
 from mutagen.mp3 import MP3
@@ -75,10 +75,17 @@ class MediaFile:
         current_ext = os.path.splitext(output_file)[1][1:]
         # we need to check if it's empty, e.g. /dev/null or NUL
         if current_ext == "" or self.output_file == os.devnull:
+            _logger.debug(
+                f"Current extension is unset, or output file is a null device, using extension: {self.ffmpeg_normalize.extension}"
+            )
             self.output_ext = self.ffmpeg_normalize.extension
         else:
+            _logger.debug(
+                f"Current extension is set from output file, using extension: {current_ext}"
+            )
             self.output_ext = current_ext
         self.streams: StreamDict = {"audio": {}, "video": {}, "subtitle": {}}
+        self.temp_file: Union[str, None] = None
 
         self.parse_streams()
 
@@ -203,12 +210,17 @@ class MediaFile:
         # run the first pass to get loudness stats
         self._first_pass()
 
-        # shortcut to apply replaygain
-        if self.ffmpeg_normalize.replaygain:
-            self._run_replaygain()
-            return
+        # for second pass, create a temp file
+        temp_dir = mkdtemp()
+        self.temp_file = os.path.join(temp_dir, f"out.{self.output_ext}")
 
-        # run the second pass as a whole
+        if self.ffmpeg_normalize.replaygain:
+            _logger.debug(
+                "ReplayGain mode: Second pass will run with temporary file to get stats."
+            )
+            self.output_file = self.temp_file
+
+        # run the second pass as a whole.
         if self.ffmpeg_normalize.progress:
             with tqdm(
                 total=100,
@@ -222,7 +234,20 @@ class MediaFile:
             for _ in self._second_pass():
                 pass
 
-        _logger.info(f"Normalized file written to {self.output_file}")
+        # remove temp dir; this will remove the temp file as well if it has not been renamed (e.g. for replaygain)
+        if os.path.exists(temp_dir):
+            rmtree(temp_dir, ignore_errors=True)
+
+        # This will use stats from ebu_pass2 if available (from the main second pass),
+        # or fall back to ebu_pass1.
+        if self.ffmpeg_normalize.replaygain:
+            _logger.debug(
+                "ReplayGain tagging is enabled. Proceeding with tag calculation/application."
+            )
+            self._run_replaygain()
+
+        if not self.ffmpeg_normalize.replaygain:
+            _logger.info(f"Normalized file written to {self.output_file}")
 
     def _run_replaygain(self) -> None:
         """
@@ -233,12 +258,31 @@ class MediaFile:
         # get the audio streams
         audio_streams = list(self.streams["audio"].values())
 
-        # get the loudnorm stats from the first pass
-        loudnorm_stats = audio_streams[0].loudness_statistics["ebu_pass1"]
+        # Attempt to use EBU pass 2 statistics, which account for pre-filters.
+        # These are populated by the main second pass if it runs (not a dry run)
+        # and normalization_type is 'ebu'.
+        loudness_stats_source = "ebu_pass2"
+        loudnorm_stats = audio_streams[0].loudness_statistics.get("ebu_pass2")
 
         if loudnorm_stats is None:
-            _logger.error("no loudnorm stats available in first pass stats!")
+            _logger.warning(
+                "ReplayGain: Second pass EBU statistics (ebu_pass2) not found. "
+                "Falling back to first pass EBU statistics (ebu_pass1). "
+                "This may not account for pre-filters if any are used."
+            )
+            loudness_stats_source = "ebu_pass1"
+            loudnorm_stats = audio_streams[0].loudness_statistics.get("ebu_pass1")
+
+        if loudnorm_stats is None:
+            _logger.error(
+                f"ReplayGain: No loudness statistics available from {loudness_stats_source} (and fallback) for stream 0. "
+                "Cannot calculate ReplayGain tags."
+            )
             return
+
+        _logger.debug(
+            f"Using statistics from {loudness_stats_source} for ReplayGain calculation."
+        )
 
         # apply the replaygain tag from the first audio stream (to all audio streams)
         if len(audio_streams) > 1:
@@ -249,23 +293,31 @@ class MediaFile:
             )
 
         target_level = self.ffmpeg_normalize.target_level
-        input_i = loudnorm_stats["input_i"]  # Integrated loudness
-        input_tp = loudnorm_stats["input_tp"]  # True peak
+        # Use 'input_i' and 'input_tp' from the chosen stats.
+        # For ebu_pass2, these are measurements *after* pre-filter but *before* loudnorm adjustment.
+        input_i = loudnorm_stats.get("input_i")
+        input_tp = loudnorm_stats.get("input_tp")
 
         if input_i is None or input_tp is None:
-            _logger.error("no input_i or input_tp available in first pass stats!")
+            _logger.error(
+                f"ReplayGain: 'input_i' or 'input_tp' missing from {loudness_stats_source} statistics. "
+                "Cannot calculate ReplayGain tags."
+            )
             return
 
         track_gain = -(input_i - target_level)  # dB
         track_peak = 10 ** (input_tp / 20)  # linear scale
 
-        _logger.debug(f"Track gain: {track_gain} dB")
-        _logger.debug(f"Track peak: {track_peak}")
+        _logger.debug(f"Calculated Track gain: {track_gain:.2f} dB")
+        _logger.debug(f"Calculated Track peak: {track_peak:.2f}")
 
-        if not self.ffmpeg_normalize.dry_run:
+        if not self.ffmpeg_normalize.dry_run:  # This uses the overall dry_run state
             self._write_replaygain_tags(track_gain, track_peak)
         else:
-            _logger.warning("Dry run used, not actually writing replaygain tags")
+            _logger.warning(
+                "Overall dry_run is enabled, not actually writing ReplayGain tags to the file. "
+                "Tag calculation based on available stats was performed."
+            )
 
     def _write_replaygain_tags(self, track_gain: float, track_peak: float) -> None:
         """
@@ -554,33 +606,27 @@ class MediaFile:
 
         cmd_runner = CommandRunner()
         try:
-            try:
-                yield from cmd_runner.run_ffmpeg_command(cmd)
-            except Exception as e:
-                _logger.error(
-                    f"Error while running command {shlex.join(cmd)}! Error: {e}"
-                )
-                raise e
-            else:
-                if self.output_file != os.devnull:
-                    _logger.debug(
-                        f"Moving temporary file from {temp_file} to {self.output_file}"
-                    )
-                    move(temp_file, self.output_file)
-                    rmtree(temp_dir, ignore_errors=True)
+            yield from cmd_runner.run_ffmpeg_command(cmd)
         except Exception as e:
-            if self.output_file != os.devnull:
-                rmtree(temp_dir, ignore_errors=True)
+            _logger.error(f"Error while running command {shlex.join(cmd)}! Error: {e}")
             raise e
+        else:
+            # only move the temp file if it's not a null device and ReplayGain is not enabled!
+            if self.output_file != os.devnull and not self.ffmpeg_normalize.replaygain:
+                _logger.debug(
+                    f"Moving temporary file from {temp_file} to {self.output_file}"
+                )
+                move(temp_file, self.output_file)
 
         output = cmd_runner.get_output()
         # in the second pass, we do not normalize stream-by-stream, so we set the stats based on the
         # overall output (which includes multiple loudnorm stats)
         if self.ffmpeg_normalize.normalization_type == "ebu":
-            all_stats = AudioStream.prune_and_parse_loudnorm_output(output)
-            for stream_id, audio_stream in self.streams["audio"].items():
-                if stream_id in all_stats:
-                    audio_stream.set_second_pass_stats(all_stats[stream_id])
+            ebu_pass_2_stats = list(
+                AudioStream.prune_and_parse_loudnorm_output(output).values()
+            )
+            for idx, audio_stream in enumerate(self.streams["audio"].values()):
+                audio_stream.set_second_pass_stats(ebu_pass_2_stats[idx])
 
         # warn if self.media_file.ffmpeg_normalize.dynamic == False and any of the second pass stats contain "normalization_type" == "dynamic"
         if self.ffmpeg_normalize.dynamic is False:
