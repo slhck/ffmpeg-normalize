@@ -41,6 +41,7 @@ nav:
     - API: advanced/api.md
     - FAQ: advanced/faq.md
   - About:
+    - Changelog: about/changelog.md
     - Contributing: about/contributing.md
     - License: about/license.md
 markdown_extensions:
