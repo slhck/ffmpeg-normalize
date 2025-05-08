@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.32.2 (2025-05-08)
+
+* Docs: reference changelog.
+
+* Fix: make replaygain use second pass stats.
+
+
 ## v1.32.1 (2025-05-08)
 
 * Fix missing mutagen requirement, fixes #283.
