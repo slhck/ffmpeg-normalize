@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.32.3 (2025-05-30)
+
+* Fix temp dir cleanup, fixes #284.
+
+
 ## v1.32.2 (2025-05-08)
 
 * Docs: reference changelog.
