@@ -596,6 +596,10 @@ class MediaFile:
             yield 100
             return
 
+        # track temp_dir for cleanup
+        temp_dir = None
+        temp_file = None
+
         # special case: if output is a null device, write directly to it
         if self.output_file == os.devnull:
             cmd.append(self.output_file)
@@ -617,6 +621,10 @@ class MediaFile:
                     f"Moving temporary file from {temp_file} to {self.output_file}"
                 )
                 move(temp_file, self.output_file)
+        finally:
+            # clean up temp directory if it was created
+            if temp_dir and os.path.exists(temp_dir):
+                rmtree(temp_dir, ignore_errors=True)
 
         output = cmd_runner.get_output()
         # in the second pass, we do not normalize stream-by-stream, so we set the stats based on the
