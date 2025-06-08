@@ -141,7 +141,7 @@ If a mono file is intended for playback on a stereo system, its EBU R128 measure
 
 Force dynamic normalization mode.
 
-Instead of applying linear EBU R128 normalization, choose a dynamic normalization. This is not usually recommended.
+Instead of applying linear EBU R128 normalization, choose a dynamic normalization. This uses a one-pass algorithm and skips the initial media scan.
 
 Dynamic mode will automatically change the sample rate to 192 kHz. Use `-ar`/`--sample-rate` to specify a different output sample rate.
 

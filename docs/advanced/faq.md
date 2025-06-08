@@ -26,7 +26,7 @@ The normalization process involves measuring these values (input) and then apply
 * It maintains the relative loudness between different parts of the audio.
 * It avoids potential artifacts or pumping effects that can occur with dynamic processing.
 
-**Dynamic mode**, on the other hand, can change the volume dynamically throughout the file. While this can achieve more consistent loudness, it may alter the original artistic intent and potentially introduce audible artifacts (possibly due to some bugs in the ffmpeg filter).
+**Dynamic mode**, on the other hand, can change the volume dynamically throughout the file. While this can achieve more consistent loudness, it may alter the original artistic intent. There were some bugs in older versions of the `loudnorm` filter that could cause artifacts, but these have been fixed in recent versions of ffmpeg.
 
 For most cases, linear mode is recommended. Dynamic mode should only be used when linear mode is not suitable or when a specific effect is desired. In some cases, `loudnorm` will still fall back to dynamic mode, and a warning will be printed to the console. Here's when this can happen:
 
@@ -39,6 +39,8 @@ At this time, the `loudnorm` filter in ffmpeg does not provide a way to force li
 - The `--keep-lra-above-loudness-range-target` option can be used to keep the input loudness range above the specified target, but it will not force linear mode in all cases.
 - Similarly, the `--keep-loudness-range-target` option can be used to keep the input loudness range target.
 - The `--lower-only` option can be used to skip the normalization pass completely if the measured loudness is lower than the target loudness.
+
+If instead you want to use dynamic mode, you can use the `--dynamic` option; this will also speed up the normalization process because only one pass is needed.
 
 ## The program doesn't work because the "loudnorm" filter can't be found
 
