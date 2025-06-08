@@ -16,7 +16,7 @@ pdoc -d google -o docs-api ./ffmpeg_normalize
 ## Creating MKdocs Releases
 
 ```bash
-mkdocs gh-deploy
+uvx --with mkdocs-material mkdocs gh-deploy
 ```
 
 (We do not have a CI pipeline for this, so we need to do it manually.)
