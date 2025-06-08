@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1045,7 +1045,7 @@
 <li>It maintains the relative loudness between different parts of the audio.</li>
 <li>It avoids potential artifacts or pumping effects that can occur with dynamic processing.</li>
 </ul>
-<p><strong>Dynamic mode</strong>, on the other hand, can change the volume dynamically throughout the file. While this can achieve more consistent loudness, it may alter the original artistic intent and potentially introduce audible artifacts (possibly due to some bugs in the ffmpeg filter).</p>
+<p><strong>Dynamic mode</strong>, on the other hand, can change the volume dynamically throughout the file. While this can achieve more consistent loudness, it may alter the original artistic intent. There were some bugs in older versions of the <code>loudnorm</code> filter that could cause artifacts, but these have been fixed in recent versions of ffmpeg.</p>
 <p>For most cases, linear mode is recommended. Dynamic mode should only be used when linear mode is not suitable or when a specific effect is desired. In some cases, <code>loudnorm</code> will still fall back to dynamic mode, and a warning will be printed to the console. Here's when this can happen:</p>
 <ul>
 <li>
@@ -1061,6 +1061,7 @@
 <li>Similarly, the <code>--keep-loudness-range-target</code> option can be used to keep the input loudness range target.</li>
 <li>The <code>--lower-only</code> option can be used to skip the normalization pass completely if the measured loudness is lower than the target loudness.</li>
 </ul>
+<p>If instead you want to use dynamic mode, you can use the <code>--dynamic</code> option; this will also speed up the normalization process because only one pass is needed.</p>
 <h2 id="the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found">The program doesn't work because the "loudnorm" filter can't be found</h2>
 <p>Make sure you run a recent ffmpeg version and that <code>loudnorm</code> is part of the output when you run <code>ffmpeg -filters</code>. Many distributions package outdated ffmpeg versions, or (even worse), Libav's <code>ffmpeg</code> disguising as a real <code>ffmpeg</code> from the FFmpeg project.</p>
 <p>Some ffmpeg builds also do not have the <code>loudnorm</code> filter enabled.</p>
@@ -1167,10 +1168,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.sections"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.sections"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
     
   </body>
