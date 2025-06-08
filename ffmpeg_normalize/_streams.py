@@ -428,6 +428,28 @@ class AudioStream(MediaStream):
         Return second pass loudnorm filter options string for ffmpeg
         """
 
+        # In dynamic mode, we can do everything in one pass, and we do not have first pass stats
+        if self.media_file.ffmpeg_normalize.dynamic:
+            if not self.ffmpeg_normalize.sample_rate:
+                _logger.warning(
+                    "In dynamic mode, the sample rate will automatically be set to 192 kHz by the loudnorm filter. "
+                    "Specify -ar/--sample-rate to override it."
+                )
+
+            opts = {
+                "i": self.media_file.ffmpeg_normalize.target_level,
+                "lra": self.media_file.ffmpeg_normalize.loudness_range_target,
+                "tp": self.media_file.ffmpeg_normalize.true_peak,
+                "offset": self.media_file.ffmpeg_normalize.offset,
+                "linear": "false",
+                "print_format": "json",
+            }
+
+            if self.media_file.ffmpeg_normalize.dual_mono:
+                opts["dual_mono"] = "true"
+
+            return "loudnorm=" + dict_to_filter_opts(opts)
+
         if not self.loudness_statistics["ebu_pass1"]:
             raise FFmpegNormalizeError(
                 "First pass not run, you must call parse_loudnorm_stats first"

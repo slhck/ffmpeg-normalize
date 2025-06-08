@@ -14,7 +14,7 @@ This program normalizes media files to a certain loudness level using the EBU R1
 
 ## ✨ Features
 
-- EBU R128 loudness normalization
+- EBU R128 loudness normalization (two-pass by default, with an option for one-pass dynamic normalization)
 - RMS-based normalization
 - Peak normalization
 - Video file support

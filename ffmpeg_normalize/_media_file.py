@@ -207,8 +207,16 @@ class MediaFile:
         """
         _logger.debug(f"Running normalization for {self.input_file}")
 
-        # run the first pass to get loudness stats
-        self._first_pass()
+        # run the first pass to get loudness stats, unless in dynamic EBU mode
+        if not (
+            self.ffmpeg_normalize.dynamic
+            and self.ffmpeg_normalize.normalization_type == "ebu"
+        ):
+            self._first_pass()
+        else:
+            _logger.debug(
+                "Dynamic EBU mode: First pass will not run, as it is not needed."
+            )
 
         # for second pass, create a temp file
         temp_dir = mkdtemp()

@@ -63,7 +63,7 @@ class FFmpegNormalize:
         lower_only (bool, optional): Whether the audio should not increase in loudness. Defaults to False.
         auto_lower_loudness_target (bool, optional): Automatically lower EBU Integrated Loudness Target.
         dual_mono (bool, optional): Dual mono. Defaults to False.
-        dynamic (bool, optional): Dynamic. Defaults to False.
+        dynamic (bool, optional): Use dynamic EBU R128 normalization. This is a one-pass algorithm and skips the initial media scan. Defaults to False.
         audio_codec (str, optional): Audio codec. Defaults to "pcm_s16le".
         audio_bitrate (float, optional): Audio bitrate. Defaults to None.
         sample_rate (int, optional): Sample rate. Defaults to None.
