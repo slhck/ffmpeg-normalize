@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.32.4 (2025-06-08)
+
+* Update api docs.
+
+* Update docs.
+
+* Make --dynamic option use one pass only, fixes #263.
+
+* Fix type error.
+
+
 ## v1.32.3 (2025-05-30)
 
 * Fix temp dir cleanup, fixes #284.
