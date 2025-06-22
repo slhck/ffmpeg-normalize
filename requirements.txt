@@ -1,5 +1,5 @@
 tqdm>=4.64.1
 colorama>=0.4.6
-ffmpeg-progress-yield>=0.11.0
+ffmpeg-progress-yield>=1.0.1
 colorlog==6.7.0
 mutagen>=1.47.0

@@ -75,10 +75,10 @@ class CommandRunner:
         """
         # wrapper for 'ffmpeg-progress-yield'
         _logger.debug(f"Running command: {shlex.join(cmd)}")
-        ff = FfmpegProgress(cmd, dry_run=self.dry)
-        yield from ff.run_command_with_progress()
+        with FfmpegProgress(cmd, dry_run=self.dry) as ff:
+            yield from ff.run_command_with_progress()
 
-        self.output = ff.stderr
+            self.output = ff.stderr
 
         if _logger.getEffectiveLevel() == logging.DEBUG and self.output is not None:
             _logger.debug(
