@@ -462,7 +462,7 @@ class AudioStream(MediaStream):
             )
             self.loudness_statistics["ebu_pass1"]["input_i"] = 0
 
-        will_use_dynamic_mode = self.media_file.ffmpeg_normalize.dynamic
+        will_use_dynamic_mode: bool = self.media_file.ffmpeg_normalize.dynamic
 
         if self.media_file.ffmpeg_normalize.keep_loudness_range_target:
             _logger.debug(
