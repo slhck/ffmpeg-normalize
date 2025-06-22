@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.32.5 (2025-06-22)
+
+* Fix classifier.
+
+* Update ffmpeg-progress-yield to clean up properly.
+
+* Changed license specifier.
+
+* Removed wheel settings from setup.cfg.
+
+
 ## v1.32.4 (2025-06-08)
 
 * Update api docs.
