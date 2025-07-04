@@ -477,13 +477,22 @@ class TestFFmpegNormalize:
         assert stream_info["channels"] == 2
 
     def test_replaygain(self):
-        for file in [
+        REPLAYGAIN_FILES = [
             "tests/test.mp4",
             "tests/test.mp3",
             "tests/test.ogg",
             "tests/test.opus",
-        ]:
-            original_mtime = os.path.getmtime(file)
-            ffmpeg_normalize_call([file, "--replaygain"])
-            assert os.path.isfile(file)
-            assert os.path.getmtime(file) > original_mtime
+        ]
+        try:
+            for file in REPLAYGAIN_FILES:
+                original_mtime = os.path.getmtime(file)
+                ffmpeg_normalize_call([file, "--replaygain"])
+                assert os.path.isfile(file)
+                assert os.path.getmtime(file) > original_mtime
+        except AssertionError:
+            print(f"Failed to normalize {file}")
+            raise
+        finally:
+            # git checkout the files!
+            for file in REPLAYGAIN_FILES:
+                subprocess.run(["git", "checkout", file], check=False)
