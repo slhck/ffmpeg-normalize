@@ -5,7 +5,7 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/slhck/ffmpeg-normalize/python-package.yml)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-21-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A utility for batch-normalizing audio using ffmpeg.
@@ -66,6 +66,7 @@ The only reason this project exists in its current form is because [@benjaoming]
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/HighMans"><img src="https://avatars.githubusercontent.com/u/42877729?v=4?s=100" width="100px;" alt="HighMans"/><br /><sub><b>HighMans</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=HighMans" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kanjieater"><img src="https://avatars.githubusercontent.com/u/32607317?v=4?s=100" width="100px;" alt="kanjieater"/><br /><sub><b>kanjieater</b></sub></a><br /><a href="#ideas-kanjieater" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://ahmetsait.com/"><img src="https://avatars.githubusercontent.com/u/8372246?v=4?s=100" width="100px;" alt="Ahmet Sait"/><br /><sub><b>Ahmet Sait</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=ahmetsait" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/georgev93"><img src="https://avatars.githubusercontent.com/u/39860568?v=4?s=100" width="100px;" alt="georgev93"/><br /><sub><b>georgev93</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=georgev93" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
