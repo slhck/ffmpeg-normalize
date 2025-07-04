@@ -7,7 +7,7 @@ If you want to contribute a new feature or fix, please:
 - Check if there isn't any open issue for the same problem
 - Fork the project
 - Implement your feature or fix
-- Bonus points if you provide a test case in `test/test.py`
+- Bonus points if you provide a test case in `test/test_*.py`
 - Provide a commit for the change you want to make (one feature per commit, please)
 - Create a pull request
 

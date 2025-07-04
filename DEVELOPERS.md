@@ -2,10 +2,10 @@
 
 ## Tests
 
-Tests are located in `test/test.py`. To run them:
+Tests are located in `tests/test_*.py`. To run them:
 
 - Install `requirements.txt` and `requirements.dev.txt`
-- Run `pytest test/test.py`
+- Run `pytest`
 
 ## Creating API Docs
 

@@ -148,12 +148,12 @@ class TestFFmpegNormalize:
                 shutil.rmtree("normalized")
 
     def test_output_filename_and_folder(self):
-        ffmpeg_normalize_call(["test/test.mp4"])
+        ffmpeg_normalize_call(["tests/test.mp4"])
         assert os.path.isfile("normalized/test.mkv")
 
     def test_default_warnings(self):
         _, stderr = ffmpeg_normalize_call(
-            ["test/test.mp4", "--dynamic", "-o", "normalized/test2.wav"]
+            ["tests/test.mp4", "--dynamic", "-o", "normalized/test2.wav"]
         )
         assert "sample rate will automatically be set" in stderr
 
@@ -161,8 +161,8 @@ class TestFFmpegNormalize:
         os.makedirs("normalized", exist_ok=True)
         ffmpeg_normalize_call(
             [
-                "test/test.mp4",
-                "test/test.mp4",
+                "tests/test.mp4",
+                "tests/test.mp4",
                 "-o",
                 "normalized/test1.mkv",
                 "normalized/test2.mkv",
@@ -172,23 +172,23 @@ class TestFFmpegNormalize:
         assert os.path.isfile("normalized/test2.mkv")
 
     def test_overwrites(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-v"])
-        _, stderr = ffmpeg_normalize_call(["test/test.mp4", "-v"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-v"])
+        _, stderr = ffmpeg_normalize_call(["tests/test.mp4", "-v"])
         assert "exists" in stderr
 
     def test_dry(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-n"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-n"])
         assert not os.path.isfile("normalized/test.mkv")
 
     def test_only_supports_one_stream_output(self):
         os.makedirs("normalized", exist_ok=True)
         _, stderr = ffmpeg_normalize_call(
-            ["test/test.mp4", "-o", "normalized/test.wav", "-v"]
+            ["tests/test.mp4", "-o", "normalized/test.wav", "-v"]
         )
         assert "Output file only supports one stream" in stderr
 
     def test_peak(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-nt", "peak", "-t", "0"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-nt", "peak", "-t", "0"])
         assert os.path.isfile("normalized/test.mkv")
         assert fuzzy_equal(
             _get_stats("normalized/test.mkv", "peak"),
@@ -215,7 +215,7 @@ class TestFFmpegNormalize:
         )
 
     def test_rms(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-nt", "rms", "-t", "-15"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-nt", "rms", "-t", "-15"])
         assert os.path.isfile("normalized/test.mkv")
         assert fuzzy_equal(
             _get_stats("normalized/test.mkv", "rms"),
@@ -242,7 +242,7 @@ class TestFFmpegNormalize:
         )
 
     def test_ebu(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-nt", "ebu"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-nt", "ebu"])
         assert os.path.isfile("normalized/test.mkv")
         assert fuzzy_equal(
             _get_stats("normalized/test.mkv", "ebu"),
@@ -291,7 +291,7 @@ class TestFFmpegNormalize:
         )
 
     def test_acodec(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-c:a", "aac"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-c:a", "aac"])
         assert os.path.isfile("normalized/test.mkv")
         assert _get_stream_info("normalized/test.mkv")[1]["codec_name"] == "aac"
 
@@ -299,7 +299,7 @@ class TestFFmpegNormalize:
         os.makedirs("normalized", exist_ok=True)
         ffmpeg_normalize_call(
             [
-                "test/test.mp4",
+                "tests/test.mp4",
                 "-c:a",
                 "aac",
                 "-b:a",
@@ -316,37 +316,37 @@ class TestFFmpegNormalize:
         )
 
     def test_ar(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-ar", "48000"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-ar", "48000"])
         assert os.path.isfile("normalized/test.mkv")
         assert _get_stream_info("normalized/test.mkv")[1]["sample_rate"] == "48000"
 
     def test_vcodec(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-c:v", "libx265"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-c:v", "libx265"])
         assert os.path.isfile("normalized/test.mkv")
         assert _get_stream_info("normalized/test.mkv")[0]["codec_name"] == "hevc"
 
     def test_extra_input_options_json(self):
         ffmpeg_normalize_call(
-            ["test/test.mp4", "-c:a", "aac", "-ei", '[ "-f", "mp4" ]']
+            ["tests/test.mp4", "-c:a", "aac", "-ei", '[ "-f", "mp4" ]']
         )
         # FIXME: some better test that options are respected?
         assert os.path.isfile("normalized/test.mkv")
 
     def test_extra_output_options_json(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-c:a", "aac", "-e", '[ "-vbr", "3" ]'])
+        ffmpeg_normalize_call(["tests/test.mp4", "-c:a", "aac", "-e", '[ "-vbr", "3" ]'])
         # FIXME: some better test that options are respected?
         assert os.path.isfile("normalized/test.mkv")
 
     def test_ofmt_fail(self):
         _, stderr = ffmpeg_normalize_call(
-            ["test/test.mp4", "-ofmt", "mp3", "-o", "normalized/test.mp3", "-vn", "-sn"]
+            ["tests/test.mp4", "-ofmt", "mp3", "-o", "normalized/test.mp3", "-vn", "-sn"]
         )
         assert "does not support" in stderr
 
     def test_ofmt_mp3(self):
         ffmpeg_normalize_call(
             [
-                "test/test.mp4",
+                "tests/test.mp4",
                 "-ofmt",
                 "mp3",
                 "-o",
@@ -360,11 +360,11 @@ class TestFFmpegNormalize:
         assert os.path.isfile("normalized/test.mp3")
 
     def test_ext_fail(self):
-        _, stderr = ffmpeg_normalize_call(["test/test.mp4", "-ext", "mp3"])
+        _, stderr = ffmpeg_normalize_call(["tests/test.mp4", "-ext", "mp3"])
         assert "does not support" in stderr
 
     def test_ext_mp3(self):
-        ffmpeg_normalize_call(["test/test.mp4", "-ext", "mp3", "-c:a", "libmp3lame"])
+        ffmpeg_normalize_call(["tests/test.mp4", "-ext", "mp3", "-c:a", "libmp3lame"])
         assert os.path.isfile("normalized/test.mp3")
 
     def test_version(self):
@@ -372,19 +372,19 @@ class TestFFmpegNormalize:
         assert "ffmpeg-normalize v" in stdout
 
     def test_progress(self):
-        _, stderr = ffmpeg_normalize_call(["test/test.mp4", "-pr"])
+        _, stderr = ffmpeg_normalize_call(["tests/test.mp4", "-pr"])
         assert "0/100" in stderr
         assert "100/100" in stderr or "100%" in stderr
         assert os.path.isfile("normalized/test.mkv")
 
     def test_duration(self):
-        _, stderr = ffmpeg_normalize_call(["test/test.wav", "--debug"])
+        _, stderr = ffmpeg_normalize_call(["tests/test.wav", "--debug"])
         assert "Found duration: " in stderr
 
     def test_pre_filters(self):
         ffmpeg_normalize_call(
             [
-                "test/test.wav",
+                "tests/test.wav",
                 "-o",
                 "normalized/test2.wav",
                 "-prf",
@@ -421,7 +421,7 @@ class TestFFmpegNormalize:
     def test_post_filters(self):
         ffmpeg_normalize_call(
             [
-                "test/test.wav",
+                "tests/test.wav",
                 "-o",
                 "normalized/test2.wav",
                 "-pof",
@@ -457,20 +457,20 @@ class TestFFmpegNormalize:
 
     def test_quiet(self):
         _, stderr = ffmpeg_normalize_call(
-            ["test/test.mp4", "-ext", "wav", "-vn", "-f", "q"]
+            ["tests/test.mp4", "-ext", "wav", "-vn", "-f", "q"]
         )
         assert "only supports one stream" not in stderr
 
     def test_audio_channels(self):
         ffmpeg_normalize_call(
-            ["test/test.mp4", "-ac", "1", "-o", "normalized/test.wav"]
+            ["tests/test.mp4", "-ac", "1", "-o", "normalized/test.wav"]
         )
         assert os.path.isfile("normalized/test.wav")
         stream_info = _get_stream_info("normalized/test.wav")[0]
         assert stream_info["channels"] == 1
 
         ffmpeg_normalize_call(
-            ["test/test.mp4", "-ac", "2", "-o", "normalized/test2.wav"]
+            ["tests/test.mp4", "-ac", "2", "-o", "normalized/test2.wav"]
         )
         assert os.path.isfile("normalized/test2.wav")
         stream_info = _get_stream_info("normalized/test2.wav")[0]
@@ -478,10 +478,10 @@ class TestFFmpegNormalize:
 
     def test_replaygain(self):
         for file in [
-            "test/test.mp4",
-            "test/test.mp3",
-            "test/test.ogg",
-            "test/test.opus",
+            "tests/test.mp4",
+            "tests/test.mp3",
+            "tests/test.ogg",
+            "tests/test.opus",
         ]:
             original_mtime = os.path.getmtime(file)
             ffmpeg_normalize_call([file, "--replaygain"])
