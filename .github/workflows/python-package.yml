@@ -34,4 +34,4 @@ jobs:
         mypy ffmpeg_normalize
     - name: Test with pytest
       run: |
-        pytest test/test.py
+        pytest
