@@ -56,3 +56,7 @@ normalized
 
 # mkdocs
 site/
+
+# Test files downloaded during testing
+tests/mus-sample/
+tests/mus-sample.zip
