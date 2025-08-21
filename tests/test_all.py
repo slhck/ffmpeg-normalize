@@ -147,6 +147,28 @@ class TestFFmpegNormalize:
             if os.path.isdir("normalized"):
                 shutil.rmtree("normalized")
 
+    def test_input_list(self, tmp_path):
+        # Create a temporary input list file using pytest tmp_path
+        input_list_path = tmp_path / "input_list.txt"
+        input_list_path.write_text("tests/test.mp4\ntests/test.mp4\n")
+        # Run ffmpeg-normalize with --input-list
+        ffmpeg_normalize_call(["--input-list", str(input_list_path)])
+        # Check output files
+        assert os.path.isfile("normalized/test.mkv")
+
+    def test_no_input_specified(self):
+        """Run the CLI with no arguments; should exit with error"""
+        _, stderr = ffmpeg_normalize_call([])
+        assert "No input files specified" in stderr
+
+    def test_empty_input_list_file(self, tmp_path):
+        # Create an empty input list file using pytest tmp_path
+        input_list_path = tmp_path / "empty_input_list.txt"
+        input_list_path.write_text("")
+        _, stderr = ffmpeg_normalize_call(["--input-list", str(input_list_path)])
+        # Should error because the list is empty
+        assert "No input files specified" in stderr
+
     def test_output_filename_and_folder(self):
         ffmpeg_normalize_call(["tests/test.mp4"])
         assert os.path.isfile("normalized/test.mkv")

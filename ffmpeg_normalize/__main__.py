@@ -52,7 +52,12 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     group_io = parser.add_argument_group("File Input/output")
-    group_io.add_argument("input", nargs="+", help="Input media file(s)")
+    group_io.add_argument("input", nargs="*", help="Input media file(s)")
+    group_io.add_argument(
+        "--input-list",
+        type=str,
+        help="Path to a text file containing a line-separated list of input files",
+    )
     group_io.add_argument(
         "-o",
         "--output",
@@ -583,7 +588,18 @@ def main() -> None:
             "Will apply default file naming for the remaining ones."
         )
 
-    for index, input_file in enumerate(cli_args.input):
+    # Collect input files from positional args and --input-list
+    input_files = list(cli_args.input) if cli_args.input else []
+    if cli_args.input_list:
+        if not os.path.exists(cli_args.input_list):
+            error(f"Input list file '{cli_args.input_list}' does not exist")
+        with open(cli_args.input_list, "r") as f:
+            input_files.extend([line.strip() for line in f if line.strip()])
+
+    if not input_files:
+        error("No input files specified. Use positional arguments or --input-list.")
+
+    for index, input_file in enumerate(input_files):
         if cli_args.output is not None and index < len(cli_args.output):
             if cli_args.output_folder and cli_args.output_folder != "normalized":
                 _logger.warning(
