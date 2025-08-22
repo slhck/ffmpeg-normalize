@@ -6,6 +6,12 @@
 
 Input media file(s)
 
+### `--input-list INPUT_LIST`
+
+Path to a text file containing a line-separated list of input files.
+
+Example: `ffmpeg-normalize --input-list input.txt`
+
 ### `-o OUTPUT [OUTPUT ...], --output OUTPUT [OUTPUT ...]`
 
 Output file names.
