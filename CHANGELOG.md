@@ -1,6 +1,35 @@
 # Changelog
 
 
+## v1.33.0 (2025-08-22)
+
+* Add fixed ffmpeg version for CI.
+
+* Add input list to docs.
+
+* Docs: add @odie5533 as a contributor.
+
+* Add --input-list option to read input files from a text file.
+
+* Add initial API-based ground truth tests.
+
+  ... with Claude Code
+
+* Ci: skip ci tests for commits that change only markdown files (#291)
+
+* Fix tests with unclean files, fixes #290.
+
+* Docs: add @georgev93 as a contributor.
+
+* Changing test file structure to ensure pytest discoverability (#289)
+
+* Fix dockerfile.
+
+* Remove johnvansickle build.
+
+* Fix type error.
+
+
 ## v1.32.5 (2025-06-22)
 
 * Fix classifier.
