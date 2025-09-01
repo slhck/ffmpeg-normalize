@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.33.1 (2025-09-01)
+
+* Bump version to 1.33.1.
+
+* Migrate to uv and modern package structure.
+
+
 ## v1.33.0 (2025-08-22)
 
 * Add fixed ffmpeg version for CI.
