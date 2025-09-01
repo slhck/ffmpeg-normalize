@@ -624,7 +624,11 @@ class MediaFile:
             raise e
         else:
             # only move the temp file if it's not a null device and ReplayGain is not enabled!
-            if self.output_file != os.devnull and temp_file and not self.ffmpeg_normalize.replaygain:
+            if (
+                self.output_file != os.devnull
+                and temp_file
+                and not self.ffmpeg_normalize.replaygain
+            ):
                 _logger.debug(
                     f"Moving temporary file from {temp_file} to {self.output_file}"
                 )

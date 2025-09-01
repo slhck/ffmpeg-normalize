@@ -1,0 +1,67 @@
+[build-system]
+requires = ["uv_build>=0.8.14,<0.9.0"]
+build-backend = "uv_build"
+
+[project]
+name = "ffmpeg-normalize"
+version = "1.33.0"
+description = "Normalize audio via ffmpeg"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.md"]
+authors = [
+    {name = "Werner Robitza", email = "werner.robitza@gmail.com"}
+]
+keywords = ["ffmpeg", "normalize", "audio"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Topic :: Multimedia :: Sound/Audio :: Conversion",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "tqdm>=4.64.1",
+    "colorama>=0.4.6; platform_system=='Windows'",
+    "ffmpeg-progress-yield>=1.0.1",
+    "colorlog==6.7.0",
+    "mutagen>=1.47.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/slhck/ffmpeg-normalize"
+Repository = "https://github.com/slhck/ffmpeg-normalize"
+
+[project.scripts]
+ffmpeg-normalize = "ffmpeg_normalize.__main__:main"
+
+[tool.uv_build]
+src-layout = true
+
+[dependency-groups]
+dev = [
+    "pytest>=8.1.1,<9",
+    "ruff>=0.12.11",
+    "mypy>=1.0.0",
+    "types-tqdm",
+]
+
+[tool.mypy]
+python_version = "3.13"
+ignore_missing_imports = true
+exclude = ["build"]
+namespace_packages = false
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+show_error_codes = true

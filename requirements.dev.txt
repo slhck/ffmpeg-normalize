@@ -1,4 +1,0 @@
-pytest
-ruff
-mypy
-types-tqdm

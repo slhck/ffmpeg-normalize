@@ -8,8 +8,6 @@ from typing import Any, Dict, List, Literal, Tuple, cast
 
 import pytest
 
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/../"))
-
 
 def ffmpeg_normalize_call(args: List[str]) -> Tuple[str, str]:
     cmd = [sys.executable, "-m", "ffmpeg_normalize"]
@@ -355,13 +353,23 @@ class TestFFmpegNormalize:
         assert os.path.isfile("normalized/test.mkv")
 
     def test_extra_output_options_json(self):
-        ffmpeg_normalize_call(["tests/test.mp4", "-c:a", "aac", "-e", '[ "-vbr", "3" ]'])
+        ffmpeg_normalize_call(
+            ["tests/test.mp4", "-c:a", "aac", "-e", '[ "-vbr", "3" ]']
+        )
         # FIXME: some better test that options are respected?
         assert os.path.isfile("normalized/test.mkv")
 
     def test_ofmt_fail(self):
         _, stderr = ffmpeg_normalize_call(
-            ["tests/test.mp4", "-ofmt", "mp3", "-o", "normalized/test.mp3", "-vn", "-sn"]
+            [
+                "tests/test.mp4",
+                "-ofmt",
+                "mp3",
+                "-o",
+                "normalized/test.mp3",
+                "-vn",
+                "-sn",
+            ]
         )
         assert "does not support" in stderr
 

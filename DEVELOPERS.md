@@ -4,13 +4,14 @@
 
 Tests are located in `tests/test_*.py`. To run them:
 
-- Install `requirements.txt` and `requirements.dev.txt`
-- Run `pytest`
+- Install `uv` (see [installation guide](https://github.com/astral-sh/uv#installation))
+- Run `uv sync --dev` to install all dependencies
+- Run `uv run pytest` to run the tests
 
 ## Creating API Docs
 
 ```bash
-pdoc -d google -o docs-api ./ffmpeg_normalize
+pdoc -d google -o docs-api ./src/ffmpeg_normalize
 ```
 
 ## Creating MKdocs Releases

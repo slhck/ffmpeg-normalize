@@ -9,16 +9,16 @@ ffmpeg-normalize is a Python utility for audio normalization using ffmpeg. It su
 ## Development Commands
 
 ### Testing
-- `pytest` - Run all tests (requires installing requirements.dev.txt)
-- `python -m ffmpeg_normalize [args]` - Run the tool directly for testing
+- `uv run pytest` - Run all tests
+- `uv run python -m ffmpeg_normalize [args]` - Run the tool directly for testing
 
 ### Code Quality
-- `ruff` - Linting and code formatting
-- `mypy` - Type checking
+- `uv run ruff check .` - Linting
+- `uv run ruff format .` - Code formatting  
+- `uv run mypy src/ffmpeg_normalize` - Type checking
 
 ### Installation
-- `pip install -r requirements.txt` - Install runtime dependencies
-- `pip install -r requirements.dev.txt` - Install development dependencies
+- `uv sync --dev` - Install all dependencies (runtime and development)
 
 ### Documentation
 - `pdoc -d google -o docs-api ./ffmpeg_normalize` - Generate API documentation
@@ -56,7 +56,7 @@ The project uses:
 - `colorama` (Windows only) for colored terminal output
 
 ### File Structure
-- `ffmpeg_normalize/` - Main package directory
+- `src/ffmpeg_normalize/` - Main package directory
 - `tests/` - Test files and test media samples
 - `docs/` - MKdocs documentation source
 - `completions/` - Shell completion scripts

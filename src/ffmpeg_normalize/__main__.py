@@ -13,7 +13,11 @@ from typing import NoReturn
 from ._errors import FFmpegNormalizeError
 from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
 from ._logger import setup_cli_logger
-from ._version import __version__
+
+# Import version from package
+import importlib.metadata
+
+__version__ = importlib.metadata.version("ffmpeg-normalize")
 
 _logger = logging.getLogger(__name__)
 

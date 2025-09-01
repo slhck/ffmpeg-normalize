@@ -11,20 +11,15 @@ Run with: pytest -m "not slow" to skip the slow integration tests
 Run with: pytest -m "slow" to run only the slow integration tests
 """
 
-import os
-import sys
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import Dict, Any
 from urllib.request import urlretrieve
 
 import pytest
 
-# Add the parent directory to sys.path so we can import ffmpeg_normalize
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/../"))
-
 from ffmpeg_normalize import FFmpegNormalize
+from ffmpeg_normalize._streams import LoudnessStatisticsWithMetadata
 
 
 def download_and_extract_mus_sample() -> Path:
@@ -52,7 +47,7 @@ def download_and_extract_mus_sample() -> Path:
     print(f"Extracting to {mus_sample_dir}...")
     mus_sample_dir.mkdir(exist_ok=True)
 
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(mus_sample_dir)
 
     # Clean up zip file
@@ -61,7 +56,12 @@ def download_and_extract_mus_sample() -> Path:
     return mus_sample_dir
 
 
-def validate_normalization_target(stats: Dict[str, Any], normalization_type: str, target_level: float, tolerance: float = 0.5) -> bool:
+def validate_normalization_target(
+    stats: LoudnessStatisticsWithMetadata,
+    normalization_type: str,
+    target_level: float,
+    tolerance: float = 0.5,
+) -> bool:
     """
     Validate that normalization achieved the target level within tolerance.
 
@@ -85,20 +85,20 @@ def validate_normalization_target(stats: Dict[str, Any], normalization_type: str
             raise ValueError("No EBU statistics found")
 
     elif normalization_type == "rms":
-        actual_level = stats["mean"]
-        if actual_level is None:
+        if stats["mean"] is None:
             raise ValueError("No RMS statistics found")
+        actual_level = stats["mean"]
 
     elif normalization_type == "peak":
-        actual_level = stats["max"]
-        if actual_level is None:
+        if stats["max"] is None:
             raise ValueError("No peak statistics found")
+        actual_level = stats["max"]
 
     else:
         raise ValueError(f"Unknown normalization type: {normalization_type}")
 
     deviation = abs(actual_level - target_level)
-    return deviation <= tolerance
+    return bool(deviation <= tolerance)
 
 
 @pytest.fixture(scope="session")
@@ -136,7 +136,7 @@ class TestFFmpegNormalizeAPI:
                 normalization_type="ebu",
                 target_level=target_level,
                 print_stats=False,
-                audio_codec="aac"  # Use AAC codec for MP4 compatibility
+                audio_codec="aac",  # Use AAC codec for MP4 compatibility
             )
 
             # Add media file and run normalization
@@ -151,7 +151,9 @@ class TestFFmpegNormalizeAPI:
             for stats in media_file.get_stats():
                 assert validate_normalization_target(
                     stats, "ebu", target_level, tolerance=1.0
-                ), f"EBU normalization failed to achieve target {target_level} dB for {test_file.name}. Got {stats.get('ebu_pass2', {}).get('output_i') or stats.get('ebu_pass1', {}).get('output_i')} dB"
+                ), (
+                    f"EBU normalization failed to achieve target {target_level} dB for {test_file.name}. Got {(stats['ebu_pass2']['output_i'] if stats['ebu_pass2'] else None) or (stats['ebu_pass1']['output_i'] if stats['ebu_pass1'] else None)} dB"
+                )
 
     @pytest.mark.slow
     def test_rms_normalization_target_achievement(self, test_files, temp_output_dir):
@@ -166,7 +168,7 @@ class TestFFmpegNormalizeAPI:
                 normalization_type="rms",
                 target_level=target_level,
                 print_stats=False,
-                audio_codec="aac"  # Use AAC codec for MP4 compatibility
+                audio_codec="aac",  # Use AAC codec for MP4 compatibility
             )
 
             # Add media file and run normalization
@@ -181,28 +183,40 @@ class TestFFmpegNormalizeAPI:
             for stats in media_file.get_stats():
                 # For RMS, validate that normalization was attempted (mean is not None)
                 # and the level is reasonable (not too far from target unless clipping prevented it)
-                assert stats["mean"] is not None, f"RMS statistics missing for {test_file.name}"
+                assert stats["mean"] is not None, (
+                    f"RMS statistics missing for {test_file.name}"
+                )
 
                 # Validate that normalization was attempted - the mean should be reasonable
                 # For stem tracks, some channels might be very quiet or empty, so be flexible
-                assert stats["mean"] > -80.0, f"RMS level extremely low: {stats['mean']} dB - possible empty channel"
+                assert stats["mean"] > -80.0, (
+                    f"RMS level extremely low: {stats['mean']} dB - possible empty channel"
+                )
 
                 # For channels with significant content (louder than -40 dB), check normalization effectiveness
-                if stats["mean"] > -40.0:
+                if stats["mean"] is not None and stats["mean"] > -40.0:
                     # If the max peak is close to 0 dB, clipping prevention is expected
-                    if stats["max"] > -1.0:  # Close to clipping
+                    if (
+                        stats["max"] is not None and stats["max"] > -1.0
+                    ):  # Close to clipping
                         # Accept that the target might not be achieved due to clipping prevention
-                        assert stats["mean"] >= target_level - 15.0, f"RMS level too low even with clipping prevention: {stats['mean']} dB"
+                        assert stats["mean"] >= target_level - 15.0, (
+                            f"RMS level too low even with clipping prevention: {stats['mean']} dB"
+                        )
                     else:
                         # If no clipping risk, should be closer to target
                         assert validate_normalization_target(
                             stats, "rms", target_level, tolerance=5.0
-                        ), f"RMS normalization failed to achieve target {target_level} dB for {test_file.name}. Got {stats['mean']} dB"
+                        ), (
+                            f"RMS normalization failed to achieve target {target_level} dB for {test_file.name}. Got {stats['mean']} dB"
+                        )
 
     @pytest.mark.slow
     def test_peak_normalization_target_achievement(self, test_files, temp_output_dir):
         """Test that peak normalization works correctly."""
-        target_level = -3.0  # Use more conservative target to account for codec behavior
+        target_level = (
+            -3.0
+        )  # Use more conservative target to account for codec behavior
 
         for test_file in test_files[:1]:  # Test with first file for now
             output_file = temp_output_dir / f"normalized_peak_{test_file.name}"
@@ -212,7 +226,7 @@ class TestFFmpegNormalizeAPI:
                 normalization_type="peak",
                 target_level=target_level,
                 print_stats=False,
-                audio_codec="aac"  # Use AAC codec for MP4 compatibility
+                audio_codec="aac",  # Use AAC codec for MP4 compatibility
             )
 
             # Add media file and run normalization
@@ -225,18 +239,28 @@ class TestFFmpegNormalizeAPI:
 
             # Get statistics for each audio stream
             for stats in media_file.get_stats():
-                assert stats["max"] is not None, f"Peak statistics missing for {test_file.name}"
+                assert stats["max"] is not None, (
+                    f"Peak statistics missing for {test_file.name}"
+                )
 
                 # Check that peak normalization was attempted
                 # For channels with significant content, the peak should be reasonable
-                if stats["mean"] > -40.0:  # Channel has significant content
+                if (
+                    stats["mean"] is not None and stats["mean"] > -40.0
+                ):  # Channel has significant content
                     # Peak should be within reasonable range of target (allowing for codec effects)
                     # Use more generous tolerance for CI environment differences
-                    assert stats["max"] >= target_level - 10.0, f"Peak level too low: {stats['max']} dB"
-                    assert stats["max"] <= target_level + 5.0, f"Peak level too high: {stats['max']} dB"
+                    assert stats["max"] >= target_level - 10.0, (
+                        f"Peak level too low: {stats['max']} dB"
+                    )
+                    assert stats["max"] <= target_level + 5.0, (
+                        f"Peak level too high: {stats['max']} dB"
+                    )
                 else:
                     # For very quiet channels, just check they're not unreasonably loud
-                    assert stats["max"] <= 0.0, f"Quiet channel unexpectedly loud: {stats['max']} dB"
+                    assert stats["max"] <= 0.0, (
+                        f"Quiet channel unexpectedly loud: {stats['max']} dB"
+                    )
 
     @pytest.mark.slow
     def test_dynamic_vs_linear_ebu_normalization(self, test_files, temp_output_dir):
@@ -251,7 +275,7 @@ class TestFFmpegNormalizeAPI:
             target_level=target_level,
             dynamic=True,
             print_stats=False,
-            audio_codec="aac"  # Use AAC codec for MP4 compatibility
+            audio_codec="aac",  # Use AAC codec for MP4 compatibility
         )
         normalizer_dynamic.add_media_file(str(test_file), str(output_file_dynamic))
         normalizer_dynamic.run_normalization()
@@ -264,7 +288,7 @@ class TestFFmpegNormalizeAPI:
             dynamic=False,
             loudness_range_target=20.0,  # Higher LRA target to allow linear mode
             print_stats=False,
-            audio_codec="aac"  # Use AAC codec for MP4 compatibility
+            audio_codec="aac",  # Use AAC codec for MP4 compatibility
         )
         normalizer_linear.add_media_file(str(test_file), str(output_file_linear))
         normalizer_linear.run_normalization()
@@ -274,16 +298,28 @@ class TestFFmpegNormalizeAPI:
         dynamic_stats = list(normalizer_dynamic.media_files[0].get_stats())[0]
 
         # Validate that both modes achieved target levels
-        assert validate_normalization_target(linear_stats, "ebu", target_level, tolerance=2.0)
-        assert validate_normalization_target(dynamic_stats, "ebu", target_level, tolerance=2.0)
-        
+        assert validate_normalization_target(
+            linear_stats, "ebu", target_level, tolerance=2.0
+        )
+        assert validate_normalization_target(
+            dynamic_stats, "ebu", target_level, tolerance=2.0
+        )
+
         # Validate dynamic mode behavior (should be one-pass only, per commit 76fb27d)
-        assert dynamic_stats["ebu_pass1"] is None, f"Dynamic mode should not have first pass stats. Got: {dynamic_stats['ebu_pass1']}"
-        assert dynamic_stats["ebu_pass2"] is not None, "Dynamic mode should have second pass stats"
-        assert dynamic_stats["ebu_pass2"]["normalization_type"] == "dynamic", "Dynamic mode should use dynamic normalization"
-        
+        assert dynamic_stats["ebu_pass1"] is None, (
+            f"Dynamic mode should not have first pass stats. Got: {dynamic_stats['ebu_pass1']}"
+        )
+        assert dynamic_stats["ebu_pass2"] is not None, (
+            "Dynamic mode should have second pass stats"
+        )
+        assert dynamic_stats["ebu_pass2"]["normalization_type"] == "dynamic", (
+            "Dynamic mode should use dynamic normalization"
+        )
+
         # Linear mode should use two-pass (may revert to dynamic depending on content)
-        assert linear_stats["ebu_pass1"] is not None, "Linear normalization should have first pass stats"
+        assert linear_stats["ebu_pass1"] is not None, (
+            "Linear normalization should have first pass stats"
+        )
 
     @pytest.mark.slow
     def test_normalization_preserves_quality_metrics(self, test_files, temp_output_dir):
@@ -296,7 +332,7 @@ class TestFFmpegNormalizeAPI:
             normalization_type="ebu",
             target_level=target_level,
             print_stats=False,
-            audio_codec="aac"  # Use AAC codec for MP4 compatibility
+            audio_codec="aac",  # Use AAC codec for MP4 compatibility
         )
 
         normalizer.add_media_file(str(test_file), str(output_file))
@@ -305,21 +341,27 @@ class TestFFmpegNormalizeAPI:
         stats = list(normalizer.media_files[0].get_stats())[0]
 
         # Check that important EBU metrics are present and reasonable
-        if stats["ebu_pass2"]:
-            ebu_stats = stats["ebu_pass2"]
-        else:
-            ebu_stats = stats["ebu_pass1"]
+        ebu_stats = (
+            stats["ebu_pass2"] if stats["ebu_pass2"] is not None else stats["ebu_pass1"]
+        )
+        assert ebu_stats is not None, "No EBU statistics found"
 
         # True peak should be within reasonable range
         # Use more generous tolerance for CI environment differences
-        assert -12.0 <= ebu_stats["output_tp"] <= 0.0, f"True peak out of range: {ebu_stats['output_tp']}"
+        assert -12.0 <= ebu_stats["output_tp"] <= 0.0, (
+            f"True peak out of range: {ebu_stats['output_tp']}"
+        )
 
         # Loudness range should be preserved or adjusted reasonably
-        assert 0.0 <= ebu_stats["output_lra"] <= 30.0, f"LRA out of range: {ebu_stats['output_lra']}"
+        assert 0.0 <= ebu_stats["output_lra"] <= 30.0, (
+            f"LRA out of range: {ebu_stats['output_lra']}"
+        )
 
         # Target offset should be reasonable
         if "target_offset" in ebu_stats:
-            assert -10.0 <= ebu_stats["target_offset"] <= 10.0, f"Target offset extreme: {ebu_stats['target_offset']}"
+            assert -10.0 <= ebu_stats["target_offset"] <= 10.0, (
+                f"Target offset extreme: {ebu_stats['target_offset']}"
+            )
 
     @pytest.mark.slow
     def test_multiple_files_batch_processing(self, test_files, temp_output_dir):
@@ -330,7 +372,7 @@ class TestFFmpegNormalizeAPI:
             normalization_type="ebu",
             target_level=target_level,
             print_stats=False,
-            audio_codec="aac"  # Use AAC codec for MP4 compatibility
+            audio_codec="aac",  # Use AAC codec for MP4 compatibility
         )
 
         # Add multiple files

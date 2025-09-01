@@ -1,16 +1,36 @@
 # Installation
 
-## Python Package
+## Via `uv` (recommended)
+
+Install `uv` from [their website](https://docs.astral.sh/uv/getting-started/installation/).
+
+Then run:
+
+```bash
+uvx ffmpeg-normalize
+```
+
+That's it.
+
+## Via `pipx`
+
+Install `pipx` from [their website](https://pipx.pypa.io/latest/installation/).
+
+Then run:
+
+```bash
+pipx install ffmpeg-normalize
+```
+
+## Via `pip`
 
 For Python 3 and pip:
 
 ```bash
-pip3 install ffmpeg-normalize
+pip3 install --user ffmpeg-normalize
 ```
 
-Or download this repository, then run `pip3 install .`.
-
-To later upgrade to the latest version, run `pip3 install --upgrade ffmpeg-normalize`.
+To later upgrade to the latest version, run `pip3 install --upgrade --user ffmpeg-normalize`.
 
 ## Shell Completions
 
