@@ -4,4 +4,8 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
-      - id: ruff-format
+      - id: ruff-format  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.1.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
