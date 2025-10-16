@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.17">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.84d31ad4.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1870,7 +1870,13 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <p>Range is -99.0 - +99.0.</p>
 <h3 id="-lower-only"><code>--lower-only</code></h3>
 <p>Whether the audio should not increase in loudness.</p>
-<p>If the measured loudness from the first pass is lower than the target loudness then normalization pass will be skipped for the measured audio source.</p>
+<p>If the measured loudness from the first pass is lower than the target loudness then normalization will be skipped for the audio source.</p>
+<p>This option works with all normalization types:</p>
+<ul>
+<li>For <strong>EBU</strong> normalization, this compares input integrated loudness to the target level.</li>
+<li>For <strong>peak</strong> normalization, this compares the input peak level to the target level.</li>
+<li>For <strong>RMS</strong> normalization, this compares the input RMS level to the target level.</li>
+</ul>
 <h3 id="-auto-lower-loudness-target"><code>--auto-lower-loudness-target</code></h3>
 <p>Automatically lower EBU Integrated Loudness Target.</p>
 <p>Automatically lower EBU Integrated Loudness Target to prevent falling back to dynamic filtering.</p>
@@ -1996,7 +2002,7 @@ the system default or you can provide a file name available on $PATH</p>
       <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.sections"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.92b07e13.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
     
   </body>
