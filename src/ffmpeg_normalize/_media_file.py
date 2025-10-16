@@ -645,8 +645,15 @@ class MediaFile:
             ebu_pass_2_stats = list(
                 AudioStream.prune_and_parse_loudnorm_output(output).values()
             )
-            for idx, audio_stream in enumerate(self.streams["audio"].values()):
-                audio_stream.set_second_pass_stats(ebu_pass_2_stats[idx])
+            # Only set second pass stats if they exist (they might not if all streams were skipped with --lower-only)
+            if len(ebu_pass_2_stats) == len(self.streams["audio"]):
+                for idx, audio_stream in enumerate(self.streams["audio"].values()):
+                    audio_stream.set_second_pass_stats(ebu_pass_2_stats[idx])
+            else:
+                _logger.debug(
+                    f"Expected {len(self.streams['audio'])} EBU pass 2 statistics but got {len(ebu_pass_2_stats)}. "
+                    "This can happen when normalization is skipped (e.g., with --lower-only)."
+                )
 
         # warn if self.media_file.ffmpeg_normalize.dynamic == False and any of the second pass stats contain "normalization_type" == "dynamic"
         if self.ffmpeg_normalize.dynamic is False:
