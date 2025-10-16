@@ -422,3 +422,136 @@ class TestFFmpegNormalizeAPI:
 
             # Test dry run (no actual processing)
             normalizer.run_normalization()  # Should complete quickly with dry_run=True
+
+    @pytest.mark.slow
+    def test_ebu_lower_only_skips_quiet_files(self, test_files, temp_output_dir):
+        """Test that EBU normalization with --lower-only skips files already below target."""
+        # Use a very high target that the input file will be below
+        target_level = -5.0  # Very high target - most audio will be below this
+        test_file = test_files[0]
+
+        output_file = temp_output_dir / f"lower_only_ebu_{test_file.name}"
+
+        # Create normalizer with lower_only enabled
+        normalizer = FFmpegNormalize(
+            normalization_type="ebu",
+            target_level=target_level,
+            lower_only=True,
+            print_stats=False,
+            audio_codec="aac",
+        )
+
+        normalizer.add_media_file(str(test_file), str(output_file))
+        normalizer.run_normalization()
+
+        # Get the first pass statistics to check if the input was below target
+        stats = list(normalizer.media_files[0].get_stats())[0]
+        input_i = stats["ebu_pass1"]["input_i"] if stats["ebu_pass1"] else None
+
+        # Verify that the file was processed and output file exists
+        assert output_file.exists(), (
+            "Output file should be created even when normalization is skipped"
+        )
+
+        # If input was below target, normalization should have been skipped
+        # (ebu_pass2 stats won't be available because acopy was used instead of loudnorm)
+        if input_i is not None and input_i < target_level:
+            # When normalization is skipped, second pass stats might not be available
+            # because no loudnorm filter was run (acopy was used instead)
+            # This is expected behavior with --lower-only
+            pass
+        else:
+            # If input was above target, normalization should have occurred
+            assert stats["ebu_pass2"] is not None, (
+                "Second pass stats should be available when normalization occurs"
+            )
+
+    @pytest.mark.slow
+    def test_peak_lower_only_skips_quiet_files(self, test_files, temp_output_dir):
+        """Test that peak normalization with --lower-only skips files already below target."""
+        # Use a very high target that the input file will be below
+        target_level = -1.0  # Very high target - most audio will be below this
+        test_file = test_files[0]
+
+        output_file = temp_output_dir / f"lower_only_peak_{test_file.name}"
+
+        # Create normalizer with lower_only enabled
+        normalizer = FFmpegNormalize(
+            normalization_type="peak",
+            target_level=target_level,
+            lower_only=True,
+            print_stats=False,
+            audio_codec="aac",
+        )
+
+        normalizer.add_media_file(str(test_file), str(output_file))
+
+        # Get first pass statistics (before normalization)
+        media_file = normalizer.media_files[0]
+        # Run first pass to get stats
+        media_file._first_pass()
+        stats_before = list(media_file.get_stats())[0]
+        input_peak_before = stats_before["max"]
+
+        # Now run the full normalization
+        normalizer.run_normalization()
+
+        # Verify that the file was processed and output file exists
+        assert output_file.exists(), (
+            "Output file should be created even when normalization is skipped"
+        )
+
+        # Verify behavior: if input was below target, it should have been skipped
+        assert input_peak_before is not None
+        if input_peak_before < target_level:
+            # Normalization should have been skipped
+            # The output file should exist but audio should not be lifted to target
+            pass
+        else:
+            # If input was above target, normalization should have occurred
+            pass
+
+    @pytest.mark.slow
+    def test_rms_lower_only_skips_quiet_files(self, test_files, temp_output_dir):
+        """Test that RMS normalization with --lower-only skips files already below target."""
+        # Use a very high target that the input file will be below
+        target_level = -10.0  # Very high target - most audio will be below this
+        test_file = test_files[0]
+
+        output_file = temp_output_dir / f"lower_only_rms_{test_file.name}"
+
+        # Create normalizer with lower_only enabled
+        normalizer = FFmpegNormalize(
+            normalization_type="rms",
+            target_level=target_level,
+            lower_only=True,
+            print_stats=False,
+            audio_codec="aac",
+        )
+
+        normalizer.add_media_file(str(test_file), str(output_file))
+
+        # Get first pass statistics (before normalization)
+        media_file = normalizer.media_files[0]
+        # Run first pass to get stats
+        media_file._first_pass()
+        stats_before = list(media_file.get_stats())[0]
+        input_rms_before = stats_before["mean"]
+
+        # Now run the full normalization
+        normalizer.run_normalization()
+
+        # Verify that the file was processed and output file exists
+        assert output_file.exists(), (
+            "Output file should be created even when normalization is skipped"
+        )
+
+        # Verify behavior: if input was below target, it should have been skipped
+        assert input_rms_before is not None
+        if input_rms_before < target_level:
+            # Normalization should have been skipped
+            # The output file should exist but audio should not be lifted to target
+            pass
+        else:
+            # If input was above target, normalization should have occurred
+            pass

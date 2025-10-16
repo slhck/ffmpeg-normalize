@@ -261,8 +261,11 @@ def create_parser() -> argparse.ArgumentParser:
         Whether the audio should not increase in loudness.
 
         If the measured loudness from the first pass is lower than the target
-        loudness then normalization pass will be skipped for the measured audio
-        source.
+        loudness then normalization will be skipped for the audio source.
+
+        For EBU normalization, this compares input integrated loudness to the target level.
+        For peak normalization, this compares the input peak level to the target level.
+        For RMS normalization, this compares the input RMS level to the target level.
         """
         ),
     )
