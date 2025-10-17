@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "ffmpeg-normalize"
-version = "1.33.2"
+version = "1.33.3"
 description = "Normalize audio via ffmpeg"
 readme = "README.md"
 license = "MIT"

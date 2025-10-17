@@ -1,3 +1,10 @@
+## [1.33.3] - 2025-10-17
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove old gitchangelog templates
+- Add python 3.14 support, remove old license classifier
+- Bump version to 1.33.3
 ## [1.33.2] - 2025-10-16
 
 ### 🐛 Bug Fixes
