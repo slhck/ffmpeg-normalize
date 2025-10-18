@@ -84,6 +84,9 @@ class FFmpegNormalize:
         debug (bool, optional): Debug. Defaults to False.
         progress (bool, optional): Progress. Defaults to False.
         replaygain (bool, optional): Write ReplayGain tags without normalizing. Defaults to False.
+        audio_streams (list[int] | None, optional): List of audio stream indices to normalize. Defaults to None (all streams).
+        audio_default_only (bool, optional): Only normalize audio streams with default disposition. Defaults to False.
+        keep_other_audio (bool, optional): Keep non-selected audio streams in output (copy without normalization). Defaults to False.
 
     Raises:
         FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
@@ -124,6 +127,9 @@ class FFmpegNormalize:
         debug: bool = False,
         progress: bool = False,
         replaygain: bool = False,
+        audio_streams: list[int] | None = None,
+        audio_default_only: bool = False,
+        keep_other_audio: bool = False,
     ):
         self.ffmpeg_exe = get_ffmpeg_exe()
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
@@ -207,6 +213,11 @@ class FFmpegNormalize:
         self.progress = progress
         self.replaygain = replaygain
 
+        # Stream selection options
+        self.audio_streams = audio_streams
+        self.audio_default_only = audio_default_only
+        self.keep_other_audio = keep_other_audio
+
         if (
             self.audio_codec is None or "pcm" in self.audio_codec
         ) and self.output_format in PCM_INCOMPATIBLE_FORMATS:
@@ -219,6 +230,19 @@ class FFmpegNormalize:
         if self.replaygain and self.normalization_type != "ebu":
             raise FFmpegNormalizeError(
                 "ReplayGain only works for EBU normalization type for now."
+            )
+
+        # Validate stream selection options
+        if self.audio_streams is not None and self.audio_default_only:
+            raise FFmpegNormalizeError(
+                "Cannot use both audio_streams and audio_default_only together."
+            )
+
+        if self.keep_other_audio and self.keep_original_audio:
+            raise FFmpegNormalizeError(
+                "Cannot use both --keep-other-audio and --keep-original-audio together. "
+                "Use --keep-original-audio to keep all original streams alongside normalized ones, "
+                "or --keep-other-audio to keep only non-selected streams as passthrough."
             )
 
         self.stats: list[LoudnessStatisticsWithMetadata] = []

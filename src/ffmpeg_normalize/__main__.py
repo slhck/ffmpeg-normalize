@@ -315,6 +315,44 @@ def create_parser() -> argparse.ArgumentParser:
         ),
     )
 
+    group_stream_selection = parser.add_argument_group("Audio Stream Selection")
+    group_stream_selection.add_argument(
+        "-as",
+        "--audio-streams",
+        type=str,
+        help=textwrap.dedent(
+            """\
+        Select specific audio streams to normalize by stream index (comma-separated).
+        Example: --audio-streams 0,2 will normalize only streams 0 and 2.
+
+        By default, all audio streams are normalized.
+        """
+        ),
+    )
+    group_stream_selection.add_argument(
+        "--audio-default-only",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Only normalize audio streams with the 'default' disposition flag.
+        This is useful for files with multiple audio tracks where only the main track
+        should be normalized (e.g., keeping commentary tracks unchanged).
+        """
+        ),
+    )
+    group_stream_selection.add_argument(
+        "--keep-other-audio",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Keep non-selected audio streams in the output file (copy without normalization).
+        Only applies when --audio-streams or --audio-default-only is used.
+
+        By default, only selected streams are included in the output.
+        """
+        ),
+    )
+
     group_acodec = parser.add_argument_group("Audio Encoding")
     group_acodec.add_argument(
         "-c:a",
@@ -553,6 +591,18 @@ def main() -> None:
     extra_input_options = _split_options(cli_args.extra_input_options)
     extra_output_options = _split_options(cli_args.extra_output_options)
 
+    # parse audio streams selection
+    audio_streams = None
+    if cli_args.audio_streams:
+        try:
+            audio_streams = [int(s.strip()) for s in cli_args.audio_streams.split(",")]
+        except ValueError:
+            error("Invalid audio stream indices. Must be comma-separated integers.")
+
+    # validate stream selection options
+    if cli_args.audio_default_only and cli_args.audio_streams:
+        error("Cannot use both --audio-default-only and --audio-streams together.")
+
     ffmpeg_normalize = FFmpegNormalize(
         normalization_type=cli_args.normalization_type,
         target_level=cli_args.target_level,
@@ -586,6 +636,9 @@ def main() -> None:
         dry_run=cli_args.dry_run,
         progress=cli_args.progress,
         replaygain=cli_args.replaygain,
+        audio_streams=audio_streams,
+        audio_default_only=cli_args.audio_default_only,
+        keep_other_audio=cli_args.keep_other_audio,
     )
 
     if cli_args.output and len(cli_args.input) > len(cli_args.output):

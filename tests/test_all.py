@@ -526,3 +526,76 @@ class TestFFmpegNormalize:
             # git checkout the files!
             for file in REPLAYGAIN_FILES:
                 subprocess.run(["git", "checkout", file], check=False)
+
+    def test_audio_streams_single(self):
+        """Test normalizing only a single audio stream"""
+        ffmpeg_normalize_call(["tests/test.mp4", "-as", "1", "-nt", "ebu"])
+        assert os.path.isfile("normalized/test.mkv")
+        # Check that output has only 1 audio stream
+        streams = _get_stream_info("normalized/test.mkv")
+        audio_streams = [s for s in streams if s["codec_type"] == "audio"]
+        assert len(audio_streams) == 1
+        # Verify stats show only one stream was normalized
+        stats = _get_stats("normalized/test.mkv", "ebu")
+        assert len(stats) == 1
+        assert stats[0]["stream_id"] == 1
+
+    def test_audio_streams_multiple(self):
+        """Test normalizing multiple specific audio streams"""
+        ffmpeg_normalize_call(["tests/test.mp4", "-as", "1,2", "-nt", "ebu"])
+        assert os.path.isfile("normalized/test.mkv")
+        # Check that output has 2 audio streams
+        streams = _get_stream_info("normalized/test.mkv")
+        audio_streams = [s for s in streams if s["codec_type"] == "audio"]
+        assert len(audio_streams) == 2
+        # Verify stats show both streams were normalized
+        stats = _get_stats("normalized/test.mkv", "ebu")
+        assert len(stats) == 2
+
+    def test_audio_streams_with_keep_other(self):
+        """Test normalizing one stream while keeping others as passthrough"""
+        ffmpeg_normalize_call(
+            ["tests/test.mp4", "-as", "1", "--keep-other-audio", "-nt", "ebu"]
+        )
+        assert os.path.isfile("normalized/test.mkv")
+        # Check that output has 2 audio streams (1 normalized, 1 passthrough)
+        streams = _get_stream_info("normalized/test.mkv")
+        audio_streams = [s for s in streams if s["codec_type"] == "audio"]
+        assert len(audio_streams) == 2
+        # First audio stream should be normalized (PCM or similar)
+        assert "pcm" in audio_streams[0]["codec_name"]
+        # Second audio stream should be copied (ac3)
+        assert audio_streams[1]["codec_name"] == "ac3"
+
+    def test_audio_default_only(self):
+        """Test normalizing only default audio streams"""
+        # Note: test.mp4 has both audio streams marked as default
+        ffmpeg_normalize_call(["tests/test.mp4", "--audio-default-only", "-nt", "ebu"])
+        assert os.path.isfile("normalized/test.mkv")
+        # Since both streams are default, both should be normalized
+        streams = _get_stream_info("normalized/test.mkv")
+        audio_streams = [s for s in streams if s["codec_type"] == "audio"]
+        assert len(audio_streams) == 2
+        # Verify stats show both streams were normalized
+        stats = _get_stats("normalized/test.mkv", "ebu")
+        assert len(stats) == 2
+
+    def test_audio_streams_invalid_option_combination(self):
+        """Test that using both --audio-streams and --audio-default-only fails"""
+        _, stderr = ffmpeg_normalize_call(
+            ["tests/test.mp4", "-as", "1", "--audio-default-only"]
+        )
+        assert "Cannot use both" in stderr
+
+    def test_keep_other_and_keep_original_conflict(self):
+        """Test that using both --keep-other-audio and --keep-original-audio fails"""
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test.mp4",
+                "-as",
+                "1",
+                "--keep-other-audio",
+                "--keep-original-audio",
+            ]
+        )
+        assert "Cannot use both" in stderr

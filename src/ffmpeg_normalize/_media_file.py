@@ -136,6 +136,18 @@ class MediaFile:
 
         output_lines = [line.strip() for line in output.split("\n")]
 
+        # First pass: parse disposition flags for each stream
+        stream_dispositions: dict[int, bool] = {}
+
+        for line in output_lines:
+            if line.startswith("Stream"):
+                if stream_id_match := re.search(r"#0:([\d]+)", line):
+                    stream_id = int(stream_id_match.group(1))
+                    # Check if (default) appears on the Stream line
+                    is_default = "(default)" in line
+                    stream_dispositions[stream_id] = is_default
+
+        # Second pass: parse stream information
         duration = None
         for line in output_lines:
             if "Duration" in line:
@@ -155,8 +167,12 @@ class MediaFile:
             else:
                 continue
 
+            is_default = stream_dispositions.get(stream_id, False)
+
             if "Audio" in line:
-                _logger.debug(f"Found audio stream at index {stream_id}")
+                _logger.debug(
+                    f"Found audio stream at index {stream_id} (default: {is_default})"
+                )
                 sample_rate_match = re.search(r"(\d+) Hz", line)
                 sample_rate = (
                     int(sample_rate_match.group(1)) if sample_rate_match else None
@@ -170,6 +186,7 @@ class MediaFile:
                     sample_rate,
                     bit_depth,
                     duration,
+                    is_default,
                 )
 
             elif "Video" in line:
@@ -200,6 +217,53 @@ class MediaFile:
             self.streams["audio"] = {first_stream.stream_id: first_stream}
             self.streams["video"] = {}
             self.streams["subtitle"] = {}
+
+    def _get_streams_to_normalize(self) -> list[AudioStream]:
+        """
+        Determine which audio streams to normalize based on configuration.
+
+        Returns:
+            list[AudioStream]: List of audio streams to normalize
+        """
+        all_audio_streams = list(self.streams["audio"].values())
+
+        if self.ffmpeg_normalize.audio_streams is not None:
+            # User specified specific stream indices
+            selected_streams = [
+                stream
+                for stream in all_audio_streams
+                if stream.stream_id in self.ffmpeg_normalize.audio_streams
+            ]
+            if not selected_streams:
+                _logger.warning(
+                    f"No audio streams found matching indices {self.ffmpeg_normalize.audio_streams}. "
+                    f"Available streams: {[s.stream_id for s in all_audio_streams]}"
+                )
+            else:
+                _logger.info(
+                    f"Normalizing selected audio streams: {[s.stream_id for s in selected_streams]}"
+                )
+            return selected_streams
+
+        elif self.ffmpeg_normalize.audio_default_only:
+            # Only normalize streams with default disposition
+            default_streams = [
+                stream for stream in all_audio_streams if stream.is_default
+            ]
+            if not default_streams:
+                _logger.warning(
+                    "No audio streams with 'default' disposition found. "
+                    f"Available streams: {[s.stream_id for s in all_audio_streams]}"
+                )
+            else:
+                _logger.info(
+                    f"Normalizing default audio streams: {[s.stream_id for s in default_streams]}"
+                )
+            return default_streams
+
+        else:
+            # Normalize all streams (default behavior)
+            return all_audio_streams
 
     def run_normalization(self) -> None:
         """
@@ -400,7 +464,9 @@ class MediaFile:
         """
         _logger.debug(f"Parsing normalization info for {self.input_file}")
 
-        for index, audio_stream in enumerate(self.streams["audio"].values()):
+        streams_to_normalize = self._get_streams_to_normalize()
+
+        for index, audio_stream in enumerate(streams_to_normalize):
             if self.ffmpeg_normalize.normalization_type == "ebu":
                 fun = getattr(audio_stream, "parse_loudnorm_stats")
             else:
@@ -410,7 +476,7 @@ class MediaFile:
                 with tqdm(
                     total=100,
                     position=1,
-                    desc=f"Stream {index + 1}/{len(self.streams['audio'].values())}",
+                    desc=f"Stream {index + 1}/{len(streams_to_normalize)}",
                     bar_format=TQDM_BAR_FORMAT,
                 ) as pbar:
                     for progress in fun():
@@ -429,7 +495,9 @@ class MediaFile:
         filter_chains = []
         output_labels = []
 
-        for audio_stream in self.streams["audio"].values():
+        streams_to_normalize = self._get_streams_to_normalize()
+
+        for audio_stream in streams_to_normalize:
             skip_normalization = False
             if self.ffmpeg_normalize.lower_only:
                 if self.ffmpeg_normalize.normalization_type == "ebu":
@@ -551,29 +619,66 @@ class MediaFile:
                         f"The chosen output extension {self.output_ext} does not support video/cover art. It will be disabled."
                     )
 
+        # Determine streams to normalize and passthrough
+        streams_to_normalize = self._get_streams_to_normalize()
+        all_audio_streams = list(self.streams["audio"].values())
+
+        # Determine which streams to passthrough
+        if self.ffmpeg_normalize.keep_other_audio and (
+            self.ffmpeg_normalize.audio_streams is not None
+            or self.ffmpeg_normalize.audio_default_only
+        ):
+            streams_to_passthrough = [
+                s for s in all_audio_streams if s not in streams_to_normalize
+            ]
+        else:
+            streams_to_passthrough = []
+
         # ... and map the output of the normalization filters
         for ol in output_labels:
             cmd.extend(["-map", ol])
 
-        # set audio codec (never copy)
-        if self.ffmpeg_normalize.audio_codec:
-            cmd.extend(["-c:a", self.ffmpeg_normalize.audio_codec])
-        else:
-            for index, (_, audio_stream) in enumerate(self.streams["audio"].items()):
-                cmd.extend([f"-c:a:{index}", audio_stream.get_pcm_codec()])
+        # ... and map passthrough audio streams (copy without normalization)
+        for stream in streams_to_passthrough:
+            cmd.extend(["-map", f"0:{stream.stream_id}"])
 
-        # other audio options (if any)
+        # Track output audio stream index for codec assignment
+        output_audio_idx = 0
+
+        # set audio codec for normalized streams
+        for audio_stream in streams_to_normalize:
+            if self.ffmpeg_normalize.audio_codec:
+                codec = self.ffmpeg_normalize.audio_codec
+            else:
+                codec = audio_stream.get_pcm_codec()
+            cmd.extend([f"-c:a:{output_audio_idx}", codec])
+            output_audio_idx += 1
+
+        # set audio codec for passthrough streams (always copy)
+        for _ in streams_to_passthrough:
+            cmd.extend([f"-c:a:{output_audio_idx}", "copy"])
+            output_audio_idx += 1
+
+        # other audio options (if any) - only apply to normalized streams
         if self.ffmpeg_normalize.audio_bitrate:
             if self.ffmpeg_normalize.audio_codec == "libvorbis":
                 # libvorbis takes just a "-b" option, for some reason
                 # https://github.com/slhck/ffmpeg-normalize/issues/277
                 cmd.extend(["-b", str(self.ffmpeg_normalize.audio_bitrate)])
             else:
-                cmd.extend(["-b:a", str(self.ffmpeg_normalize.audio_bitrate)])
+                # Only apply to normalized streams
+                for idx in range(len(streams_to_normalize)):
+                    cmd.extend(
+                        [f"-b:a:{idx}", str(self.ffmpeg_normalize.audio_bitrate)]
+                    )
         if self.ffmpeg_normalize.sample_rate:
-            cmd.extend(["-ar", str(self.ffmpeg_normalize.sample_rate)])
+            # Only apply to normalized streams
+            for idx in range(len(streams_to_normalize)):
+                cmd.extend([f"-ar:a:{idx}", str(self.ffmpeg_normalize.sample_rate)])
         if self.ffmpeg_normalize.audio_channels:
-            cmd.extend(["-ac", str(self.ffmpeg_normalize.audio_channels)])
+            # Only apply to normalized streams
+            for idx in range(len(streams_to_normalize)):
+                cmd.extend([f"-ac:a:{idx}", str(self.ffmpeg_normalize.audio_channels)])
 
         # ... and subtitles
         if not self.ffmpeg_normalize.subtitle_disable:
@@ -583,10 +688,11 @@ class MediaFile:
             cmd.extend(["-c:s", "copy"])
 
         if self.ffmpeg_normalize.keep_original_audio:
-            highest_index = len(self.streams["audio"])
+            # Map all original audio streams after normalized and passthrough streams
             for index, _ in enumerate(self.streams["audio"].items()):
                 cmd.extend(["-map", f"0:a:{index}"])
-                cmd.extend([f"-c:a:{highest_index + index}", "copy"])
+                cmd.extend([f"-c:a:{output_audio_idx}", "copy"])
+                output_audio_idx += 1
 
         # extra options (if any)
         if self.ffmpeg_normalize.extra_output_options:
@@ -645,13 +751,14 @@ class MediaFile:
             ebu_pass_2_stats = list(
                 AudioStream.prune_and_parse_loudnorm_output(output).values()
             )
-            # Only set second pass stats if they exist (they might not if all streams were skipped with --lower-only)
-            if len(ebu_pass_2_stats) == len(self.streams["audio"]):
-                for idx, audio_stream in enumerate(self.streams["audio"].values()):
+            # Only set second pass stats for streams that were actually normalized
+            streams_to_normalize = self._get_streams_to_normalize()
+            if len(ebu_pass_2_stats) == len(streams_to_normalize):
+                for idx, audio_stream in enumerate(streams_to_normalize):
                     audio_stream.set_second_pass_stats(ebu_pass_2_stats[idx])
             else:
                 _logger.debug(
-                    f"Expected {len(self.streams['audio'])} EBU pass 2 statistics but got {len(ebu_pass_2_stats)}. "
+                    f"Expected {len(streams_to_normalize)} EBU pass 2 statistics but got {len(ebu_pass_2_stats)}. "
                     "This can happen when normalization is skipped (e.g., with --lower-only)."
                 )
 

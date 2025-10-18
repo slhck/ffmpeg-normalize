@@ -187,6 +187,32 @@ Set the number of audio channels. If not specified, the input channel layout wil
 
 Copy original, non-normalized audio streams to output file
 
+## Audio Stream Selection
+
+### `-as AUDIO_STREAMS, --audio-streams AUDIO_STREAMS`
+
+Select specific audio streams to normalize by stream index (comma-separated).
+
+Example: `-as 1` normalizes only stream 1, `-as 1,2` normalizes streams 1 and 2.
+
+If not specified, all audio streams will be normalized (default behavior).
+
+### `--audio-default-only`
+
+Only normalize audio streams with the 'default' disposition flag.
+
+This is useful for files with multiple audio tracks where only the default track should be normalized (e.g., main audio track vs. commentary tracks).
+
+### `--keep-other-audio`
+
+Keep non-selected audio streams in the output file (copy without normalization).
+
+Must be combined with either `-as`/`--audio-streams` or `--audio-default-only`.
+
+Example: `ffmpeg-normalize input.mkv -as 1 --keep-other-audio` will normalize stream 1 and copy all other audio streams unchanged.
+
+**Note:** This option is mutually exclusive with `--keep-original-audio`. Use `--keep-original-audio` to keep all original streams alongside normalized ones, or `--keep-other-audio` to keep only non-selected streams as passthrough.
+
 ### `-prf PRE_FILTER, --pre-filter PRE_FILTER`
 
 Add an audio filter chain before applying normalization.

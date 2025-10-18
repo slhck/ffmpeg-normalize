@@ -99,6 +99,7 @@ class AudioStream(MediaStream):
         sample_rate: int | None,
         bit_depth: int | None,
         duration: float | None,
+        is_default: bool = False,
     ):
         """
         Create an AudioStream object.
@@ -110,6 +111,7 @@ class AudioStream(MediaStream):
             sample_rate (int): sample rate in Hz
             bit_depth (int): bit depth in bits
             duration (float): duration in seconds
+            is_default (bool): Whether this stream has the default disposition flag
         """
         super().__init__(ffmpeg_normalize, media_file, "audio", stream_id)
 
@@ -124,6 +126,7 @@ class AudioStream(MediaStream):
         self.bit_depth = bit_depth
 
         self.duration = duration
+        self.is_default = is_default
 
     @staticmethod
     def _constrain(
