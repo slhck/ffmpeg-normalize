@@ -238,16 +238,25 @@ class AudioStream(MediaStream):
             self.media_file.ffmpeg_normalize.ffmpeg_exe,
             "-hide_banner",
             "-y",
-            "-i",
-            self.media_file.input_file,
-            "-filter_complex",
-            filter_str,
-            "-vn",
-            "-sn",
-            "-f",
-            "null",
-            os.devnull,
         ]
+
+        # Add extra input options if specified
+        if self.media_file.ffmpeg_normalize.extra_input_options:
+            cmd.extend(self.media_file.ffmpeg_normalize.extra_input_options)
+
+        cmd.extend(
+            [
+                "-i",
+                self.media_file.input_file,
+                "-filter_complex",
+                filter_str,
+                "-vn",
+                "-sn",
+                "-f",
+                "null",
+                os.devnull,
+            ]
+        )
 
         cmd_runner = CommandRunner()
         yield from cmd_runner.run_ffmpeg_command(cmd)
@@ -307,18 +316,27 @@ class AudioStream(MediaStream):
             self.media_file.ffmpeg_normalize.ffmpeg_exe,
             "-hide_banner",
             "-y",
-            "-i",
-            self.media_file.input_file,
-            "-map",
-            f"0:{self.stream_id}",
-            "-filter_complex",
-            filter_str,
-            "-vn",
-            "-sn",
-            "-f",
-            "null",
-            os.devnull,
         ]
+
+        # Add extra input options if specified
+        if self.media_file.ffmpeg_normalize.extra_input_options:
+            cmd.extend(self.media_file.ffmpeg_normalize.extra_input_options)
+
+        cmd.extend(
+            [
+                "-i",
+                self.media_file.input_file,
+                "-map",
+                f"0:{self.stream_id}",
+                "-filter_complex",
+                filter_str,
+                "-vn",
+                "-sn",
+                "-f",
+                "null",
+                os.devnull,
+            ]
+        )
 
         cmd_runner = CommandRunner()
         yield from cmd_runner.run_ffmpeg_command(cmd)
