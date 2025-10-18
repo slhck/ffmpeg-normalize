@@ -1,3 +1,16 @@
+## [1.33.4] - 2025-10-18
+
+### 🐛 Bug Fixes
+
+- Apply extra input options to first pass, fixes #294
+
+### 📚 Documentation
+
+- Update intro
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.33.4
 ## [1.33.3] - 2025-10-17
 
 ### ⚙️ Miscellaneous Tasks
