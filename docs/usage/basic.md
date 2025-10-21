@@ -6,11 +6,29 @@ Supply one or more input files, and optionally, output file names:
 ffmpeg-normalize input [input ...][-h][-o OUTPUT [OUTPUT ...]] [options]
 ```
 
-Example:
+A very simple normalization command looks like this:
 
 ```bash
-ffmpeg-normalize 1.wav 2.wav -o 1-normalized.m4a 2-normalized.m4a -c:a aac -b:a 192k
+ffmpeg-normalize input.mp3
 ```
 
-For more information on the options (`[options]`) available, run `ffmpeg-normalize -h`, or read the [Options](options.md) page.
+This creates `normalized/input.mkv` with EBU R128 normalization (target: -23 LUFS) using PCM audio.
 
+You can customize the normalization and output format with various options, as described below.
+
+```bash
+ffmpeg-normalize input.mp3 -c:a aac -b:a 192k
+```
+
+This uses the AAC codec at 192 kbps bitrate instead of PCM to keep file size manageable.
+
+To process multiple files, just list them all as input using wildcards (Linux):
+
+```bash
+ffmpeg-normalize *.mp3 -c:a libmp3lame -b:a 320k -ext mp3
+```
+
+This normalizes all MP3 files in the current directory, outputs as MP3 at 320 kbps.
+
+For the complete list of options, run `ffmpeg-normalize -h` or read the [detailed options page](options.md).
+You can also find more examples in the [examples page](examples.md).

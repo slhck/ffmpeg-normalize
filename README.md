@@ -14,12 +14,31 @@ This program normalizes media files to a certain loudness level using the EBU R1
 
 ## ✨ Features
 
-- EBU R128 loudness normalization (two-pass by default, with an option for one-pass dynamic normalization)
-- RMS-based normalization
-- Peak normalization
-- Video file support
-- Docker support
-- Python API
+- **EBU R128 loudness normalization** — Two-pass by default, with an option for one-pass dynamic normalization
+- **RMS-based normalization** — Adjust audio to a specific RMS level
+- **Peak normalization** — Adjust audio to a specific peak level
+- **Selective audio stream normalization** — Normalize specific audio streams or only default streams
+- **Video file support** — Process video files while preserving video streams
+- **Docker support** — Run via Docker container
+- **Python API** — Use programmatically in your Python projects
+- **Shell completions** — Available for bash, zsh, and fish
+
+## 🆕 What's New
+
+**Version 1.34.0** brings selective audio stream normalization! You can now:
+
+- **Normalize specific audio streams** with `-as/--audio-streams` (e.g., `-as 1,2` to normalize only streams 1 and 2)
+- **Normalize only default audio streams** with `--audio-default-only` (useful for files with multiple language tracks)
+- **Keep other streams unchanged** with `--keep-other-audio` (copy non-selected streams without normalization)
+
+Example: `ffmpeg-normalize input.mkv -as 1 --keep-other-audio` normalizes stream 1 and copies all other audio streams unchanged.
+
+**Recent additions:**
+
+- **Shell completions** (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the [completions](completions/) directory for installation instructions.
+- **`--lower-only` option** — Prevent audio from increasing in loudness, only lower it if needed (works with all normalization types).
+
+See the [full changelog](https://github.com/slhck/ffmpeg-normalize/blob/master/CHANGELOG.md) for all updates.
 
 ## 🚀 Quick Start
 

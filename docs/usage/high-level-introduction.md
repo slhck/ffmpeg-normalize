@@ -58,6 +58,37 @@ This will create a file called `normalized/input.m4a`.
 
 ## What will get normalized?
 
-By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently.
+By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently. Any video and subtitle tracks will be copied over to the output file.
 
-Any video and subtitle tracks will be copied over to the output file.
+You additionally have several options for controlling which audio streams get normalized. By default, all audio streams are normalized:
+
+```bash
+ffmpeg-normalize input.mkv
+```
+
+Use `-as/--audio-streams` to select specific streams by their index (comma-separated):
+
+```bash
+# Normalize only stream 1
+ffmpeg-normalize input.mkv -as 1
+
+# Normalize streams 1 and 2
+ffmpeg-normalize input.mkv -as 1,2
+```
+
+!!! tip
+
+    You can use `ffmpeg -i input.mkv` to see all streams and their indices before normalizing.
+
+Use `--audio-default-only` to normalize only streams marked with the "default" disposition (useful for files with multiple language tracks where you only want to normalize the main track):
+
+```bash
+ffmpeg-normalize input.mkv --audio-default-only
+```
+
+By default, if you select specific streams, only those streams will be in the output. Use `--keep-other-audio` to copy all other audio streams unchanged:
+
+```bash
+# Normalize stream 1, keep all other audio streams as-is
+ffmpeg-normalize input.mkv -as 1 --keep-other-audio
+```
