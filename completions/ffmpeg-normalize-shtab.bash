@@ -2,14 +2,14 @@
 
 
 
-_shtab_ffmpeg_normalize_option_strings=('-h' '--help' '-o' '--output' '-of' '--output-folder' '-f' '--force' '-d' '--debug' '-v' '--verbose' '-q' '--quiet' '-n' '--dry-run' '-pr' '--progress' '--version' '-nt' '--normalization-type' '-t' '--target-level' '-p' '--print-stats' '-lrt' '--loudness-range-target' '--keep-loudness-range-target' '--keep-lra-above-loudness-range-target' '-tp' '--true-peak' '--offset' '--lower-only' '--auto-lower-loudness-target' '--dual-mono' '--dynamic' '-c:a' '--audio-codec' '-b:a' '--audio-bitrate' '-ar' '--sample-rate' '-ac' '--audio-channels' '-koa' '--keep-original-audio' '-prf' '--pre-filter' '-pof' '--post-filter' '-vn' '--video-disable' '-c:v' '--video-codec' '-sn' '--subtitle-disable' '-mn' '--metadata-disable' '-cn' '--chapters-disable' '-ei' '--extra-input-options' '-e' '--extra-output-options' '-ofmt' '--output-format' '-ext' '--extension')
+_shtab_ffmpeg_normalize_option_strings=('-h' '--help' '--input-list' '-o' '--output' '-of' '--output-folder' '-f' '--force' '-d' '--debug' '-v' '--verbose' '-q' '--quiet' '-n' '--dry-run' '-pr' '--progress' '--version' '-nt' '--normalization-type' '-t' '--target-level' '-p' '--print-stats' '--replaygain' '-lrt' '--loudness-range-target' '--keep-loudness-range-target' '--keep-lra-above-loudness-range-target' '-tp' '--true-peak' '--offset' '--lower-only' '--auto-lower-loudness-target' '--dual-mono' '--dynamic' '-as' '--audio-streams' '--audio-default-only' '--keep-other-audio' '-c:a' '--audio-codec' '-b:a' '--audio-bitrate' '-ar' '--sample-rate' '-ac' '--audio-channels' '-koa' '--keep-original-audio' '-prf' '--pre-filter' '-pof' '--post-filter' '-vn' '--video-disable' '-c:v' '--video-codec' '-sn' '--subtitle-disable' '-mn' '--metadata-disable' '-cn' '--chapters-disable' '-ei' '--extra-input-options' '-e' '--extra-output-options' '-ofmt' '--output-format' '-ext' '--extension')
 
 
 
 _shtab_ffmpeg_normalize__nt_choices=('ebu' 'rms' 'peak')
 _shtab_ffmpeg_normalize___normalization_type_choices=('ebu' 'rms' 'peak')
 
-_shtab_ffmpeg_normalize_pos_0_nargs=+
+_shtab_ffmpeg_normalize_pos_0_nargs=*
 _shtab_ffmpeg_normalize__h_nargs=0
 _shtab_ffmpeg_normalize___help_nargs=0
 _shtab_ffmpeg_normalize__o_nargs=+
@@ -29,12 +29,15 @@ _shtab_ffmpeg_normalize___progress_nargs=0
 _shtab_ffmpeg_normalize___version_nargs=0
 _shtab_ffmpeg_normalize__p_nargs=0
 _shtab_ffmpeg_normalize___print_stats_nargs=0
+_shtab_ffmpeg_normalize___replaygain_nargs=0
 _shtab_ffmpeg_normalize___keep_loudness_range_target_nargs=0
 _shtab_ffmpeg_normalize___keep_lra_above_loudness_range_target_nargs=0
 _shtab_ffmpeg_normalize___lower_only_nargs=0
 _shtab_ffmpeg_normalize___auto_lower_loudness_target_nargs=0
 _shtab_ffmpeg_normalize___dual_mono_nargs=0
 _shtab_ffmpeg_normalize___dynamic_nargs=0
+_shtab_ffmpeg_normalize___audio_default_only_nargs=0
+_shtab_ffmpeg_normalize___keep_other_audio_nargs=0
 _shtab_ffmpeg_normalize__koa_nargs=0
 _shtab_ffmpeg_normalize___keep_original_audio_nargs=0
 _shtab_ffmpeg_normalize__vn_nargs=0
@@ -108,6 +111,7 @@ _set_new_action() {
 #     ${!x} -> ${hello} -> "world"
 _shtab_ffmpeg_normalize() {
   local completing_word="${COMP_WORDS[COMP_CWORD]}"
+  local previous_word="${COMP_WORDS[COMP_CWORD-1]}"
   local completed_positional_actions
   local current_action
   local current_action_args_start_index
@@ -164,6 +168,10 @@ _shtab_ffmpeg_normalize() {
   if [[ $pos_only = 0 && "${completing_word}" == -* ]]; then
     # optional argument started: use option strings
     COMPREPLY=( $(compgen -W "${current_option_strings[*]}" -- "${completing_word}") )
+  elif [[ "${previous_word}" == ">" || "${previous_word}" == ">>" ||
+          "${previous_word}" =~ ^[12]">" || "${previous_word}" =~ ^[12]">>" ]]; then
+    # handle redirection operators
+    COMPREPLY=( $(compgen -f -- "${completing_word}") )
   else
     # use choices & compgen
     local IFS=$'\n' # items may contain spaces, so delimit using newline

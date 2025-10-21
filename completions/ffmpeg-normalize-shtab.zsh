@@ -12,6 +12,7 @@ _shtab_ffmpeg_normalize_commands() {
 
 _shtab_ffmpeg_normalize_options=(
   "(- : *)"{-h,--help}"[show this help message and exit]"
+  "--input-list[Path to a text file containing a line-separated list of input files]:input_list:"
   {-o,--output}"[Output file names. Will be applied per input file.
 
 If no output file name is specified for an input file, the output files
@@ -50,6 +51,10 @@ in LUFS. The range is -70.0 - -5.0.
 Otherwise, the range is -99 to 0.
 ]:target_level:"
   {-p,--print-stats}"[Print loudness statistics for both passes formatted as JSON to stdout.]"
+  "--replaygain[Write ReplayGain tags to the original file without normalizing.
+This mode will overwrite the input file and ignore other options.
+Only works with EBU normalization, and only with .mp3, .mp4\/.m4a, .ogg, .opus for now.
+]"
   {-lrt,--loudness-range-target}"[EBU Loudness Range Target in LUFS (default\: 7.0).
 Range is 1.0 - 50.0.
 ]:loudness_range_target:"
@@ -69,14 +74,17 @@ Range is -99.0 - \+99.0.
   "--lower-only[Whether the audio should not increase in loudness.
 
 If the measured loudness from the first pass is lower than the target
-loudness then normalization pass will be skipped for the measured audio
-source.
+loudness then normalization will be skipped for the audio source.
+
+For EBU normalization, this compares input integrated loudness to the target level.
+For peak normalization, this compares the input peak level to the target level.
+For RMS normalization, this compares the input RMS level to the target level.
 ]"
   "--auto-lower-loudness-target[Automatically lower EBU Integrated Loudness Target to prevent falling
 back to dynamic filtering.
 
 Makes sure target loudness is lower than measured loudness minus peak
-loudness (input_i - input_tp) by a small amount.
+loudness (input_i - input_tp) by a small amount (0.1 LUFS).
 ]"
   "--dual-mono[Treat mono input files as \"dual-mono\".
 
@@ -92,6 +100,20 @@ normalization. This is not usually recommended.
 
 Dynamic mode will automatically change the sample rate to 192 kHz. Use
 -ar\/--sample-rate to specify a different output sample rate.
+]"
+  {-as,--audio-streams}"[Select specific audio streams to normalize by stream index (comma-separated).
+Example\: --audio-streams 0,2 will normalize only streams 0 and 2.
+
+By default, all audio streams are normalized.
+]:audio_streams:"
+  "--audio-default-only[Only normalize audio streams with the \'default\' disposition flag.
+This is useful for files with multiple audio tracks where only the main track
+should be normalized (e.g., keeping commentary tracks unchanged).
+]"
+  "--keep-other-audio[Keep non-selected audio streams in the output file (copy without normalization).
+Only applies when --audio-streams or --audio-default-only is used.
+
+By default, only selected streams are included in the output.
 ]"
   {-c:a,--audio-codec}"[Audio codec to use for output files.
 See \`ffmpeg -encoders\` for a list.
@@ -169,7 +191,7 @@ extension will govern the format (see \'--extension\' option).
   {-ext,--extension}"[Output file extension to use for output files that were not explicitly
 specified. (Default\: \`mkv\`)
 ]:extension:"
-  "(*):Input media file(s):"
+  "(*)::Input media file(s):"
 )
 
 
