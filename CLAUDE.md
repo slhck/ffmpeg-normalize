@@ -47,6 +47,8 @@ The tool supports three normalization types defined in `NORMALIZATION_TYPES`:
 
 ## Development Notes
 
+When committing, YOU MUST use conventional commits.
+
 ### Dependencies
 The project uses:
 - `tqdm` for progress bars
