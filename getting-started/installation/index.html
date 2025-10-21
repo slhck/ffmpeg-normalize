@@ -950,7 +950,7 @@
 <p>This tool provides shell completions for bash and zsh. To install them:</p>
 <h3 id="bash">Bash</h3>
 <p>If you have <a href="https://github.com/scop/bash-completion"><code>bash-completion</code></a> installed, you can just copy your new completion script to the <code>/usr/local/etc/bash_completion.d</code> directory.</p>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/slhck/ffmpeg-normalize/master/completions/ffmpeg-normalize-completion.bash<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/slhck/ffmpeg-normalize/master/completions/ffmpeg-normalize.bash<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-o<span class="w"> </span>/usr/local/etc/bash_completion.d/ffmpeg-normalize
 </code></pre></div>
 <p>Without bash-completion, you can manually install the completion script:</p>
@@ -958,7 +958,7 @@
 mkdir<span class="w"> </span>-p<span class="w"> </span>~/.bash_completions.d
 
 <span class="c1"># download and install completion script</span>
-curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/slhck/ffmpeg-normalize/master/completions/ffmpeg-normalize-completion.bash<span class="w"> </span><span class="se">\</span>
+curl<span class="w"> </span>-L<span class="w"> </span>https://raw.githubusercontent.com/slhck/ffmpeg-normalize/master/completions/ffmpeg-normalize.bash<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-o<span class="w"> </span>~/.bash_completions.d/ffmpeg-normalize
 
 <span class="c1"># source it in your ~/.bashrc</span>
