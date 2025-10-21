@@ -24,6 +24,26 @@ ffmpeg-normalize is a Python utility for audio normalization using ffmpeg. It su
 - `pdoc -d google -o docs-api ./ffmpeg_normalize` - Generate API documentation
 - `uvx --with mkdocs-material mkdocs gh-deploy` - Deploy MKdocs documentation
 
+### Shell Completions
+To regenerate shell completions after adding new CLI options:
+```bash
+# Bash
+uv run python -c "
+from ffmpeg_normalize.__main__ import create_parser
+import shtab
+parser = create_parser()
+print(shtab.complete(parser, shell='bash'))
+" > completions/ffmpeg-normalize-shtab.bash
+
+# Zsh
+uv run python -c "
+from ffmpeg_normalize.__main__ import create_parser
+import shtab
+parser = create_parser()
+print(shtab.complete(parser, shell='zsh'))
+" > completions/ffmpeg-normalize-shtab.zsh
+```
+
 ## Architecture
 
 ### Core Components

@@ -53,6 +53,7 @@ dev = [
     "ruff>=0.12.11",
     "mypy>=1.0.0",
     "types-tqdm",
+    "shtab>=1.7.0",
 ]
 
 [tool.mypy]
