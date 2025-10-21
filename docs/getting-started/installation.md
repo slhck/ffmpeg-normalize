@@ -41,7 +41,7 @@ This tool provides shell completions for bash and zsh. To install them:
 If you have [`bash-completion`](https://github.com/scop/bash-completion) installed, you can just copy your new completion script to the `/usr/local/etc/bash_completion.d` directory.
 
 ```bash
-curl -L https://raw.githubusercontent.com/slhck/ffmpeg-normalize/master/completions/ffmpeg-normalize-completion.bash \
+curl -L https://raw.githubusercontent.com/slhck/ffmpeg-normalize/master/completions/ffmpeg-normalize.bash \
   -o /usr/local/etc/bash_completion.d/ffmpeg-normalize
 ```
 
@@ -52,7 +52,7 @@ Without bash-completion, you can manually install the completion script:
 mkdir -p ~/.bash_completions.d
 
 # download and install completion script
-curl -L https://raw.githubusercontent.com/slhck/ffmpeg-normalize/master/completions/ffmpeg-normalize-completion.bash \
+curl -L https://raw.githubusercontent.com/slhck/ffmpeg-normalize/master/completions/ffmpeg-normalize.bash \
   -o ~/.bash_completions.d/ffmpeg-normalize
 
 # source it in your ~/.bashrc

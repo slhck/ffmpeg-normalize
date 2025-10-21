@@ -7,7 +7,8 @@ _ffmpeg_normalize()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # Main options
-    opts="-o --output \
+    opts="--input-list \
+          -o --output \
           -of --output-folder \
           -f --force \
           -d --debug \
@@ -19,6 +20,7 @@ _ffmpeg_normalize()
           -nt --normalization-type \
           -t --target-level \
           -p --print-stats \
+          --replaygain \
           -lrt --loudness-range-target \
           --keep-loudness-range-target \
           --keep-lra-above-loudness-range-target \
@@ -28,6 +30,9 @@ _ffmpeg_normalize()
           --lower-only \
           --dual-mono \
           --dynamic \
+          -as --audio-streams \
+          --audio-default-only \
+          --keep-other-audio \
           -c:a --audio-codec \
           -b:a --audio-bitrate \
           -ar --sample-rate \

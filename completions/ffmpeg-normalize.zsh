@@ -7,6 +7,7 @@ _ffmpeg_normalize() {
 
   args=(
     # File Input/Output
+    '--input-list[Read input list from file]:input list:_files'
     '(-o --output)'{-o,--output}'[Output file names]:output file:_files'
     '(-of --output-folder)'{-of,--output-folder}'[Output folder (default: normalized)]:directory:_files -/'
 
@@ -23,6 +24,7 @@ _ffmpeg_normalize() {
     '(-nt --normalization-type)'{-nt,--normalization-type}'[Normalization type]:type:(ebu rms peak)'
     '(-t --target-level)'{-t,--target-level}'[Target level in dB/LUFS]:level:'
     '(-p --print-stats)'{-p,--print-stats}'[Print loudness statistics as JSON]'
+    '--replaygain[Write ReplayGain tags]'
 
     # EBU Options
     '(-lrt --loudness-range-target)'{-lrt,--loudness-range-target}'[EBU Loudness Range Target in LUFS]:range:'
@@ -36,6 +38,9 @@ _ffmpeg_normalize() {
     '--dynamic[Force dynamic normalization mode]'
 
     # Audio Encoding
+    '(-as --audio-streams)'{-as,--audio-streams}'[Select specific audio streams to normalize]:streams:'
+    '--audio-default-only[Only normalize default audio streams]'
+    '--keep-other-audio[Keep non-selected audio streams]'
     '(-c:a --audio-codec)'{-c:a,--audio-codec}'[Audio codec]:codec:'
     '(-b:a --audio-bitrate)'{-b:a,--audio-bitrate}'[Audio bitrate]:bitrate:'
     '(-ar --sample-rate)'{-ar,--sample-rate}'[Audio sample rate]:sample rate:'

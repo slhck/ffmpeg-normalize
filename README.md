@@ -35,7 +35,7 @@ Example: `ffmpeg-normalize input.mkv -as 1 --keep-other-audio` normalizes stream
 
 **Recent additions:**
 
-- **Shell completions** (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the [completions](completions/) directory for installation instructions.
+- **Shell completions** (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the [installation guide](https://slhck.info/ffmpeg-normalize/getting-started/installation/#shell-completions) for setup instructions.
 - **`--lower-only` option** — Prevent audio from increasing in loudness, only lower it if needed (works with all normalization types).
 
 See the [full changelog](https://github.com/slhck/ffmpeg-normalize/blob/master/CHANGELOG.md) for all updates.
