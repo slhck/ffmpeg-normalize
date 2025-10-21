@@ -1,0 +1,46 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper git info in docs
+
+      - name: Configure Git Credentials
+        if: github.event_name == 'push'
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Build documentation (PR dry run)
+        if: github.event_name == 'pull_request'
+        run: uvx --with mkdocs-material mkdocs build
+
+      - name: Deploy documentation
+        if: github.event_name == 'push'
+        run: uvx --with mkdocs-material mkdocs gh-deploy --force
