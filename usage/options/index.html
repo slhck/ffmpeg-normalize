@@ -867,6 +867,48 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-stream-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Audio Stream Selection
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Audio Stream Selection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-as-audio_streams-audio-streams-audio_streams" class="md-nav__link">
+    <span class="md-ellipsis">
+      -as AUDIO_STREAMS, --audio-streams AUDIO_STREAMS
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-audio-default-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      --audio-default-only
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-other-audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      --keep-other-audio
+    </span>
+  </a>
+  
+</li>
+        
           <li class="md-nav__item">
   <a href="#-prf-pre_filter-pre-filter-pre_filter" class="md-nav__link">
     <span class="md-ellipsis">
@@ -1622,6 +1664,48 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-stream-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Audio Stream Selection
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Audio Stream Selection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-as-audio_streams-audio-streams-audio_streams" class="md-nav__link">
+    <span class="md-ellipsis">
+      -as AUDIO_STREAMS, --audio-streams AUDIO_STREAMS
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-audio-default-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      --audio-default-only
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-other-audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      --keep-other-audio
+    </span>
+  </a>
+  
+</li>
+        
           <li class="md-nav__item">
   <a href="#-prf-pre_filter-pre-filter-pre_filter" class="md-nav__link">
     <span class="md-ellipsis">
@@ -1903,6 +1987,19 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <p>Set the number of audio channels. If not specified, the input channel layout will be used. This is equivalent to <code>-ac</code> in ffmpeg.</p>
 <h3 id="-koa-keep-original-audio"><code>-koa, --keep-original-audio</code></h3>
 <p>Copy original, non-normalized audio streams to output file</p>
+<h2 id="audio-stream-selection">Audio Stream Selection</h2>
+<h3 id="-as-audio_streams-audio-streams-audio_streams"><code>-as AUDIO_STREAMS, --audio-streams AUDIO_STREAMS</code></h3>
+<p>Select specific audio streams to normalize by stream index (comma-separated).</p>
+<p>Example: <code>-as 1</code> normalizes only stream 1, <code>-as 1,2</code> normalizes streams 1 and 2.</p>
+<p>If not specified, all audio streams will be normalized (default behavior).</p>
+<h3 id="-audio-default-only"><code>--audio-default-only</code></h3>
+<p>Only normalize audio streams with the 'default' disposition flag.</p>
+<p>This is useful for files with multiple audio tracks where only the default track should be normalized (e.g., main audio track vs. commentary tracks).</p>
+<h3 id="-keep-other-audio"><code>--keep-other-audio</code></h3>
+<p>Keep non-selected audio streams in the output file (copy without normalization).</p>
+<p>Must be combined with either <code>-as</code>/<code>--audio-streams</code> or <code>--audio-default-only</code>.</p>
+<p>Example: <code>ffmpeg-normalize input.mkv -as 1 --keep-other-audio</code> will normalize stream 1 and copy all other audio streams unchanged.</p>
+<p><strong>Note:</strong> This option is mutually exclusive with <code>--keep-original-audio</code>. Use <code>--keep-original-audio</code> to keep all original streams alongside normalized ones, or <code>--keep-other-audio</code> to keep only non-selected streams as passthrough.</p>
 <h3 id="-prf-pre_filter-pre-filter-pre_filter"><code>-prf PRE_FILTER, --pre-filter PRE_FILTER</code></h3>
 <p>Add an audio filter chain before applying normalization.</p>
 <p>Multiple filters can be specified by comma-separating them.</p>
