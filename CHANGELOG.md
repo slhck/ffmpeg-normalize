@@ -1,3 +1,18 @@
+## [1.34.0] - 2025-10-21
+
+### 🚀 Features
+
+- Add selective audio stream normalization (#295)
+
+### 📚 Documentation
+
+- Fix Docker Hub badge link in README
+
+### ⚙️ Miscellaneous Tasks
+
+- Update ffmpeg version
+- Update claude.md
+- Bump version to 1.34.0
 ## [1.33.4] - 2025-10-18
 
 ### 🐛 Bug Fixes
