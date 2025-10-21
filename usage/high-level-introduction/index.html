@@ -933,8 +933,28 @@
 <p>You need to make sure that the container supports the codecs used for the output. For example, you cannot place AAC audio in a WAV container.</p>
 </div>
 <h2 id="what-will-get-normalized">What will get normalized?</h2>
-<p>By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently.</p>
-<p>Any video and subtitle tracks will be copied over to the output file.</p>
+<p>By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently. Any video and subtitle tracks will be copied over to the output file.</p>
+<p>You additionally have several options for controlling which audio streams get normalized. By default, all audio streams are normalized:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mkv
+</code></pre></div>
+<p>Use <code>-as/--audio-streams</code> to select specific streams by their index (comma-separated):</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Normalize only stream 1</span>
+ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<span class="w"> </span><span class="m">1</span>
+
+<span class="c1"># Normalize streams 1 and 2</span>
+ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<span class="w"> </span><span class="m">1</span>,2
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can use <code>ffmpeg -i input.mkv</code> to see all streams and their indices before normalizing.</p>
+</div>
+<p>Use <code>--audio-default-only</code> to normalize only streams marked with the "default" disposition (useful for files with multiple language tracks where you only want to normalize the main track):</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>--audio-default-only
+</code></pre></div>
+<p>By default, if you select specific streams, only those streams will be in the output. Use <code>--keep-other-audio</code> to copy all other audio streams unchanged:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Normalize stream 1, keep all other audio streams as-is</span>
+ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<span class="w"> </span><span class="m">1</span><span class="w"> </span>--keep-other-audio
+</code></pre></div>
 
 
 

@@ -773,10 +773,20 @@
 <p>Supply one or more input files, and optionally, output file names:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input<span class="w"> </span><span class="o">[</span>input<span class="w"> </span>...<span class="o">][</span>-h<span class="o">][</span>-o<span class="w"> </span>OUTPUT<span class="w"> </span><span class="o">[</span>OUTPUT<span class="w"> </span>...<span class="o">]]</span><span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
 </code></pre></div>
-<p>Example:</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span><span class="m">1</span>.wav<span class="w"> </span><span class="m">2</span>.wav<span class="w"> </span>-o<span class="w"> </span><span class="m">1</span>-normalized.m4a<span class="w"> </span><span class="m">2</span>-normalized.m4a<span class="w"> </span>-c:a<span class="w"> </span>aac<span class="w"> </span>-b:a<span class="w"> </span>192k
+<p>A very simple normalization command looks like this:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp3
 </code></pre></div>
-<p>For more information on the options (<code>[options]</code>) available, run <code>ffmpeg-normalize -h</code>, or read the <a href="../options/">Options</a> page.</p>
+<p>This creates <code>normalized/input.mkv</code> with EBU R128 normalization (target: -23 LUFS) using PCM audio.</p>
+<p>You can customize the normalization and output format with various options, as described below.</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp3<span class="w"> </span>-c:a<span class="w"> </span>aac<span class="w"> </span>-b:a<span class="w"> </span>192k
+</code></pre></div>
+<p>This uses the AAC codec at 192 kbps bitrate instead of PCM to keep file size manageable.</p>
+<p>To process multiple files, just list them all as input using wildcards (Linux):</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>*.mp3<span class="w"> </span>-c:a<span class="w"> </span>libmp3lame<span class="w"> </span>-b:a<span class="w"> </span>320k<span class="w"> </span>-ext<span class="w"> </span>mp3
+</code></pre></div>
+<p>This normalizes all MP3 files in the current directory, outputs as MP3 at 320 kbps.</p>
+<p>For the complete list of options, run <code>ffmpeg-normalize -h</code> or read the <a href="../options/">detailed options page</a>.
+You can also find more examples in the <a href="../examples/">examples page</a>.</p>
 
 
 
