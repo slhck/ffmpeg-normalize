@@ -11,7 +11,7 @@ on:
     types: [submitted]
 
 env:
-  FFMPEG_VERSION: "7.1"
+  FFMPEG_VERSION: "8.0"
 
 jobs:
   claude:
