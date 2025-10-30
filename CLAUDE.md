@@ -69,6 +69,17 @@ The tool supports three normalization types defined in `NORMALIZATION_TYPES`:
 
 When committing, YOU MUST use conventional commits.
 
+### CLI Changes Checklist
+
+When adding, removing, or modifying CLI options, YOU MUST:
+
+1. **Update the documentation** at `docs/usage/options.md` with the new option details
+2. **Regenerate shell completions** for bash and zsh (see Shell Completions section above)
+3. **Test the changes** with `uv run python -m ffmpeg_normalize --help` to verify help text
+4. **Update tests** if the new option affects behavior
+
+This ensures users have accurate documentation and working shell completions for all CLI flags.
+
 ### Dependencies
 The project uses:
 - `tqdm` for progress bars
