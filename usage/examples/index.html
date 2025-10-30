@@ -1282,25 +1282,25 @@ ffmpeg-normalize<span class="w"> </span>album/*.wav<span class="w"> </span>--bat
 </blockquote>
 <p>There are different strategies to deal with this:</p>
 <ol>
-<li>Use Peak normalization instead – guarantees no clipping:</li>
-</ol>
+<li>
+<p>Use Peak normalization instead – guarantees no clipping:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span>-1<span class="w"> </span>-c:a<span class="w"> </span>flac
 </code></pre></div>
-<ol>
-<li>Use a more conservative RMS target – leave more headroom:</li>
-</ol>
+</li>
+<li>
+<p>Use a more conservative RMS target – leave more headroom:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-23<span class="w"> </span>-c:a<span class="w"> </span>flac<span class="w">  </span><span class="c1"># More conservative</span>
 </code></pre></div>
-<ol>
+</li>
 <li>
 <p>Accept minor clipping – if clipping is &lt; 0.5 dB, it may be inaudible in most cases</p>
 </li>
 <li>
 <p>Pre-process with a limiter – use <code>--pre-filter</code> to apply limiting before normalization:</p>
-</li>
-</ol>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20<span class="w"> </span>-prf<span class="w"> </span><span class="s2">&quot;alimiter=limit=0.99&quot;</span><span class="w"> </span>-c:a<span class="w"> </span>flac
 </code></pre></div>
+</li>
+</ol>
 <h2 id="filters">Filters</h2>
 <h3 id="dynamic-normalization">Dynamic normalization</h3>
 <p>You can use pre-filters to modify the audio signal before or after it is normalized, e.g. by using dynamic compression. This smooths out any volume differences in the signal.</p>
