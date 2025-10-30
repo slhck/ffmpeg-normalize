@@ -909,18 +909,35 @@
 <li><strong>Docker support</strong> — Run via Docker container</li>
 <li><strong>Python API</strong> — Use programmatically in your Python projects</li>
 <li><strong>Shell completions</strong> — Available for bash, zsh, and fish</li>
+<li><strong>Album Batch normalization</strong> – Process files jointy, preserving relative loudness</li>
 </ul>
 <h2 id="whats-new">🆕 What's New</h2>
-<p><strong>Version 1.34.0</strong> brings selective audio stream normalization! You can now:</p>
 <ul>
-<li><strong>Normalize specific audio streams</strong> with <code>-as/--audio-streams</code> (e.g., <code>-as 1,2</code> to normalize only streams 1 and 2)</li>
-<li><strong>Normalize only default audio streams</strong> with <code>--audio-default-only</code> (useful for files with multiple language tracks)</li>
-<li><strong>Keep other streams unchanged</strong> with <code>--keep-other-audio</code> (copy non-selected streams without normalization)</li>
+<li>
+<p>Version 1.35.0 has <strong>batch/album normalization</strong> with <code>--batch</code>. It preserves relative loudness between files! Perfect for music albums where you want to shift all tracks by the same amount.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20
+</code></pre></div>
+<p>shifts the entire album so the average RMS is -20 dB, preserving the original relative loudness as mastered.</p>
+</li>
+<li>
+<p>Version 1.34.0 brings <strong>selective audio stream normalization</strong>! You can now:</p>
+</li>
+<li>
+<p>Normalize specific audio streams with <code>-as/--audio-streams</code> (e.g., <code>-as 1,2</code> to normalize only streams 1 and 2)</p>
+</li>
+<li>Normalize only default audio streams with <code>--audio-default-only</code> (useful for files with multiple language tracks)</li>
+<li>
+<p>Keep other streams unchanged with <code>--keep-other-audio</code> (copy non-selected streams without normalization)</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<span class="w"> </span><span class="m">1</span><span class="w"> </span>--keep-other-audio
+</code></pre></div>
+<p>normalizes stream 1 and copies all other audio streams unchanged.</p>
+</li>
 </ul>
-<p>Example: <code>ffmpeg-normalize input.mkv -as 1 --keep-other-audio</code> normalizes stream 1 and copies all other audio streams unchanged.</p>
-<p><strong>Recent additions:</strong></p>
+<p>Other recent additions:</p>
 <ul>
-<li><strong>Shell completions</strong> (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the <a href="https://github.com/slhck/ffmpeg-normalize/tree/master/completions">completions directory</a> for installation instructions.</li>
+<li><strong>Shell completions</strong> (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the <a href="../getting-started/installation/#shell-completions">installation guide</a> for setup instructions.</li>
 <li><strong><code>--lower-only</code> option</strong> — Prevent audio from increasing in loudness, only lower it if needed (works with all normalization types).</li>
 </ul>
 <p>See the <a href="about/changelog/">full changelog</a> for all updates.</p>
