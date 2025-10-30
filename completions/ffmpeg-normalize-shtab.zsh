@@ -5,7 +5,7 @@
 
 _shtab_ffmpeg_normalize_commands() {
   local _commands=(
-    
+
   )
   _describe 'ffmpeg-normalize commands' _commands
 }
@@ -54,6 +54,17 @@ Otherwise, the range is -99 to 0.
   "--replaygain[Write ReplayGain tags to the original file without normalizing.
 This mode will overwrite the input file and ignore other options.
 Only works with EBU normalization, and only with .mp3, .mp4\/.m4a, .ogg, .opus for now.
+]"
+  "--batch[Preserve relative loudness between files (album mode).
+
+When operating on a group of unrelated files, you usually want all of them at the same
+level. However, a group of music files all from the same album is generally meant to be
+listened to at the relative volumes they were recorded at. In batch mode, all the specified
+files are considered to be part of a single album and their relative volumes are preserved.
+This is done by averaging the loudness of all the files, computing a single adjustment from
+that, and applying a relative adjustment to all the files.
+
+Batch mode works with all normalization types (EBU, RMS, peak), but we recommend RMS.
 ]"
   {-lrt,--loudness-range-target}"[EBU Loudness Range Target in LUFS (default\: 7.0).
 Range is 1.0 - 50.0.
@@ -209,7 +220,7 @@ _shtab_ffmpeg_normalize() {
       (( CURRENT += 1 ))
       curcontext="${curcontext%:*:*}:_shtab_ffmpeg_normalize-$line[1]:"
       case $line[1] in
-        
+
       esac
   esac
 }

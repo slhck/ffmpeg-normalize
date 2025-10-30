@@ -555,3 +555,88 @@ class TestFFmpegNormalizeAPI:
         else:
             # If input was above target, normalization should have occurred
             pass
+
+    def test_batch_mode_preserves_relative_loudness(self, temp_output_dir):
+        """Test that batch mode preserves relative loudness between files."""
+        test_dir = Path(__file__).parent
+        test_files = [
+            test_dir / "test_loud.m4a",
+            test_dir / "test_normal.m4a",
+            test_dir / "test_quiet.m4a",
+        ]
+
+        # Skip if test files don't exist
+        if not all(f.exists() for f in test_files):
+            pytest.skip(
+                "Batch test files not found (test_loud.m4a, test_normal.m4a, test_quiet.m4a)"
+            )
+
+        target_level = -23.0
+
+        # Test with batch mode
+        normalizer_batch = FFmpegNormalize(
+            normalization_type="ebu",
+            target_level=target_level,
+            print_stats=False,
+            batch=True,
+        )
+
+        # Add all files
+        output_files = []
+        for test_file in test_files:
+            output_file = temp_output_dir / f"batch_{test_file.stem}.mkv"
+            output_files.append(output_file)
+            normalizer_batch.add_media_file(str(test_file), str(output_file))
+
+        # Run batch normalization
+        normalizer_batch.run_normalization()
+
+        # Get the loudness measurements from all files
+        loudness_values = []
+        for media_file in normalizer_batch.media_files:
+            for stats in media_file.get_stats():
+                if stats["ebu_pass2"] is not None:
+                    loudness_values.append(stats["ebu_pass2"]["output_i"])
+                elif stats["ebu_pass1"] is not None:
+                    loudness_values.append(stats["ebu_pass1"]["output_i"])
+
+        assert len(loudness_values) >= 3, "Should have at least 3 loudness measurements"
+
+        # Verify that relative loudness differences are preserved
+        # The files should maintain their original loudness relationship
+        # Expected: loud > normal > quiet in terms of output loudness
+        # Since we preserve relative loudness, they should NOT all be at the same target level
+
+        # Calculate the loudness range
+        loudness_range = max(loudness_values) - min(loudness_values)
+
+        # The range should be significant (around 14 dB, since originals were 7 dB apart)
+        # We allow some tolerance for measurement and codec differences
+        assert loudness_range > 5.0, (
+            f"Batch mode should preserve relative loudness. "
+            f"Expected range > 5 dB, got {loudness_range:.2f} dB. "
+            f"Loudness values: {loudness_values}"
+        )
+
+        # Verify relative differences are preserved with CORRECTED formula
+        # In batch mode with target -23, the files should be adjusted relative to the batch average
+        # Original files: loud=-32.77, normal=-39.77, quiet=-46.77
+        # Batch avg: -39.77
+        # Corrected formula: adjusted_target = target_level + (input_i - batch_reference)
+        # Expected adjusted targets:
+        #   loud:   -23 + (-32.77 - (-39.77)) = -23 + 7 = -16 LUFS (louder than target)
+        #   normal: -23 + (-39.77 - (-39.77)) = -23 + 0 = -23 LUFS (at target)
+        #   quiet:  -23 + (-46.77 - (-39.77)) = -23 + (-7) = -30 LUFS (quieter than target)
+        # So the relative order is preserved: loud > normal > quiet
+        if len(loudness_values) == 3:
+            # Loudness values are in order: loud, normal, quiet
+            # After batch normalization, loud should still be loudest, quiet should still be quietest
+            # Allow some tolerance for codec and measurement differences
+            assert loudness_values[0] > loudness_values[1] - 1.0, (
+                f"Loud file should remain louder than normal file in batch mode. "
+                f"Got loud={loudness_values[0]:.2f}, normal={loudness_values[1]:.2f}"
+            )
+            assert loudness_values[1] > loudness_values[2] - 1.0, (
+                f"Normal file should remain louder than quiet file in batch mode. "
+                f"Got normal={loudness_values[1]:.2f}, quiet={loudness_values[2]:.2f}"
+            )

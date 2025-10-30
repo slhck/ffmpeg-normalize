@@ -91,6 +91,18 @@ This mode will overwrite the input file and ignore other options.
 
 Only works with EBU normalization, and only with .mp3, .mp4/.m4a, .ogg, .opus for now.
 
+### `--batch`
+
+Preserve relative loudness between files (album mode).
+
+When operating on a group of unrelated files, you usually want all of them at the same level. However, a group of music files all from the same album is generally meant to be listened to at the relative volumes they were recorded at. In batch mode, all the specified files are considered to be part of a single album and their relative volumes are preserved. This is done by averaging the loudness of all the files, computing a single adjustment from that, and applying a relative adjustment to all the files.
+
+Batch mode works with all normalization types (EBU, RMS, peak).
+
+Example: `ffmpeg-normalize album/*.flac --batch -nt rms -t -20`
+
+**Note:** For music albums, RMS or Peak normalization is recommended over EBU. See the [FAQ](../advanced/faq.md#how-do-i-normalize-an-album-while-preserving-relative-loudness-between-tracks) for details.
+
 ## EBU R128 Normalization
 
 ### `-lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET`

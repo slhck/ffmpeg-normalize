@@ -86,6 +86,7 @@ class MediaFile:
             self.output_ext = current_ext
         self.streams: StreamDict = {"audio": {}, "video": {}, "subtitle": {}}
         self.temp_file: Union[str, None] = None
+        self.batch_reference: float | None = None
 
         self.parse_streams()
 
@@ -265,21 +266,35 @@ class MediaFile:
             # Normalize all streams (default behavior)
             return all_audio_streams
 
-    def run_normalization(self) -> None:
+    def run_normalization(self, batch_reference: float | None = None) -> None:
         """
         Run the normalization process for this file.
+
+        Args:
+            batch_reference (float | None, optional): Reference loudness for batch mode.
+                If provided, the first pass is skipped (assumed already done) and this
+                reference is used to calculate relative adjustments. Defaults to None.
         """
         _logger.debug(f"Running normalization for {self.input_file}")
 
-        # run the first pass to get loudness stats, unless in dynamic EBU mode
-        if not (
-            self.ffmpeg_normalize.dynamic
-            and self.ffmpeg_normalize.normalization_type == "ebu"
-        ):
-            self._first_pass()
+        # Store batch reference for use in second pass
+        self.batch_reference = batch_reference
+
+        # run the first pass to get loudness stats, unless in dynamic EBU mode or batch mode
+        # (in batch mode, first pass is already done in FFmpegNormalize.run_normalization)
+        if batch_reference is None:
+            if not (
+                self.ffmpeg_normalize.dynamic
+                and self.ffmpeg_normalize.normalization_type == "ebu"
+            ):
+                self._first_pass()
+            else:
+                _logger.debug(
+                    "Dynamic EBU mode: First pass will not run, as it is not needed."
+                )
         else:
             _logger.debug(
-                "Dynamic EBU mode: First pass will not run, as it is not needed."
+                f"Batch mode: Skipping first pass (already completed), using batch reference = {batch_reference:.2f}"
             )
 
         # for second pass, create a temp file
@@ -529,9 +544,13 @@ class MediaFile:
                 normalization_filter = "acopy"
             else:
                 if self.ffmpeg_normalize.normalization_type == "ebu":
-                    normalization_filter = audio_stream.get_second_pass_opts_ebu()
+                    normalization_filter = audio_stream.get_second_pass_opts_ebu(
+                        batch_reference=self.batch_reference
+                    )
                 else:
-                    normalization_filter = audio_stream.get_second_pass_opts_peakrms()
+                    normalization_filter = audio_stream.get_second_pass_opts_peakrms(
+                        batch_reference=self.batch_reference
+                    )
 
             input_label = f"[0:{audio_stream.stream_id}]"
             output_label = f"[norm{audio_stream.stream_id}]"

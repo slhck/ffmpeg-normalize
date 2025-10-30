@@ -179,6 +179,24 @@ def create_parser() -> argparse.ArgumentParser:
         """
         ),
     )
+    group_normalization.add_argument(
+        "--batch",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Preserve relative loudness between files (album mode).
+
+        When operating on a group of unrelated files, you usually want all of them at the same
+        level. However, a group of music files all from the same album is generally meant to be
+        listened to at the relative volumes they were recorded at. In batch mode, all the specified
+        files are considered to be part of a single album and their relative volumes are preserved.
+        This is done by averaging the loudness of all the files, computing a single adjustment from
+        that, and applying a relative adjustment to all the files.
+
+        Batch mode works with all normalization types (EBU, RMS, peak).
+        """
+        ),
+    )
 
     # group_normalization.add_argument(
     #     '--threshold',
@@ -636,6 +654,7 @@ def main() -> None:
         dry_run=cli_args.dry_run,
         progress=cli_args.progress,
         replaygain=cli_args.replaygain,
+        batch=cli_args.batch,
         audio_streams=audio_streams,
         audio_default_only=cli_args.audio_default_only,
         keep_other_audio=cli_args.keep_other_audio,

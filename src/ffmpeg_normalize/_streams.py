@@ -444,9 +444,14 @@ class AudioStream(MediaStream):
                         )
         return result
 
-    def get_second_pass_opts_ebu(self) -> str:
+    def get_second_pass_opts_ebu(self, batch_reference: float | None = None) -> str:
         """
         Return second pass loudnorm filter options string for ffmpeg
+
+        Args:
+            batch_reference (float | None, optional): Reference loudness for batch mode.
+                When provided, the target level is adjusted to preserve relative loudness.
+                Defaults to None.
         """
 
         # In dynamic mode, we can do everything in one pass, and we do not have first pass stats
@@ -552,6 +557,19 @@ class AudioStream(MediaStream):
 
         stats = self.loudness_statistics["ebu_pass1"]
 
+        # Adjust target level for batch mode to preserve relative loudness
+        if batch_reference is not None:
+            input_i = float(stats["input_i"])
+            # Formula: adjusted_target = target_level + (input_i - batch_reference)
+            # If track is quieter than average (input_i < batch_ref), offset is negative → quieter target
+            # If track is louder than average (input_i > batch_ref), offset is positive → louder target
+            adjusted_target = target_level + (input_i - batch_reference)
+            _logger.info(
+                f"Batch mode: Adjusting target from {target_level:.2f} to {adjusted_target:.2f} LUFS "
+                f"(input_i={input_i:.2f}, batch_ref={batch_reference:.2f}, offset={input_i - batch_reference:.2f})"
+            )
+            target_level = adjusted_target
+
         opts = {
             "i": target_level,
             "lra": self.media_file.ffmpeg_normalize.loudness_range_target,
@@ -576,10 +594,15 @@ class AudioStream(MediaStream):
 
         return "loudnorm=" + dict_to_filter_opts(opts)
 
-    def get_second_pass_opts_peakrms(self) -> str:
+    def get_second_pass_opts_peakrms(self, batch_reference: float | None = None) -> str:
         """
         Set the adjustment gain based on chosen option and mean/max volume,
         return the matching ffmpeg volume filter.
+
+        Args:
+            batch_reference (float | None, optional): Reference loudness for batch mode.
+                When provided, the target level is adjusted to preserve relative loudness.
+                Defaults to None.
 
         Returns:
             str: ffmpeg volume filter string
@@ -594,6 +617,27 @@ class AudioStream(MediaStream):
 
         normalization_type = self.media_file.ffmpeg_normalize.normalization_type
         target_level = self.media_file.ffmpeg_normalize.target_level
+
+        # Adjust target level for batch mode to preserve relative loudness
+        if batch_reference is not None:
+            if normalization_type == "peak":
+                measured_level = float(self.loudness_statistics["max"])
+            elif normalization_type == "rms":
+                measured_level = float(self.loudness_statistics["mean"])
+            else:
+                raise FFmpegNormalizeError(
+                    "Can only set adjustment for peak and RMS normalization"
+                )
+
+            # Formula: adjusted_target = target_level + (measured_level - batch_reference)
+            # If track is quieter than average (measured < batch_ref), offset is negative → quieter target
+            # If track is louder than average (measured > batch_ref), offset is positive → louder target
+            adjusted_target = target_level + (measured_level - batch_reference)
+            _logger.info(
+                f"Batch mode: Adjusting target from {target_level:.2f} to {adjusted_target:.2f} dB "
+                f"(measured={measured_level:.2f}, batch_ref={batch_reference:.2f}, offset={measured_level - batch_reference:.2f})"
+            )
+            target_level = adjusted_target
 
         if normalization_type == "peak":
             adjustment = 0 + target_level - self.loudness_statistics["max"]

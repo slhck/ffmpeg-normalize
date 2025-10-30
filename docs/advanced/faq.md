@@ -58,6 +58,35 @@ You can use the `--replaygain` option to write ReplayGain tags to the original f
 
 If you decide to run `ffmpeg-normalize` with the default options, it will encode the audio with PCM audio (the default), and the resulting files will be very large. You can also choose to re-encode the files with MP3 or AAC, but you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this kind of destructive operation on your precious music collection, unless you have a backup of the originals or accept potential quality reduction.
 
+## How do I normalize an album while preserving relative loudness between tracks?
+
+Use the `--batch` flag with **RMS or Peak normalization**:
+
+```bash
+# Recommended: RMS-based album normalization
+ffmpeg-normalize album/*.flac --batch -nt rms -t -20 -c:a flac
+
+# Or peak-based album normalization
+ffmpeg-normalize album/*.wav --batch -nt peak -t -1 -c:a pcm_s16le
+```
+
+**Why RMS or Peak? Why not EBU?**
+
+Album normalization means shifting all tracks by the same gain amount – just like turning up or down the volume. Music albums are already mastered with the correct relative loudness between tracks, so you want to preserve this exactly. While EBU batch mode works, it's not recommended for albums because EBU normalization applies different processing to each track based on its perceived loudness characteristics. See the [discussion here for details](https://github.com/slhck/ffmpeg-normalize/issues/145).
+
+**How it works (RMS/Peak):**
+
+1. Analyze all files (first pass)
+2. Calculate average RMS or peak across all tracks
+3. Compute a single gain adjustment needed to reach the target
+4. Apply the same adjustment to all tracks
+
+For example:
+
+- Album's average RMS: -26 dB
+- Target: -20 dB
+- Result: +6 dB applied to all tracks equally
+
 ## Why are my output files MKV?
 
 I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.

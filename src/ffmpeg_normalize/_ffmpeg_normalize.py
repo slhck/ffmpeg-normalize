@@ -84,6 +84,7 @@ class FFmpegNormalize:
         debug (bool, optional): Debug. Defaults to False.
         progress (bool, optional): Progress. Defaults to False.
         replaygain (bool, optional): Write ReplayGain tags without normalizing. Defaults to False.
+        batch (bool, optional): Preserve relative loudness between files (album mode). Defaults to False.
         audio_streams (list[int] | None, optional): List of audio stream indices to normalize. Defaults to None (all streams).
         audio_default_only (bool, optional): Only normalize audio streams with default disposition. Defaults to False.
         keep_other_audio (bool, optional): Keep non-selected audio streams in output (copy without normalization). Defaults to False.
@@ -127,6 +128,7 @@ class FFmpegNormalize:
         debug: bool = False,
         progress: bool = False,
         replaygain: bool = False,
+        batch: bool = False,
         audio_streams: list[int] | None = None,
         audio_default_only: bool = False,
         keep_other_audio: bool = False,
@@ -212,6 +214,7 @@ class FFmpegNormalize:
         self.debug = debug
         self.progress = progress
         self.replaygain = replaygain
+        self.batch = batch
 
         # Stream selection options
         self.audio_streams = audio_streams
@@ -272,29 +275,172 @@ class FFmpegNormalize:
         self.media_files.append(MediaFile(self, input_file, output_file))
         self.file_count += 1
 
+    def _calculate_batch_reference(self) -> float | None:
+        """
+        Calculate the batch reference loudness by averaging measurements across all files.
+
+        Returns:
+            float | None: The batch reference loudness value, or None if no measurements found.
+
+        Note:
+            TODO: Add option to specify different averaging methods (duration-weighted,
+            use quietest/loudest track, etc.)
+        """
+        measurements: list[float] = []
+
+        for media_file in self.media_files:
+            # Access audio streams from the streams dict
+            audio_streams = media_file.streams.get("audio", {})
+            for stream in audio_streams.values():
+                if self.normalization_type == "ebu":
+                    # Get EBU integrated loudness from first pass
+                    ebu_stats = stream.loudness_statistics.get("ebu_pass1")
+                    if ebu_stats and "input_i" in ebu_stats:
+                        measurements.append(float(ebu_stats["input_i"]))
+                elif self.normalization_type == "rms":
+                    # Get RMS mean value
+                    mean = stream.loudness_statistics.get("mean")
+                    if mean is not None:
+                        measurements.append(float(mean))
+                elif self.normalization_type == "peak":
+                    # Get peak max value
+                    max_val = stream.loudness_statistics.get("max")
+                    if max_val is not None:
+                        measurements.append(float(max_val))
+
+        if not measurements:
+            _logger.warning(
+                "No loudness measurements found for batch reference calculation. "
+                "Batch mode will not be applied."
+            )
+            return None
+
+        # Simple average of all measurements
+        batch_reference = sum(measurements) / len(measurements)
+        _logger.debug(f"Batch mode: Measurements for batch reference: {measurements}")
+        _logger.info(
+            f"Batch mode: Calculated reference loudness = {batch_reference:.2f} "
+            f"({self.normalization_type.upper()}, averaged from {len(measurements)} stream(s))"
+        )
+
+        return batch_reference
+
     def run_normalization(self) -> None:
         """
-        Run the normalization procedures
+        Run the normalization procedures.
+
+        In batch mode, all files are analyzed first (first pass), then a batch reference
+        loudness is calculated, and finally all files are normalized (second pass) with
+        adjustments relative to the batch reference to preserve relative loudness.
+
+        In non-batch mode, each file is processed completely (both passes) before
+        moving to the next file.
         """
-        for index, media_file in enumerate(
-            tqdm(self.media_files, desc="File", disable=not self.progress, position=0)
-        ):
+        if self.batch:
+            # Batch mode: analyze all files first, then normalize with relative adjustments
             _logger.info(
-                f"Normalizing file {media_file} ({index + 1} of {self.file_count})"
+                f"Batch mode enabled: processing {self.file_count} file(s) while preserving relative loudness"
             )
 
-            try:
-                media_file.run_normalization()
-            except Exception as e:
-                if len(self.media_files) > 1:
-                    # simply warn and do not die
-                    _logger.error(
-                        f"Error processing input file {media_file}, will "
-                        f"continue batch-processing. Error was: {e}"
-                    )
-                else:
-                    # raise the error so the program will exit
-                    raise e
+            # Recommend RMS/Peak for album normalization instead of EBU
+            if self.normalization_type == "ebu":
+                _logger.warning(
+                    "Using EBU R128 normalization with --batch. For true album normalization where "
+                    "all tracks are shifted by the same amount, consider using --normalization-type rms "
+                    "or --normalization-type peak instead. EBU normalization applies different processing "
+                    "to each track based on its loudness characteristics, which may alter relative levels "
+                    "slightly due to psychoacoustic adjustments."
+                )
+
+            # Warn if using dynamic EBU mode with batch
+            if self.dynamic and self.normalization_type == "ebu":
+                _logger.warning(
+                    "ffmpeg uses dynamic EBU normalization. This may change relative "
+                    "loudness within a file. Use linear mode for true album normalization, or "
+                    "switch to --normalization-type peak or --normalization-type rms instead. "
+                    "To force linear mode, use --keep-lra-above-loudness-range-target or "
+                    "--keep-loudness-range-target."
+                )
+
+            # Phase 1: Run first pass on all files to collect measurements
+            _logger.info("Phase 1: Analyzing all files...")
+            for index, media_file in enumerate(
+                tqdm(
+                    self.media_files,
+                    desc="Analysis",
+                    disable=not self.progress,
+                    position=0,
+                )
+            ):
+                _logger.info(
+                    f"Analyzing file {media_file} ({index + 1} of {self.file_count})"
+                )
+
+                try:
+                    # Only run first pass if not in dynamic EBU mode
+                    if not (self.dynamic and self.normalization_type == "ebu"):
+                        media_file._first_pass()
+                    else:
+                        _logger.debug(
+                            "Dynamic EBU mode: First pass skipped for this file."
+                        )
+                except Exception as e:
+                    if len(self.media_files) > 1:
+                        _logger.error(
+                            f"Error analyzing input file {media_file}, will "
+                            f"continue batch-processing. Error was: {e}"
+                        )
+                    else:
+                        raise e
+
+            # Phase 2: Calculate batch reference loudness
+            batch_reference = self._calculate_batch_reference()
+
+            # Phase 3: Run second pass on all files with batch reference
+            _logger.info("Phase 2: Normalizing all files...")
+            for index, media_file in enumerate(
+                tqdm(
+                    self.media_files,
+                    desc="Normalization",
+                    disable=not self.progress,
+                    position=0,
+                )
+            ):
+                _logger.info(
+                    f"Normalizing file {media_file} ({index + 1} of {self.file_count})"
+                )
+
+                try:
+                    media_file.run_normalization(batch_reference=batch_reference)
+                except Exception as e:
+                    if len(self.media_files) > 1:
+                        _logger.error(
+                            f"Error processing input file {media_file}, will "
+                            f"continue batch-processing. Error was: {e}"
+                        )
+                    else:
+                        raise e
+        else:
+            # Non-batch mode: process each file completely before moving to the next
+            for index, media_file in enumerate(
+                tqdm(
+                    self.media_files, desc="File", disable=not self.progress, position=0
+                )
+            ):
+                _logger.info(
+                    f"Normalizing file {media_file} ({index + 1} of {self.file_count})"
+                )
+
+                try:
+                    media_file.run_normalization()
+                except Exception as e:
+                    if len(self.media_files) > 1:
+                        _logger.error(
+                            f"Error processing input file {media_file}, will "
+                            f"continue batch-processing. Error was: {e}"
+                        )
+                    else:
+                        raise e
 
         if self.print_stats:
             json.dump(

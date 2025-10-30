@@ -408,13 +408,13 @@ class TestFFmpegNormalize:
         assert os.path.isfile("normalized/test.mkv")
 
     def test_duration(self):
-        _, stderr = ffmpeg_normalize_call(["tests/test.wav", "--debug"])
+        _, stderr = ffmpeg_normalize_call(["tests/test.m4a", "--debug"])
         assert "Found duration: " in stderr
 
     def test_pre_filters(self):
         ffmpeg_normalize_call(
             [
-                "tests/test.wav",
+                "tests/test.m4a",
                 "-o",
                 "normalized/test2.wav",
                 "-prf",
@@ -430,16 +430,16 @@ class TestFFmpegNormalize:
                     "output_file": "normalized/test2.mkv",
                     "stream_id": 0,
                     "ebu_pass1": {
-                        "input_i": -23.01,
-                        "input_tp": -10.75,
-                        "input_lra": 2.20,
-                        "input_thresh": -33.06,
-                        "output_i": -22.16,
-                        "output_tp": -9.46,
-                        "output_lra": 2.10,
-                        "output_thresh": -32.25,
+                        "input_i": -23.03,
+                        "input_tp": -17.86,
+                        "input_lra": 0.4,
+                        "input_thresh": -35.86,
+                        "output_i": -19.91,
+                        "output_tp": -14.76,
+                        "output_lra": 0.0,
+                        "output_thresh": -32.59,
                         "normalization_type": "dynamic",
-                        "target_offset": -0.84,
+                        "target_offset": -3.09,
                     },
                     "ebu_pass2": None,
                     "mean": None,
@@ -451,7 +451,7 @@ class TestFFmpegNormalize:
     def test_post_filters(self):
         ffmpeg_normalize_call(
             [
-                "tests/test.wav",
+                "tests/test.m4a",
                 "-o",
                 "normalized/test2.wav",
                 "-pof",
@@ -467,16 +467,16 @@ class TestFFmpegNormalize:
                     "output_file": "normalized/test2.mkv",
                     "stream_id": 0,
                     "ebu_pass1": {
-                        "input_i": -35.02,
-                        "input_tp": -22.76,
-                        "input_lra": 2.20,
-                        "input_thresh": -45.07,
-                        "output_i": -22.16,
-                        "output_tp": -9.46,
-                        "output_lra": 2.10,
-                        "output_thresh": -32.24,
+                        "input_i": -35.05,
+                        "input_tp": -29.9,
+                        "input_lra": 0.4,
+                        "input_thresh": -47.87,
+                        "output_i": -19.9,
+                        "output_tp": -14.76,
+                        "output_lra": 0.0,
+                        "output_thresh": -32.58,
                         "normalization_type": "dynamic",
-                        "target_offset": -0.84,
+                        "target_offset": -3.1,
                     },
                     "ebu_pass2": None,
                     "mean": None,
