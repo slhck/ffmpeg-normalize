@@ -189,6 +189,18 @@
       
     
     
+      <div class="md-header__source">
+        <a href="https://github.com/slhck/ffmpeg-normalize" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
   </nav>
   
 </header>
@@ -222,6 +234,18 @@
     </a>
     ffmpeg-normalize
   </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/slhck/ffmpeg-normalize" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
     
@@ -669,6 +693,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-do-i-normalize-an-album-while-preserving-relative-loudness-between-tracks" class="md-nav__link">
+    <span class="md-ellipsis">
+      How do I normalize an album while preserving relative loudness between tracks?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#why-are-my-output-files-mkv" class="md-nav__link">
     <span class="md-ellipsis">
       Why are my output files MKV?
@@ -938,6 +971,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-do-i-normalize-an-album-while-preserving-relative-loudness-between-tracks" class="md-nav__link">
+    <span class="md-ellipsis">
+      How do I normalize an album while preserving relative loudness between tracks?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#why-are-my-output-files-mkv" class="md-nav__link">
     <span class="md-ellipsis">
       Why are my output files MKV?
@@ -1024,6 +1066,9 @@
                   
 
 
+  
+  
+
 
 <h1 id="faq">FAQ</h1>
 <h2 id="my-output-file-is-too-large">My output file is too large?</h2>
@@ -1070,6 +1115,29 @@
 <h2 id="should-i-use-this-to-normalize-my-music-collection">Should I use this to normalize my music collection?</h2>
 <p>You can use the <code>--replaygain</code> option to write ReplayGain tags to the original file without normalizing. This makes most music players understand the loudness difference and adjust the volume accordingly.</p>
 <p>If you decide to run <code>ffmpeg-normalize</code> with the default options, it will encode the audio with PCM audio (the default), and the resulting files will be very large. You can also choose to re-encode the files with MP3 or AAC, but you will inevitably introduce <a href="https://en.wikipedia.org/wiki/Generation_loss">generation loss</a>. Therefore, I do not recommend running this kind of destructive operation on your precious music collection, unless you have a backup of the originals or accept potential quality reduction.</p>
+<h2 id="how-do-i-normalize-an-album-while-preserving-relative-loudness-between-tracks">How do I normalize an album while preserving relative loudness between tracks?</h2>
+<p>Use the <code>--batch</code> flag with <strong>RMS or Peak normalization</strong>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Recommended: RMS-based album normalization</span>
+ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20<span class="w"> </span>-c:a<span class="w"> </span>flac
+
+<span class="c1"># Or peak-based album normalization</span>
+ffmpeg-normalize<span class="w"> </span>album/*.wav<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span>-1<span class="w"> </span>-c:a<span class="w"> </span>pcm_s16le
+</code></pre></div>
+<p><strong>Why RMS or Peak? Why not EBU?</strong></p>
+<p>Album normalization means shifting all tracks by the same gain amount – just like turning up or down the volume. Music albums are already mastered with the correct relative loudness between tracks, so you want to preserve this exactly. While EBU batch mode works, it's not recommended for albums because EBU normalization applies different processing to each track based on its perceived loudness characteristics. See the <a href="https://github.com/slhck/ffmpeg-normalize/issues/145">discussion here for details</a>.</p>
+<p><strong>How it works (RMS/Peak):</strong></p>
+<ol>
+<li>Analyze all files (first pass)</li>
+<li>Calculate average RMS or peak across all tracks</li>
+<li>Compute a single gain adjustment needed to reach the target</li>
+<li>Apply the same adjustment to all tracks</li>
+</ol>
+<p>For example:</p>
+<ul>
+<li>Album's average RMS: -26 dB</li>
+<li>Target: -20 dB</li>
+<li>Result: +6 dB applied to all tracks equally</li>
+</ul>
 <h2 id="why-are-my-output-files-mkv">Why are my output files MKV?</h2>
 <p>I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.</p>
 <h2 id="i-get-a-could-not-write-header-for-output-file-error">I get a "Could not write header for output file" error</h2>

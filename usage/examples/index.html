@@ -189,6 +189,18 @@
       
     
     
+      <div class="md-header__source">
+        <a href="https://github.com/slhck/ffmpeg-normalize" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
   </nav>
   
 </header>
@@ -222,6 +234,18 @@
     </a>
     ffmpeg-normalize
   </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/slhck/ffmpeg-normalize" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
     
@@ -623,6 +647,15 @@
   <a href="#changing-the-loudness-range" class="md-nav__link">
     <span class="md-ellipsis">
       Changing the loudness range
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#albumbatch-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Album/Batch Normalization
     </span>
   </a>
   
@@ -1070,6 +1103,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#albumbatch-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Album/Batch Normalization
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1131,6 +1173,9 @@
                 
                   
 
+
+  
+  
 
 
 <h1 id="examples">Examples</h1>
@@ -1204,6 +1249,55 @@ ffmpeg-normalize<span class="w"> </span>test.wav<span class="w"> </span>-nt<span
 <p>The default is 7, but by setting a lower value, you can "squeeze" the signal more:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>test/test.wav<span class="w"> </span>-lrt<span class="w"> </span><span class="m">1</span>
 </code></pre></div>
+<h3 id="albumbatch-normalization">Album/Batch Normalization</h3>
+<p>When normalizing an album or collection of tracks, you typically want to shift all files by the same amount rather than normalizing each file independently. This is where batch mode comes in.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Recommended: RMS-based album normalization</span>
+<span class="c1"># Shifts entire album to average RMS of -20 dB</span>
+ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20<span class="w"> </span>-c:a<span class="w"> </span>flac
+
+<span class="c1"># Or peak-based album normalization</span>
+<span class="c1"># Shifts entire album so average peak is at -1 dB</span>
+ffmpeg-normalize<span class="w"> </span>album/*.wav<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span>-1<span class="w"> </span>-c:a<span class="w"> </span>pcm_s16le
+</code></pre></div>
+<p>Best practices for album normalization:</p>
+<ul>
+<li>Use RMS (<code>-nt rms</code>) for most music albums</li>
+<li>Use Peak (<code>-nt peak</code>) if you want to avoid any clipping</li>
+<li>Set a reasonable target level (e.g., <code>-t -20</code> for RMS, <code>-t -1</code> for peak)</li>
+<li>Use lossless codecs (FLAC, WAV) to preserve quality</li>
+</ul>
+<p><strong>What about clipping?</strong></p>
+<p>When using RMS batch normalization, the same gain adjustment is applied to all tracks. This means some tracks might clip if they have higher peaks than average.</p>
+<p>For example:
+- Album average RMS: -26 dB
+- Target RMS: -20 dB
+- Adjustment needed: +6 dB (applied to all tracks)
+- Track A has peak at -1 dB → after +6 dB = <strong>+5 dB</strong> → ⚠️ Clipping!
+- Track B has peak at -8 dB → after +6 dB = -2 dB → ✅ No clipping</p>
+<p>The program will <strong>warn you</strong> for each track that will clip:
+<div class="highlight"><pre><span></span><code>WARNING: Adjusting will lead to clipping of 5.0 dB
+</code></pre></div></p>
+<p><strong>How to avoid clipping:</strong></p>
+<ol>
+<li>
+<p><strong>Use Peak normalization instead</strong> - guarantees no clipping:
+   <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span>-1<span class="w"> </span>-c:a<span class="w"> </span>flac
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Use a more conservative RMS target</strong> - leave more headroom:
+   <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-23<span class="w"> </span>-c:a<span class="w"> </span>flac<span class="w">  </span><span class="c1"># More conservative</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Accept minor clipping</strong> - if clipping is &lt; 0.5 dB, it may be inaudible in most cases</p>
+</li>
+<li>
+<p><strong>Pre-process with a limiter</strong> - use <code>--pre-filter</code> to apply limiting before normalization:
+   <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20<span class="w"> </span>-prf<span class="w"> </span><span class="s2">&quot;alimiter=limit=0.99&quot;</span><span class="w"> </span>-c:a<span class="w"> </span>flac
+</code></pre></div></p>
+</li>
+</ol>
 <h2 id="filters">Filters</h2>
 <h3 id="dynamic-normalization">Dynamic normalization</h3>
 <p>You can use pre-filters to modify the audio signal before or after it is normalized, e.g. by using dynamic compression. This smooths out any volume differences in the signal.</p>
