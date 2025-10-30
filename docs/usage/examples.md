@@ -160,23 +160,23 @@ There are different strategies to deal with this:
 
 1. Use Peak normalization instead – guarantees no clipping:
 
-   ```bash
-   ffmpeg-normalize album/*.flac --batch -nt peak -t -1 -c:a flac
-   ```
+      ```bash
+      ffmpeg-normalize album/*.flac --batch -nt peak -t -1 -c:a flac
+      ```
 
 2. Use a more conservative RMS target – leave more headroom:
 
-   ```bash
-   ffmpeg-normalize album/*.flac --batch -nt rms -t -23 -c:a flac  # More conservative
-   ```
+      ```bash
+      ffmpeg-normalize album/*.flac --batch -nt rms -t -23 -c:a flac  # More conservative
+      ```
 
 3. Accept minor clipping – if clipping is < 0.5 dB, it may be inaudible in most cases
 
 4. Pre-process with a limiter – use `--pre-filter` to apply limiting before normalization:
 
-   ```bash
-   ffmpeg-normalize album/*.flac --batch -nt rms -t -20 -prf "alimiter=limit=0.99" -c:a flac
-   ```
+      ```bash
+      ffmpeg-normalize album/*.flac --batch -nt rms -t -20 -prf "alimiter=limit=0.99" -c:a flac
+      ```
 
 ## Filters
 
