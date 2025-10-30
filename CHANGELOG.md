@@ -1,3 +1,25 @@
+## [1.35.0] - 2025-10-30
+
+### 🚀 Features
+
+- Batch mode normalization
+
+### 🐛 Bug Fixes
+
+- Update completions
+
+### 📚 Documentation
+
+- Update readme and docs
+- How to generate completions
+- Fix completion links and update manual completions
+- Add link to GH repo
+
+### ⚙️ Miscellaneous Tasks
+
+- Add GitHub Actions workflow for automatic docs deployment
+- Update claude.md
+- Bump version to 1.35.0
 ## [1.34.0] - 2025-10-21
 
 ### 🚀 Features
