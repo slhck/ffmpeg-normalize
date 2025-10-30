@@ -922,13 +922,11 @@
 </li>
 <li>
 <p>Version 1.34.0 brings <strong>selective audio stream normalization</strong>! You can now:</p>
-</li>
-<li>
-<p>Normalize specific audio streams with <code>-as/--audio-streams</code> (e.g., <code>-as 1,2</code> to normalize only streams 1 and 2)</p>
-</li>
+<ul>
+<li>Normalize specific audio streams with <code>-as/--audio-streams</code> (e.g., <code>-as 1,2</code> to normalize only streams 1 and 2)</li>
 <li>Normalize only default audio streams with <code>--audio-default-only</code> (useful for files with multiple language tracks)</li>
-<li>
-<p>Keep other streams unchanged with <code>--keep-other-audio</code> (copy non-selected streams without normalization)</p>
+<li>Keep other streams unchanged with <code>--keep-other-audio</code> (copy non-selected streams without normalization)</li>
+</ul>
 <p>Example:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<span class="w"> </span><span class="m">1</span><span class="w"> </span>--keep-other-audio
 </code></pre></div>
