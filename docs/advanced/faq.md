@@ -87,6 +87,8 @@ For example:
 - Target: -20 dB
 - Result: +6 dB applied to all tracks equally
 
+See more details and best practices in the [examples section](../usage/examples.md#albumbatch-normalization).
+
 ## Why are my output files MKV?
 
 I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.

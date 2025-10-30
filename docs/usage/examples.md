@@ -145,6 +145,7 @@ Best practices for album normalization:
 When using RMS batch normalization, the same gain adjustment is applied to all tracks. This means some tracks might clip if they have higher peaks than average.
 
 For example:
+
 - Album average RMS: -26 dB
 - Target RMS: -20 dB
 - Adjustment needed: +6 dB (applied to all tracks)
@@ -152,25 +153,27 @@ For example:
 - Track B has peak at -8 dB → after +6 dB = -2 dB → ✅ No clipping
 
 The program will **warn you** for each track that will clip:
-```
-WARNING: Adjusting will lead to clipping of 5.0 dB
-```
 
-**How to avoid clipping:**
+> `WARNING: Adjusting will lead to clipping of 5.0 dB`
 
-1. **Use Peak normalization instead** - guarantees no clipping:
+There are different strategies to deal with this:
+
+1. Use Peak normalization instead – guarantees no clipping:
+
    ```bash
    ffmpeg-normalize album/*.flac --batch -nt peak -t -1 -c:a flac
    ```
 
-2. **Use a more conservative RMS target** - leave more headroom:
+2. Use a more conservative RMS target – leave more headroom:
+
    ```bash
    ffmpeg-normalize album/*.flac --batch -nt rms -t -23 -c:a flac  # More conservative
    ```
 
-3. **Accept minor clipping** - if clipping is < 0.5 dB, it may be inaudible in most cases
+3. Accept minor clipping – if clipping is < 0.5 dB, it may be inaudible in most cases
 
-4. **Pre-process with a limiter** - use `--pre-filter` to apply limiting before normalization:
+4. Pre-process with a limiter – use `--pre-filter` to apply limiting before normalization:
+
    ```bash
    ffmpeg-normalize album/*.flac --batch -nt rms -t -20 -prf "alimiter=limit=0.99" -c:a flac
    ```
