@@ -1268,36 +1268,39 @@ ffmpeg-normalize<span class="w"> </span>album/*.wav<span class="w"> </span>--bat
 </ul>
 <p><strong>What about clipping?</strong></p>
 <p>When using RMS batch normalization, the same gain adjustment is applied to all tracks. This means some tracks might clip if they have higher peaks than average.</p>
-<p>For example:
-- Album average RMS: -26 dB
-- Target RMS: -20 dB
-- Adjustment needed: +6 dB (applied to all tracks)
-- Track A has peak at -1 dB → after +6 dB = <strong>+5 dB</strong> → ⚠️ Clipping!
-- Track B has peak at -8 dB → after +6 dB = -2 dB → ✅ No clipping</p>
-<p>The program will <strong>warn you</strong> for each track that will clip:
-<div class="highlight"><pre><span></span><code>WARNING: Adjusting will lead to clipping of 5.0 dB
-</code></pre></div></p>
-<p><strong>How to avoid clipping:</strong></p>
+<p>For example:</p>
+<ul>
+<li>Album average RMS: -26 dB</li>
+<li>Target RMS: -20 dB</li>
+<li>Adjustment needed: +6 dB (applied to all tracks)</li>
+<li>Track A has peak at -1 dB → after +6 dB = <strong>+5 dB</strong> → ⚠️ Clipping!</li>
+<li>Track B has peak at -8 dB → after +6 dB = -2 dB → ✅ No clipping</li>
+</ul>
+<p>The program will <strong>warn you</strong> for each track that will clip:</p>
+<blockquote>
+<p><code>WARNING: Adjusting will lead to clipping of 5.0 dB</code></p>
+</blockquote>
+<p>There are different strategies to deal with this:</p>
+<ol>
+<li>Use Peak normalization instead – guarantees no clipping:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span>-1<span class="w"> </span>-c:a<span class="w"> </span>flac
+</code></pre></div>
+<ol>
+<li>Use a more conservative RMS target – leave more headroom:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-23<span class="w"> </span>-c:a<span class="w"> </span>flac<span class="w">  </span><span class="c1"># More conservative</span>
+</code></pre></div>
 <ol>
 <li>
-<p><strong>Use Peak normalization instead</strong> - guarantees no clipping:
-   <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span>-1<span class="w"> </span>-c:a<span class="w"> </span>flac
-</code></pre></div></p>
+<p>Accept minor clipping – if clipping is &lt; 0.5 dB, it may be inaudible in most cases</p>
 </li>
 <li>
-<p><strong>Use a more conservative RMS target</strong> - leave more headroom:
-   <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-23<span class="w"> </span>-c:a<span class="w"> </span>flac<span class="w">  </span><span class="c1"># More conservative</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>Accept minor clipping</strong> - if clipping is &lt; 0.5 dB, it may be inaudible in most cases</p>
-</li>
-<li>
-<p><strong>Pre-process with a limiter</strong> - use <code>--pre-filter</code> to apply limiting before normalization:
-   <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20<span class="w"> </span>-prf<span class="w"> </span><span class="s2">&quot;alimiter=limit=0.99&quot;</span><span class="w"> </span>-c:a<span class="w"> </span>flac
-</code></pre></div></p>
+<p>Pre-process with a limiter – use <code>--pre-filter</code> to apply limiting before normalization:</p>
 </li>
 </ol>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20<span class="w"> </span>-prf<span class="w"> </span><span class="s2">&quot;alimiter=limit=0.99&quot;</span><span class="w"> </span>-c:a<span class="w"> </span>flac
+</code></pre></div>
 <h2 id="filters">Filters</h2>
 <h3 id="dynamic-normalization">Dynamic normalization</h3>
 <p>You can use pre-filters to modify the audio signal before or after it is normalized, e.g. by using dynamic compression. This smooths out any volume differences in the signal.</p>
