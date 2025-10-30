@@ -1,5 +1,6 @@
 site_name: ffmpeg-normalize
 site_url: https://slhck.info/ffmpeg-normalize/
+repo_url: https://github.com/slhck/ffmpeg-normalize
 theme:
   name: material
   features:
