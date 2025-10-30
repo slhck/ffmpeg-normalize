@@ -69,6 +69,19 @@ The tool supports three normalization types defined in `NORMALIZATION_TYPES`:
 
 When committing, YOU MUST use conventional commits.
 
+### Documentation Synchronization
+
+When updating the "What's New" section or the "Features" list, YOU MUST keep **both** files in sync:
+
+1. **README.md** (root of repository) - The "🆕 What's New" and "✨ Features" sections
+2. **docs/index.md** (documentation homepage) - The "🆕 What's New" and "✨ Features" sections
+
+These sections should always contain identical content. When adding a new feature or version announcement:
+
+- Update both files simultaneously
+- Ensure formatting and wording are consistent
+- Verify links work in both contexts (GitHub links in README, relative links in docs)
+
 ### CLI Changes Checklist
 
 When adding, removing, or modifying CLI options, YOU MUST:
@@ -81,7 +94,9 @@ When adding, removing, or modifying CLI options, YOU MUST:
 This ensures users have accurate documentation and working shell completions for all CLI flags.
 
 ### Dependencies
+
 The project uses:
+
 - `tqdm` for progress bars
 - `ffmpeg-progress-yield` for FFmpeg progress monitoring
 - `colorlog` for colored logging
@@ -89,15 +104,18 @@ The project uses:
 - `colorama` (Windows only) for colored terminal output
 
 ### File Structure
+
 - `src/ffmpeg_normalize/` - Main package directory
 - `tests/` - Test files and test media samples
 - `docs/` - MKdocs documentation source
 - `completions/` - Shell completion scripts
 
 ### Testing
+
 Tests use pytest and include actual media files in the `tests/` directory. The test suite calls the CLI directly using `python -m ffmpeg_normalize` to test the full pipeline.
 
 ### Requirements
+
 - Python 3.9+
 - FFmpeg binary must be available in PATH
 - The tool checks for FFmpeg loudnorm filter availability at runtime

@@ -27,20 +27,37 @@ Batch processing of several input files is possible, including video files.
 - **Docker support** — Run via Docker container
 - **Python API** — Use programmatically in your Python projects
 - **Shell completions** — Available for bash, zsh, and fish
+- **Album Batch normalization** – Process files jointy, preserving relative loudness
 
 ## 🆕 What's New
 
-**Version 1.34.0** brings selective audio stream normalization! You can now:
+- Version 1.35.0 has **batch/album normalization** with `--batch`. It preserves relative loudness between files! Perfect for music albums where you want to shift all tracks by the same amount.
 
-- **Normalize specific audio streams** with `-as/--audio-streams` (e.g., `-as 1,2` to normalize only streams 1 and 2)
-- **Normalize only default audio streams** with `--audio-default-only` (useful for files with multiple language tracks)
-- **Keep other streams unchanged** with `--keep-other-audio` (copy non-selected streams without normalization)
+    Example:
 
-Example: `ffmpeg-normalize input.mkv -as 1 --keep-other-audio` normalizes stream 1 and copies all other audio streams unchanged.
+    ```bash
+    ffmpeg-normalize album/*.flac --batch -nt rms -t -20
+    ```
 
-**Recent additions:**
+    shifts the entire album so the average RMS is -20 dB, preserving the original relative loudness as mastered.
 
-- **Shell completions** (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the [completions directory](https://github.com/slhck/ffmpeg-normalize/tree/master/completions) for installation instructions.
+- Version 1.34.0 brings **selective audio stream normalization**! You can now:
+
+  - Normalize specific audio streams with `-as/--audio-streams` (e.g., `-as 1,2` to normalize only streams 1 and 2)
+  - Normalize only default audio streams with `--audio-default-only` (useful for files with multiple language tracks)
+  - Keep other streams unchanged with `--keep-other-audio` (copy non-selected streams without normalization)
+
+    Example:
+
+    ```bash
+    ffmpeg-normalize input.mkv -as 1 --keep-other-audio
+    ```
+
+    normalizes stream 1 and copies all other audio streams unchanged.
+
+Other recent additions:
+
+- **Shell completions** (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the [installation guide](../getting-started/installation/#shell-completions) for setup instructions.
 - **`--lower-only` option** — Prevent audio from increasing in loudness, only lower it if needed (works with all normalization types).
 
 See the [full changelog](about/changelog.md) for all updates.
