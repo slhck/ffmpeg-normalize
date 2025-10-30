@@ -43,9 +43,9 @@ Batch processing of several input files is possible, including video files.
 
 - Version 1.34.0 brings **selective audio stream normalization**! You can now:
 
-  - Normalize specific audio streams with `-as/--audio-streams` (e.g., `-as 1,2` to normalize only streams 1 and 2)
-  - Normalize only default audio streams with `--audio-default-only` (useful for files with multiple language tracks)
-  - Keep other streams unchanged with `--keep-other-audio` (copy non-selected streams without normalization)
+    - Normalize specific audio streams with `-as/--audio-streams` (e.g., `-as 1,2` to normalize only streams 1 and 2)
+    - Normalize only default audio streams with `--audio-default-only` (useful for files with multiple language tracks)
+    - Keep other streams unchanged with `--keep-other-audio` (copy non-selected streams without normalization)
 
     Example:
 
