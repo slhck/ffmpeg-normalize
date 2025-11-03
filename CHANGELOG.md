@@ -1,3 +1,24 @@
+## [1.36.0] - 2025-11-03
+
+### 🚀 Features
+
+- Add --preset option and update docs
+
+### 🐛 Bug Fixes
+
+- Correct markdown indentation for MkDocs Material
+- Warn instead of debug on invalid preset options
+
+### 📚 Documentation
+
+- Synchronize "What's New" section between README and docs
+- Update
+- Fix formatting
+- Update documentation for new features
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.36.0
 ## [1.35.0] - 2025-10-30
 
 ### 🚀 Features
