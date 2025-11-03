@@ -158,8 +158,8 @@ class PresetManager:
 
             # Check if this attribute exists in cli_args
             if not hasattr(cli_args, attr_name):
-                _logger.debug(
-                    f"Preset option '{key}' is not a valid ffmpeg-normalize option"
+                _logger.warning(
+                    f"Preset option '{key}' is not a valid ffmpeg-normalize option. Skipping."
                 )
                 continue
 
