@@ -1,0 +1,6 @@
+{
+  "normalization-type": "rms",
+  "target-level": -20.0,
+  "batch": true,
+  "progress": true
+}

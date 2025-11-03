@@ -6,6 +6,7 @@ theme:
   features:
     - navigation.instant
     - navigation.sections
+    - navigation.footer
   palette:
     - scheme: default
       primary: indigo
@@ -34,10 +35,13 @@ nav:
     - Installation: getting-started/installation.md
     - Docker Usage: getting-started/docker.md
   - Usage:
-    - High-Level Introduction: usage/high-level-introduction.md
     - Basic Usage: usage/basic.md
-    - Examples: usage/examples.md
-    - Options: usage/options.md
+    - File Input/Output: usage/file-input-output.md
+    - Normalization Options: usage/normalization-options.md
+    - Album/Batch Normalization: usage/album-batch-normalization.md
+    - Audio Filters: usage/audio-filters.md
+    - Presets: usage/presets.md
+    - CLI Options Reference: usage/cli-options.md
   - Advanced:
     - API: advanced/api.md
     - FAQ: advanced/faq.md

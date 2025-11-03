@@ -14,7 +14,7 @@ ffmpeg-normalize is a Python utility for audio normalization using ffmpeg. It su
 
 ### Code Quality
 - `uv run ruff check .` - Linting
-- `uv run ruff format .` - Code formatting  
+- `uv run ruff format .` - Code formatting
 - `uv run mypy src/ffmpeg_normalize` - Type checking
 
 ### Installation
@@ -86,7 +86,7 @@ These sections should always contain identical content. When adding a new featur
 
 When adding, removing, or modifying CLI options, YOU MUST:
 
-1. **Update the documentation** at `docs/usage/options.md` with the new option details
+1. **Update the documentation** at `docs/usage/cli-options.md` with the new option details
 2. **Regenerate shell completions** for bash and zsh (see Shell Completions section above)
 3. **Test the changes** with `uv run python -m ffmpeg_normalize --help` to verify help text
 4. **Update tests** if the new option affects behavior

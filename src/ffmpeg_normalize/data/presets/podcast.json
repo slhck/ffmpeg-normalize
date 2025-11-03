@@ -1,0 +1,7 @@
+{
+  "normalization-type": "ebu",
+  "target-level": -16.0,
+  "loudness-range-target": 7.0,
+  "true-peak": -2.0,
+  "progress": true
+}

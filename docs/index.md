@@ -57,7 +57,7 @@ Batch processing of several input files is possible, including video files.
 
 Other recent additions:
 
-- **Shell completions** (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the [installation guide](../getting-started/installation/#shell-completions) for setup instructions.
+- **Shell completions** (v1.31.0) — Tab completion for bash, zsh, and fish shells. See the [installation guide](getting-started/installation/#shell-completions) for setup instructions.
 - **`--lower-only` option** — Prevent audio from increasing in loudness, only lower it if needed (works with all normalization types).
 
 See the [full changelog](about/changelog.md) for all updates.

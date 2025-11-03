@@ -1,4 +1,6 @@
-# Detailed Options
+# CLI Options Reference
+
+This is a complete list of all command-line options supported by `ffmpeg-normalize`.
 
 ## File Input/Output
 
@@ -58,6 +60,27 @@ Show progress bar for files and streams
 ### `--version`
 
 Print version and exit
+
+### `--preset PRESET`
+
+Load options from a preset file.
+
+Preset files are JSON files located in the presets directory. The directory location depends on your OS:
+
+- **Linux/macOS:** `~/.config/ffmpeg-normalize/presets/`
+- **Windows:** `%APPDATA%\ffmpeg-normalize\presets\`
+
+Use `--list-presets` to see available presets.
+
+CLI options specified on the command line take precedence over preset values.
+
+Example: `ffmpeg-normalize input.mp3 --preset podcast`
+
+### `--list-presets`
+
+List all available presets and exit.
+
+This displays both built-in presets and any custom presets installed in your config directory.
 
 ## Normalization
 

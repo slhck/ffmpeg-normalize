@@ -93,6 +93,48 @@ class FFmpegNormalize:
         FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
     """
 
+    # Default parameter values - single source of truth for all defaults
+    # Note: output_folder is a CLI-level option and not passed to FFmpegNormalize.__init__
+    DEFAULTS = {
+        "normalization_type": "ebu",
+        "target_level": -23.0,
+        "print_stats": False,
+        "loudness_range_target": 7.0,
+        "keep_loudness_range_target": False,
+        "keep_lra_above_loudness_range_target": False,
+        "true_peak": -2.0,
+        "offset": 0.0,
+        "lower_only": False,
+        "auto_lower_loudness_target": False,
+        "dual_mono": False,
+        "dynamic": False,
+        "audio_codec": "pcm_s16le",
+        "audio_bitrate": None,
+        "sample_rate": None,
+        "audio_channels": None,
+        "keep_original_audio": False,
+        "pre_filter": None,
+        "post_filter": None,
+        "video_codec": "copy",
+        "video_disable": False,
+        "subtitle_disable": False,
+        "metadata_disable": False,
+        "chapters_disable": False,
+        "extra_input_options": None,
+        "extra_output_options": None,
+        "output_format": None,
+        "output_folder": "normalized",
+        "extension": "mkv",
+        "dry_run": False,
+        "debug": False,
+        "progress": False,
+        "replaygain": False,
+        "batch": False,
+        "audio_streams": None,
+        "audio_default_only": False,
+        "keep_other_audio": False,
+    }
+
     def __init__(
         self,
         normalization_type: Literal["ebu", "rms", "peak"] = "ebu",

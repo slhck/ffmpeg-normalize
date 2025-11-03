@@ -5,7 +5,7 @@
 
 _shtab_ffmpeg_normalize_commands() {
   local _commands=(
-
+    
   )
   _describe 'ffmpeg-normalize commands' _commands
 }
@@ -33,6 +33,17 @@ name specified.
   {-n,--dry-run}"[Do not run normalization, only print what would be done]"
   {-pr,--progress}"[Show progress bar for files and streams]"
   "(- : *)--version[Print version and exit]"
+  "--preset[Load options from a preset file.
+
+Preset files are JSON files located in the presets directory.
+The directory location depends on your OS\:
+- Linux\/macOS\: \~\/.config\/ffmpeg-normalize\/presets\/
+- Windows\: \%APPDATA\%\/ffmpeg-normalize\/presets\/
+
+Use --list-presets to see available presets.
+CLI options specified on the command line take precedence over preset values.
+]:preset:"
+  "--list-presets[List all available presets and exit]"
   {-nt,--normalization-type}"[Normalization type (default\: \`ebu\`).
 
 EBU normalization performs two passes and normalizes according to EBU
@@ -64,7 +75,7 @@ files are considered to be part of a single album and their relative volumes are
 This is done by averaging the loudness of all the files, computing a single adjustment from
 that, and applying a relative adjustment to all the files.
 
-Batch mode works with all normalization types (EBU, RMS, peak), but we recommend RMS.
+Batch mode works with all normalization types (EBU, RMS, peak).
 ]"
   {-lrt,--loudness-range-target}"[EBU Loudness Range Target in LUFS (default\: 7.0).
 Range is 1.0 - 50.0.
@@ -220,7 +231,7 @@ _shtab_ffmpeg_normalize() {
       (( CURRENT += 1 ))
       curcontext="${curcontext%:*:*}:_shtab_ffmpeg_normalize-$line[1]:"
       case $line[1] in
-
+        
       esac
   esac
 }

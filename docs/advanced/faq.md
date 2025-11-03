@@ -12,35 +12,7 @@ ffmpeg-normalize input.wav -o output.m4a -c:a aac -b:a 192k
 
 ## What options should I choose for the EBU R128 filter? What is linear and dynamic mode?
 
-EBU R128 is a method for normalizing audio loudness across different tracks or programs. It works by analyzing the audio content and adjusting it to meet specific loudness targets. The main components are:
-
-* Integrated Loudness (I): The overall loudness of the entire audio.
-* Loudness Range (LRA): The variation in loudness over time.
-* True Peak (TP): The maximum level of the audio signal.
-
-The normalization process involves measuring these values (input) and then applying gain adjustments to meet target levels (output), typically -23 LUFS for integrated loudness. You can also specify a target loudness range (LRA) and true peak level (TP).
-
-**Linear mode** applies a constant gain adjustment across the entire audio file. This is generally preferred because:
-
-* It preserves the original dynamic range of the audio.
-* It maintains the relative loudness between different parts of the audio.
-* It avoids potential artifacts or pumping effects that can occur with dynamic processing.
-
-**Dynamic mode**, on the other hand, can change the volume dynamically throughout the file. While this can achieve more consistent loudness, it may alter the original artistic intent. There were some bugs in older versions of the `loudnorm` filter that could cause artifacts, but these have been fixed in recent versions of ffmpeg.
-
-For most cases, linear mode is recommended. Dynamic mode should only be used when linear mode is not suitable or when a specific effect is desired. In some cases, `loudnorm` will still fall back to dynamic mode, and a warning will be printed to the console. Here's when this can happen:
-
-* When the input loudness range (LRA) is larger than the target loudness range: If the input file has a loudness range that exceeds the specified loudness range target, the loudnorm filter will automatically switch to dynamic mode. This is because linear normalization alone cannot reduce the loudness range without dynamic processing (limiting). The `--keep-loudness-range-target` option can be used to keep the input loudness range target above the specified target.
-
-* When the required gain adjustment to meet the integrated loudness target would result in the true peak exceeding the specified true peak limit. This is because linear processing alone cannot reduce peaks without affecting the entire signal. For example, if a file needs to be amplified by 6 dB to reach the target integrated loudness, but doing so would push the true peak above the specified limit, the filter might switch to dynamic mode to handle this situation. If your content allows for it, you can increase the true peak target to give more headroom for linear processing. If you're consistently running into true peak issues, you might also consider lowering your target integrated loudness level.
-
-At this time, the `loudnorm` filter in ffmpeg does not provide a way to force linear mode when the input loudness range exceeds the target or when the true peak would be exceeded. There are some options to mitigate this:
-
-- The `--keep-lra-above-loudness-range-target` option can be used to keep the input loudness range above the specified target, but it will not force linear mode in all cases.
-- Similarly, the `--keep-loudness-range-target` option can be used to keep the input loudness range target.
-- The `--lower-only` option can be used to skip the normalization pass completely if the measured loudness is lower than the target loudness.
-
-If instead you want to use dynamic mode, you can use the `--dynamic` option; this will also speed up the normalization process because only one pass is needed.
+See [the audio normalization options](../usage/normalization-options.md).
 
 ## The program doesn't work because the "loudnorm" filter can't be found
 
@@ -57,37 +29,6 @@ If you have to use an outdated ffmpeg version, you can only use `rms` or `peak` 
 You can use the `--replaygain` option to write ReplayGain tags to the original file without normalizing. This makes most music players understand the loudness difference and adjust the volume accordingly.
 
 If you decide to run `ffmpeg-normalize` with the default options, it will encode the audio with PCM audio (the default), and the resulting files will be very large. You can also choose to re-encode the files with MP3 or AAC, but you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this kind of destructive operation on your precious music collection, unless you have a backup of the originals or accept potential quality reduction.
-
-## How do I normalize an album while preserving relative loudness between tracks?
-
-Use the `--batch` flag with **RMS or Peak normalization**:
-
-```bash
-# Recommended: RMS-based album normalization
-ffmpeg-normalize album/*.flac --batch -nt rms -t -20 -c:a flac
-
-# Or peak-based album normalization
-ffmpeg-normalize album/*.wav --batch -nt peak -t -1 -c:a pcm_s16le
-```
-
-**Why RMS or Peak? Why not EBU?**
-
-Album normalization means shifting all tracks by the same gain amount – just like turning up or down the volume. Music albums are already mastered with the correct relative loudness between tracks, so you want to preserve this exactly. While EBU batch mode works, it's not recommended for albums because EBU normalization applies different processing to each track based on its perceived loudness characteristics. See the [discussion here for details](https://github.com/slhck/ffmpeg-normalize/issues/145).
-
-**How it works (RMS/Peak):**
-
-1. Analyze all files (first pass)
-2. Calculate average RMS or peak across all tracks
-3. Compute a single gain adjustment needed to reach the target
-4. Apply the same adjustment to all tracks
-
-For example:
-
-- Album's average RMS: -26 dB
-- Target: -20 dB
-- Result: +6 dB applied to all tracks equally
-
-See more details and best practices in the [examples section](../usage/examples.md#albumbatch-normalization).
 
 ## Why are my output files MKV?
 

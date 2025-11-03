@@ -46,6 +46,7 @@ ffmpeg-normalize = "ffmpeg_normalize.__main__:main"
 
 [tool.uv_build]
 src-layout = true
+package-data = {"ffmpeg_normalize" = ["data/**/*.json"]}
 
 [dependency-groups]
 dev = [

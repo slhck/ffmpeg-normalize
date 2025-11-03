@@ -13,6 +13,7 @@ from typing import NoReturn
 from ._errors import FFmpegNormalizeError
 from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
 from ._logger import setup_cli_logger
+from ._presets import PresetManager
 
 # Import version from package
 import importlib.metadata
@@ -50,7 +51,7 @@ def create_parser() -> argparse.ArgumentParser:
 
             Author: Werner Robitza
             License: MIT
-            Homepage / Issues: https://github.com/slhck/ffmpeg-normalize
+            Website / Issues: https://github.com/slhck/ffmpeg-normalize
             """
         ),
     )
@@ -90,7 +91,7 @@ def create_parser() -> argparse.ArgumentParser:
             name specified.
         """
         ),
-        default="normalized",
+        default=FFmpegNormalize.DEFAULTS["output_folder"],
     )
 
     group_general = parser.add_argument_group("General Options")
@@ -124,6 +125,28 @@ def create_parser() -> argparse.ArgumentParser:
         version=f"%(prog)s v{__version__}",
         help="Print version and exit",
     )
+    group_general.add_argument(
+        "--preset",
+        type=str,
+        help=textwrap.dedent(
+            """\
+        Load options from a preset file.
+
+        Preset files are JSON files located in the presets directory.
+        The directory location depends on your OS:
+        - Linux/macOS: ~/.config/ffmpeg-normalize/presets/
+        - Windows: %%APPDATA%%/ffmpeg-normalize/presets/
+
+        Use --list-presets to see available presets.
+        CLI options specified on the command line take precedence over preset values.
+        """
+        ),
+    )
+    group_general.add_argument(
+        "--list-presets",
+        action="store_true",
+        help="List all available presets and exit",
+    )
 
     group_normalization = parser.add_argument_group("Normalization")
     group_normalization.add_argument(
@@ -144,15 +167,15 @@ def create_parser() -> argparse.ArgumentParser:
         Peak normalization brings the signal to the specified peak level.
         """
         ),
-        default="ebu",
+        default=FFmpegNormalize.DEFAULTS["normalization_type"],
     )
     group_normalization.add_argument(
         "-t",
         "--target-level",
         type=float,
         help=textwrap.dedent(
-            """\
-        Normalization target level in dB/LUFS (default: -23).
+            f"""\
+        Normalization target level in dB/LUFS (default: {FFmpegNormalize.DEFAULTS["target_level"]}).
 
         For EBU normalization, it corresponds to Integrated Loudness Target
         in LUFS. The range is -70.0 - -5.0.
@@ -160,7 +183,7 @@ def create_parser() -> argparse.ArgumentParser:
         Otherwise, the range is -99 to 0.
         """
         ),
-        default=-23.0,
+        default=FFmpegNormalize.DEFAULTS["target_level"],
     )
     group_normalization.add_argument(
         "-p",
@@ -215,12 +238,12 @@ def create_parser() -> argparse.ArgumentParser:
         "--loudness-range-target",
         type=float,
         help=textwrap.dedent(
-            """\
-        EBU Loudness Range Target in LUFS (default: 7.0).
+            f"""\
+        EBU Loudness Range Target in LUFS (default: {FFmpegNormalize.DEFAULTS["loudness_range_target"]}).
         Range is 1.0 - 50.0.
         """
         ),
-        default=7.0,
+        default=FFmpegNormalize.DEFAULTS["loudness_range_target"],
     )
 
     group_ebu.add_argument(
@@ -249,26 +272,26 @@ def create_parser() -> argparse.ArgumentParser:
         "--true-peak",
         type=float,
         help=textwrap.dedent(
-            """\
-        EBU Maximum True Peak in dBTP (default: -2.0).
+            f"""\
+        EBU Maximum True Peak in dBTP (default: {FFmpegNormalize.DEFAULTS["true_peak"]}).
         Range is -9.0 - +0.0.
         """
         ),
-        default=-2.0,
+        default=FFmpegNormalize.DEFAULTS["true_peak"],
     )
 
     group_ebu.add_argument(
         "--offset",
         type=float,
         help=textwrap.dedent(
-            """\
-        EBU Offset Gain (default: 0.0).
+            f"""\
+        EBU Offset Gain (default: {FFmpegNormalize.DEFAULTS["offset"]}).
         The gain is applied before the true-peak limiter in the first pass only.
         The offset for the second pass will be automatically determined based on the first pass statistics.
         Range is -99.0 - +99.0.
         """
         ),
-        default=0.0,
+        default=FFmpegNormalize.DEFAULTS["offset"],
     )
 
     group_ebu.add_argument(
@@ -471,7 +494,7 @@ def create_parser() -> argparse.ArgumentParser:
         Will attempt to copy video codec by default.
         """
         ),
-        default="copy",
+        default=FFmpegNormalize.DEFAULTS["video_codec"],
     )
     group_vcodec.add_argument(
         "-sn",
@@ -565,7 +588,7 @@ def create_parser() -> argparse.ArgumentParser:
         specified. (Default: `mkv`)
         """
         ),
-        default="mkv",
+        default=FFmpegNormalize.DEFAULTS["extension"],
     )
     return parser
 
@@ -580,6 +603,28 @@ def main() -> None:
         else:
             _logger.error(message)
         sys.exit(1)
+
+    # Handle --list-presets
+    preset_manager = PresetManager()
+    if cli_args.list_presets:
+        presets = preset_manager.get_available_presets()
+        if presets:
+            print("Available presets:")
+            for preset in presets:
+                print(f"  - {preset}")
+        else:
+            print(f"No presets found in {preset_manager.presets_dir}")
+        sys.exit(0)
+
+    # Load and apply preset if specified
+    if cli_args.preset:
+        try:
+            preset_data = preset_manager.load_preset(cli_args.preset)
+            _logger.debug(f"Loaded preset '{cli_args.preset}': {preset_data}")
+            preset_manager.merge_preset_with_args(preset_data, cli_args)
+            _logger.info(f"Applied preset '{cli_args.preset}'")
+        except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
+            error(str(e))
 
     def _split_options(opts: str) -> list[str]:
         """
