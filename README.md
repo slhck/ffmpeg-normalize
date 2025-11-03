@@ -26,6 +26,16 @@ This program normalizes media files to a certain loudness level using the EBU R1
 
 ## 🆕 What's New
 
+- Version 1.36.0 introduces **presets** with `--preset`! Save and reuse your favorite normalization configurations for different use cases. Comes with three built-in presets: `podcast` (AES standard), `music` (RMS-based batch normalization), and `streaming-video` (video content). Create custom presets too!
+
+    Example:
+
+    ```bash
+    ffmpeg-normalize input.mp3 --preset podcast
+    ```
+
+    applies the podcast preset (EBU R128, -16 LUFS) to your file. Learn more in the [presets guide](https://slhck.info/ffmpeg-normalize/usage/presets/).
+
 - Version 1.35.0 has **batch/album normalization** with `--batch`. It preserves relative loudness between files! Perfect for music albums where you want to shift all tracks by the same amount.
 
     Example:
