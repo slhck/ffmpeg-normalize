@@ -8,21 +8,21 @@
       
       
       
-        <link rel="canonical" href="https://slhck.info/ffmpeg-normalize/usage/high-level-introduction/">
+        <link rel="canonical" href="https://slhck.info/ffmpeg-normalize/usage/presets/">
       
       
-        <link rel="prev" href="../../getting-started/docker/">
+        <link rel="prev" href="../audio-filters/">
       
       
-        <link rel="next" href="../basic/">
+        <link rel="next" href="../cli-options/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
     
     
       
-        <title>High-Level Introduction - ffmpeg-normalize</title>
+        <title>Presets - ffmpeg-normalize</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#high-level-introduction" class="md-skip">
+        <a href="#using-presets" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              High-Level Introduction
+              Presets
             
           </span>
         </div>
@@ -439,116 +439,6 @@
                 
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    High-Level Introduction
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    High-Level Introduction
-    
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#what-does-the-program-do" class="md-nav__link">
-    <span class="md-ellipsis">
-      What does the program do?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-do-i-specify-the-input" class="md-nav__link">
-    <span class="md-ellipsis">
-      How do I specify the input?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-codec-is-chosen" class="md-nav__link">
-    <span class="md-ellipsis">
-      What codec is chosen?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-do-i-specify-the-output-file-name-or-extension" class="md-nav__link">
-    <span class="md-ellipsis">
-      How do I specify the output file name or extension?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-will-get-normalized" class="md-nav__link">
-    <span class="md-ellipsis">
-      What will get normalized?
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
@@ -575,12 +465,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/" class="md-nav__link">
+      <a href="../file-input-output/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Examples
+    File Input/Output
     
   </span>
   
@@ -598,12 +488,263 @@
   
   
     <li class="md-nav__item">
-      <a href="../options/" class="md-nav__link">
+      <a href="../normalization-options/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Options
+    Normalization Options
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../album-batch-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Album/Batch Normalization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audio-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Audio Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Presets
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Presets
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linuxmacos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Linux/macOS
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#built-in-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Built-in Presets
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in Presets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#podcast" class="md-nav__link">
+    <span class="md-ellipsis">
+      podcast
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#music" class="md-nav__link">
+    <span class="md-ellipsis">
+      music
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      streaming-video
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-presets_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using Presets
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-custom-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating Custom Presets
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating Custom Presets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-custom-voice-preset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Custom Voice Preset
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-custom-streaming-audio-preset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Custom Streaming Audio Preset
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CLI Options Reference
     
   </span>
   
@@ -863,47 +1004,119 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-does-the-program-do" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
-      What does the program do?
+      Overview
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linuxmacos" class="md-nav__link">
+    <span class="md-ellipsis">
+      Linux/macOS
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Windows
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#built-in-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Built-in Presets
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in Presets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#podcast" class="md-nav__link">
+    <span class="md-ellipsis">
+      podcast
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#music" class="md-nav__link">
+    <span class="md-ellipsis">
+      music
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      streaming-video
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-presets_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using Presets
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-do-i-specify-the-input" class="md-nav__link">
+  <a href="#creating-custom-presets" class="md-nav__link">
     <span class="md-ellipsis">
-      How do I specify the input?
+      Creating Custom Presets
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating Custom Presets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-custom-voice-preset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Custom Voice Preset
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#what-codec-is-chosen" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#example-custom-streaming-audio-preset" class="md-nav__link">
     <span class="md-ellipsis">
-      What codec is chosen?
+      Example: Custom Streaming Audio Preset
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#how-do-i-specify-the-output-file-name-or-extension" class="md-nav__link">
-    <span class="md-ellipsis">
-      How do I specify the output file name or extension?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-will-get-normalized" class="md-nav__link">
-    <span class="md-ellipsis">
-      What will get normalized?
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -926,62 +1139,119 @@
   
 
 
-<h1 id="high-level-introduction">High-Level Introduction</h1>
-<h2 id="what-does-the-program-do">What does the program do?</h2>
-<p>The program takes one or more input files and, by default, writes them to a folder called <code>normalized</code>, using an <code>.mkv</code> container. The reason for choosing the MKV container is that it can handle almost any codec combination without any additional configuration.</p>
-<p>All audio streams will be normalized so that they have the same (perceived) volume according to the <a href="https://tech.ebu.ch/docs/r/r128.pdf">EBU R128</a> standard. This is done by analyzing the audio streams and applying a filter to bring them to a target level. This ensures that multiple files normalized with this filter will have the same perceived loudness.</p>
-<p>Under the hood, the <code>ffmpeg-normalize</code> program uses <a href="https://ffmpeg.org/ffmpeg-filters.html#loudnorm">ffmpeg's <code>loudnorm</code> filter</a> to do this; the filter was <a href="https://k.ylo.ph/2016/04/04/loudnorm.html">originally written by Kyle Swanson</a>.</p>
-<h2 id="how-do-i-specify-the-input">How do I specify the input?</h2>
-<p>Just give the program one or more input files as arguments. It works with most media files, including video files:</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input1.mp3
+<h1 id="using-presets">Using Presets</h1>
+<p>Presets allow you to save and reuse common configurations for different use cases. Instead of specifying the same options every time, you can create a preset file and reference it with <code>--preset</code>.</p>
+<h2 id="overview">Overview</h2>
+<p>A preset is a JSON file containing a set of ffmpeg-normalize options. When you use <code>--preset &lt;name&gt;</code>, the options from the preset file are applied to your command. Any options you specify on the command line take precedence over the preset values.</p>
+<p>Presets are stored in a platform-specific configuration directory.</p>
+<h3 id="linuxmacos">Linux/macOS</h3>
+<p>By default:
+<div class="highlight"><pre><span></span><code>~/.config/ffmpeg-normalize/presets/
+</code></pre></div></p>
+<p>If you have <code>XDG_CONFIG_HOME</code> set:
+<div class="highlight"><pre><span></span><code>$XDG_CONFIG_HOME/ffmpeg-normalize/presets/
+</code></pre></div></p>
+<h3 id="windows">Windows</h3>
+<div class="highlight"><pre><span></span><code>%APPDATA%\ffmpeg-normalize\presets\
 </code></pre></div>
-<p>This will create a file called <code>normalized/input1.mkv</code> in the current directory.</p>
-<h2 id="what-codec-is-chosen">What codec is chosen?</h2>
-<p>The default audio encoding method is uncompressed PCM (<code>pcm_s16le</code>) to avoid introducing compression artifacts.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This default keeps the quality high, but will result in a much higher bitrate than you might want, for example if your input files are MP3s, and now your output is much larger.</p>
-</div>
-<p>If you want to keep the file size down, use <code>-c:a</code> and specify an audio codec (e.g., <code>-c:a aac</code> for ffmpeg's built-in AAC encoder):</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input1.mp3<span class="w"> </span>-c:a<span class="w"> </span>aac
+<h2 id="built-in-presets">Built-in Presets</h2>
+<p>ffmpeg-normalize comes with three built-in presets:</p>
+<h3 id="podcast"><code>podcast</code></h3>
+<p>Optimized for podcast audio normalization using the <a href="https://www.aes.org/technical/documents/AESTD1004_1_15_10.pdf">AES recommended standard</a>.</p>
+<ul>
+<li>Normalization type: EBU R128</li>
+<li>Target level: -16 LUFS</li>
+<li>Loudness range target: 7.0 LUFS</li>
+<li>True peak: -2.0 dBTP</li>
+</ul>
+<h3 id="music"><code>music</code></h3>
+<p>Optimized for music album normalization. Preserves relative loudness between tracks using RMS-based normalization in batch mode for consistent loudness across albums.</p>
+<ul>
+<li>Normalization type: RMS</li>
+<li>Target level: -20.0 dB</li>
+<li>Batch mode: enabled (preserves relative loudness between tracks)</li>
+</ul>
+<h3 id="streaming-video"><code>streaming-video</code></h3>
+<p>Optimized for video streaming platforms with the standard loudness level for video content.</p>
+<ul>
+<li>Normalization type: EBU R128</li>
+<li>Target level: -14.0 LUFS</li>
+<li>Loudness range target: 7.0 LUFS</li>
+<li>True peak: -2.0 dBTP</li>
+</ul>
+<h2 id="using-presets_1">Using Presets</h2>
+<p>To see all available presets:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>--list-presets
 </code></pre></div>
-<p>This will create a file called <code>normalized/input1.mkv</code> in the current directory, now using the AAC codec.</p>
-<h2 id="how-do-i-specify-the-output-file-name-or-extension">How do I specify the output file name or extension?</h2>
-<p>You don't have to specify an output file name (the default is <code>normalized/&lt;input&gt;.mkv</code>), but if you want to override it, you can specify one output file name for each input file with the <code>-o</code> option. In this case, the container format (e.g. <code>.wav</code>) will be inferred from the file name extension that you've given.</p>
-<p>Example:</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span><span class="m">1</span>.wav<span class="w"> </span><span class="m">2</span>.wav<span class="w"> </span>-o<span class="w"> </span><span class="m">1</span>-normalized.wav<span class="w"> </span><span class="m">2</span>-normalized.wav
+<p>To apply a preset to your files:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp3<span class="w"> </span>--preset<span class="w"> </span>podcast
 </code></pre></div>
-<p>Using the <code>-ext</code> option, you can supply a different output extension common to all output files, e.g. <code>-ext m4a</code>. Example:</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp3<span class="w"> </span>-c:a<span class="w"> </span>aac<span class="w"> </span>-ext<span class="w"> </span>m4a
+<p>This will automatically apply all options defined in the <code>podcast</code> preset to your command.</p>
+<p>CLI options take precedence over preset values. For example, to use the podcast preset but with a different output codec:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp3<span class="w"> </span>--preset<span class="w"> </span>podcast<span class="w"> </span>--audio-codec<span class="w"> </span>libmp3lame
 </code></pre></div>
-<p>This will create a file called <code>normalized/input.m4a</code>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>You need to make sure that the container supports the codecs used for the output. For example, you cannot place AAC audio in a WAV container.</p>
-</div>
-<h2 id="what-will-get-normalized">What will get normalized?</h2>
-<p>By default, all streams from the input file will be written to the output file. For example, if your input is a video with two language tracks and a subtitle track, both audio tracks will be normalized independently. Any video and subtitle tracks will be copied over to the output file.</p>
-<p>You additionally have several options for controlling which audio streams get normalized. By default, all audio streams are normalized:</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mkv
+<p>The <code>--audio-codec</code> option will then override the preset's codec choice.</p>
+<h2 id="creating-custom-presets">Creating Custom Presets</h2>
+<p>You can create your own presets by creating a JSON file in your presets directory.
+A preset file is a simple JSON object with option names as keys and their values:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;normalization-type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ebu&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;target-level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-23.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;loudness-range-target&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;true-peak&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-2.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;audio-codec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aac&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;audio-bitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;192k&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
 </code></pre></div>
-<p>Use <code>-as/--audio-streams</code> to select specific streams by their index (comma-separated):</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Normalize only stream 1</span>
-ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<span class="w"> </span><span class="m">1</span>
-
-<span class="c1"># Normalize streams 1 and 2</span>
-ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<span class="w"> </span><span class="m">1</span>,2
+<p>Use the long form of option names (with hyphens) in presets. Examples:</p>
+<ul>
+<li><code>normalization-type</code> (not <code>-nt</code>)</li>
+<li><code>target-level</code> (not <code>-t</code>)</li>
+<li><code>audio-codec</code> (not <code>-c:a</code>)</li>
+<li><code>audio-bitrate</code> (not <code>-b:a</code>)</li>
+<li><code>sample-rate</code> (not <code>-ar</code>)</li>
+<li><code>audio-channels</code> (not <code>-ac</code>)</li>
+<li><code>loudness-range-target</code> (not <code>-lrt</code>)</li>
+<li><code>true-peak</code> (not <code>-tp</code>)</li>
+</ul>
+<p>Boolean options should be <code>true</code> in the JSON:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;batch&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
 </code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>You can use <code>ffmpeg -i input.mkv</code> to see all streams and their indices before normalizing.</p>
-</div>
-<p>Use <code>--audio-default-only</code> to normalize only streams marked with the "default" disposition (useful for files with multiple language tracks where you only want to normalize the main track):</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>--audio-default-only
+<p>Note: It's not required to include options that are <code>false</code> because they are the default.</p>
+<h3 id="example-custom-voice-preset">Example: Custom Voice Preset</h3>
+<p>Create a file <code>~/.config/ffmpeg-normalize/presets/voice.json</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;normalization-type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ebu&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;target-level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-18.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;loudness-range-target&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;true-peak&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-3.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;audio-codec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;libopus&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;audio-bitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;96k&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;audio-channels&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;verbose&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
 </code></pre></div>
-<p>By default, if you select specific streams, only those streams will be in the output. Use <code>--keep-other-audio</code> to copy all other audio streams unchanged:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Normalize stream 1, keep all other audio streams as-is</span>
-ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<span class="w"> </span><span class="m">1</span><span class="w"> </span>--keep-other-audio
+<p>Then use it:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>voice_recording.wav<span class="w"> </span>--preset<span class="w"> </span>voice
 </code></pre></div>
+<h3 id="example-custom-streaming-audio-preset">Example: Custom Streaming Audio Preset</h3>
+<p>Create a file <code>~/.config/ffmpeg-normalize/presets/streaming-audio.json</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;normalization-type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ebu&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;target-level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-14.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;loudness-range-target&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;true-peak&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-2.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;audio-codec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aac&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;audio-bitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;192k&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>This preset normalizes audio to the streaming video standard and encodes it as AAC at 192 kbps.</p>
 
 
 
@@ -1005,6 +1275,46 @@ ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<spa
       </main>
       
         <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../audio-filters/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Audio Filters">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Audio Filters
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../cli-options/" class="md-footer__link md-footer__link--next" aria-label="Next: CLI Options Reference">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                CLI Options Reference
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -1030,7 +1340,7 @@ ffmpeg-normalize<span class="w"> </span>input.mkv<span class="w"> </span>-as<spa
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.sections"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>

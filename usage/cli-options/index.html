@@ -8,21 +8,21 @@
       
       
       
-        <link rel="canonical" href="https://slhck.info/ffmpeg-normalize/usage/options/">
+        <link rel="canonical" href="https://slhck.info/ffmpeg-normalize/usage/cli-options/">
       
       
-        <link rel="prev" href="../examples/">
+        <link rel="prev" href="../presets/">
       
       
         <link rel="next" href="../../advanced/api/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
     
     
       
-        <title>Options - ffmpeg-normalize</title>
+        <title>CLI Options Reference - ffmpeg-normalize</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#detailed-options" class="md-skip">
+        <a href="#cli-options-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Options
+              CLI Options Reference
             
           </span>
         </div>
@@ -442,29 +442,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../high-level-introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    High-Level Introduction
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../basic/" class="md-nav__link">
         
   
@@ -488,12 +465,104 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/" class="md-nav__link">
+      <a href="../file-input-output/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Examples
+    File Input/Output
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../normalization-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Normalization Options
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../album-batch-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Album/Batch Normalization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audio-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Audio Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Presets
     
   </span>
   
@@ -525,7 +594,7 @@
   
   
   <span class="md-ellipsis">
-    Options
+    CLI Options Reference
     
   </span>
   
@@ -538,7 +607,7 @@
   
   
   <span class="md-ellipsis">
-    Options
+    CLI Options Reference
     
   </span>
   
@@ -679,6 +748,24 @@
   <a href="#-version" class="md-nav__link">
     <span class="md-ellipsis">
       --version
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-preset-preset" class="md-nav__link">
+    <span class="md-ellipsis">
+      --preset PRESET
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-list-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      --list-presets
     </span>
   </a>
   
@@ -1490,6 +1577,24 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-preset-preset" class="md-nav__link">
+    <span class="md-ellipsis">
+      --preset PRESET
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-list-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      --list-presets
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1934,7 +2039,8 @@
   
 
 
-<h1 id="detailed-options">Detailed Options</h1>
+<h1 id="cli-options-reference">CLI Options Reference</h1>
+<p>This is a complete list of all command-line options supported by <code>ffmpeg-normalize</code>.</p>
 <h2 id="file-inputoutput">File Input/Output</h2>
 <h3 id="input"><code>input</code></h3>
 <p>Input media file(s)</p>
@@ -1965,6 +2071,19 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <p>Show progress bar for files and streams</p>
 <h3 id="-version"><code>--version</code></h3>
 <p>Print version and exit</p>
+<h3 id="-preset-preset"><code>--preset PRESET</code></h3>
+<p>Load options from a preset file.</p>
+<p>Preset files are JSON files located in the presets directory. The directory location depends on your OS:</p>
+<ul>
+<li><strong>Linux/macOS:</strong> <code>~/.config/ffmpeg-normalize/presets/</code></li>
+<li><strong>Windows:</strong> <code>%APPDATA%\ffmpeg-normalize\presets\</code></li>
+</ul>
+<p>Use <code>--list-presets</code> to see available presets.</p>
+<p>CLI options specified on the command line take precedence over preset values.</p>
+<p>Example: <code>ffmpeg-normalize input.mp3 --preset podcast</code></p>
+<h3 id="-list-presets"><code>--list-presets</code></h3>
+<p>List all available presets and exit.</p>
+<p>This displays both built-in presets and any custom presets installed in your config directory.</p>
 <h2 id="normalization">Normalization</h2>
 <h3 id="-nt-eburmspeak-normalization-type-eburmspeak"><code>-nt {ebu,rms,peak}, --normalization-type {ebu,rms,peak}</code></h3>
 <p>Normalization type (default: <code>ebu</code>).</p>
@@ -2123,6 +2242,46 @@ the system default or you can provide a file name available on $PATH</p>
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../presets/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Presets">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Presets
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../advanced/api/" class="md-footer__link md-footer__link--next" aria-label="Next: API">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                API
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -2147,7 +2306,7 @@ the system default or you can provide a file name available on $PATH</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.sections"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
