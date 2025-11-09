@@ -27,7 +27,7 @@ Batch processing of several input files is possible, including video files.
 - **Docker support** — Run via Docker container
 - **Python API** — Use programmatically in your Python projects
 - **Shell completions** — Available for bash, zsh, and fish
-- **Album Batch normalization** – Process files jointy, preserving relative loudness
+- **Album Batch normalization** – Process files jointly, preserving relative loudness
 
 ## 🆕 What's New
 

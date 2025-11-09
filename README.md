@@ -22,7 +22,7 @@ This program normalizes media files to a certain loudness level using the EBU R1
 - Docker support — Run via Docker container
 - Python API — Use programmatically in your Python projects
 - Shell completions — Available for bash, zsh, and fish
-- Album Batch normalization – Process files jointy, preserving relative loudness
+- Album Batch normalization – Process files jointly, preserving relative loudness
 
 ## 🆕 What's New
 
