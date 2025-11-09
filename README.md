@@ -24,6 +24,13 @@ This program normalizes media files to a certain loudness level using the EBU R1
 - Shell completions — Available for bash, zsh, and fish
 - Album Batch normalization – Process files jointly, preserving relative loudness
 
+## 🚀 Quick Start
+
+1. Install a recent version of [ffmpeg](https://ffmpeg.org/download.html)
+2. Run `pip3 install ffmpeg-normalize` and `ffmpeg-normalize /path/to/your/file.mp4`, alternatively install [`uv`](https://docs.astral.sh/uv/getting-started/installation/) and run `uvx ffmpeg-normalize /path/to/your/file.mp4`
+3. Done! 🎧 (the normalized file will be called `normalized/file.mkv`)
+
+
 ## 🆕 What's New
 
 - Version 1.36.0 introduces **presets** with `--preset`! Save and reuse your favorite normalization configurations for different use cases. Comes with three built-in presets: `podcast` (AES standard), `music` (RMS-based batch normalization), and `streaming-video` (video content). Create custom presets too!
@@ -66,12 +73,6 @@ Other recent additions:
 - **`--lower-only` option** — Prevent audio from increasing in loudness, only lower it if needed (works with all normalization types).
 
 See the [full changelog](https://github.com/slhck/ffmpeg-normalize/blob/master/CHANGELOG.md) for all updates.
-
-## 🚀 Quick Start
-
-1. Install a recent version of [ffmpeg](https://ffmpeg.org/download.html)
-2. Run `pip3 install ffmpeg-normalize` and `ffmpeg-normalize /path/to/your/file.mp4`, alternatively install [`uv`](https://docs.astral.sh/uv/getting-started/installation/) and run `uvx ffmpeg-normalize /path/to/your/file.mp4`
-3. Done! 🎧 (the normalized file will be called `normalized/file.mkv`)
 
 ## 📓 Documentation
 
