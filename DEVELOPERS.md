@@ -20,4 +20,4 @@ pdoc -d google -o docs-api ./src/ffmpeg_normalize
 uvx --with mkdocs-material mkdocs gh-deploy
 ```
 
-(We do not have a CI pipeline for this, so we need to do it manually.)
+We have a CI pipeline for this, so we do not need to do it manually (normally).
