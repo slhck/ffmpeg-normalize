@@ -1,3 +1,25 @@
+## [1.36.1] - 2026-01-07
+
+### 🚀 Features
+
+- Better file validation
+
+### 📚 Documentation
+
+- Typo
+- Move quickstart before what's new section
+
+### ⚙️ Miscellaneous Tasks
+
+- Update support to python 3.15
+- Test only Python 3.9 and 3.15
+- Add auto-deployment for docs
+- Fix dev docs
+- Bump version to 1.36.1
+
+### ◀️ Revert
+
+- Use Python 3.14 instead of 3.15
 ## [1.36.0] - 2025-11-03
 
 ### 🚀 Features
