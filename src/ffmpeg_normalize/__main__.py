@@ -723,6 +723,18 @@ def main() -> None:
     if not input_files:
         error("No input files specified. Use positional arguments or --input-list.")
 
+    # Validate all input files upfront before processing
+    _logger.debug("Validating all input files before processing...")
+    validation_errors = FFmpegNormalize.validate_input_files(input_files)
+    if validation_errors:
+        _logger.error("Validation failed for the following files:")
+        for err in validation_errors:
+            _logger.error(f"  - {err}")
+        error(
+            f"Validation failed for {len(validation_errors)} file(s). "
+            "Please fix the issues above and try again."
+        )
+
     for index, input_file in enumerate(input_files):
         if cli_args.output is not None and index < len(cli_args.output):
             if cli_args.output_folder and cli_args.output_folder != "normalized":

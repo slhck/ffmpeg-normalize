@@ -599,3 +599,62 @@ class TestFFmpegNormalize:
             ]
         )
         assert "Cannot use both" in stderr
+
+
+class TestFileValidation:
+    """Tests for pre-batch file validation."""
+
+    def test_nonexistent_file(self):
+        """Test that validation fails for non-existent files."""
+        _, stderr = ffmpeg_normalize_call(["nonexistent_file.mp4"])
+        assert "Validation failed" in stderr
+        assert "does not exist" in stderr
+
+    def test_multiple_invalid_files(self):
+        """Test that validation reports all invalid files at once."""
+        _, stderr = ffmpeg_normalize_call(
+            ["nonexistent1.mp4", "nonexistent2.mp4", "nonexistent3.mp4"]
+        )
+        assert "Validation failed for 3 file(s)" in stderr
+        assert "nonexistent1.mp4" in stderr
+        assert "nonexistent2.mp4" in stderr
+        assert "nonexistent3.mp4" in stderr
+
+    def test_file_without_audio(self, tmp_path):
+        """Test that validation fails for files without audio streams."""
+        # Create a video-only file using ffmpeg
+        video_only = tmp_path / "video_only.mp4"
+        cmd = [
+            "ffmpeg",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=blue:s=320x240:d=1",
+            "-an",  # no audio
+            "-c:v",
+            "libx264",
+            str(video_only),
+        ]
+        subprocess.run(cmd, check=True, capture_output=True)
+
+        _, stderr = ffmpeg_normalize_call([str(video_only)])
+        assert "Validation failed" in stderr
+        assert "does not contain any audio streams" in stderr
+
+    def test_mixed_valid_invalid_files(self, tmp_path):
+        """Test that validation fails when mix of valid and invalid files."""
+        _, stderr = ffmpeg_normalize_call(
+            ["tests/test.mp4", "nonexistent.mp4", "tests/test.m4a"]
+        )
+        # Should report the invalid file but not the valid ones
+        assert "Validation failed for 1 file(s)" in stderr
+        assert "nonexistent.mp4" in stderr
+        # Valid files should not appear in error messages
+        assert "test.mp4" not in stderr or "does not exist" not in stderr
+
+    def test_valid_file_passes_validation(self):
+        """Test that valid files pass validation."""
+        # Should succeed (file exists and has audio)
+        ffmpeg_normalize_call(["tests/test.mp4", "-n"])  # dry run
+        # No assertion needed - if validation fails, the command will error

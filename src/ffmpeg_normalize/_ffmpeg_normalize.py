@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Literal
 
 from tqdm import tqdm
 
-from ._cmd_utils import ffmpeg_has_loudnorm, get_ffmpeg_exe
+from ._cmd_utils import ffmpeg_has_loudnorm, get_ffmpeg_exe, validate_input_file
 from ._errors import FFmpegNormalizeError
 from ._media_file import MediaFile
 
@@ -316,6 +316,28 @@ class FFmpegNormalize:
 
         self.media_files.append(MediaFile(self, input_file, output_file))
         self.file_count += 1
+
+    @staticmethod
+    def validate_input_files(input_files: list[str]) -> list[str]:
+        """
+        Validate all input files before processing.
+
+        This method checks that each input file exists, is readable, and contains
+        at least one audio stream. All files are validated upfront so that users
+        can fix all issues before rerunning the batch.
+
+        Args:
+            input_files: List of input file paths to validate
+
+        Returns:
+            list: List of error messages for invalid files. Empty if all files are valid.
+        """
+        errors = []
+        for input_file in input_files:
+            is_valid, error_msg = validate_input_file(input_file)
+            if not is_valid and error_msg:
+                errors.append(error_msg)
+        return errors
 
     def _calculate_batch_reference(self) -> float | None:
         """

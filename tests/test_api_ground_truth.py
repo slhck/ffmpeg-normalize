@@ -11,6 +11,7 @@ Run with: pytest -m "not slow" to skip the slow integration tests
 Run with: pytest -m "slow" to run only the slow integration tests
 """
 
+import subprocess
 import tempfile
 import zipfile
 from pathlib import Path
@@ -19,6 +20,7 @@ from urllib.request import urlretrieve
 import pytest
 
 from ffmpeg_normalize import FFmpegNormalize
+from ffmpeg_normalize._cmd_utils import validate_input_file
 from ffmpeg_normalize._streams import LoudnessStatisticsWithMetadata
 
 
@@ -640,3 +642,88 @@ class TestFFmpegNormalizeAPI:
                 f"Normal file should remain louder than quiet file in batch mode. "
                 f"Got normal={loudness_values[1]:.2f}, quiet={loudness_values[2]:.2f}"
             )
+
+
+class TestFileValidationAPI:
+    """API-level tests for input file validation."""
+
+    def test_validate_input_file_exists(self):
+        """Test validation of existing audio file."""
+        test_file = Path(__file__).parent / "test.mp4"
+        is_valid, error_msg = validate_input_file(str(test_file))
+        assert is_valid is True
+        assert error_msg is None
+
+    def test_validate_input_file_not_exists(self):
+        """Test validation fails for non-existent file."""
+        is_valid, error_msg = validate_input_file("nonexistent_file.mp4")
+        assert is_valid is False
+        assert error_msg is not None
+        assert "does not exist" in error_msg
+
+    def test_validate_input_file_directory(self, tmp_path):
+        """Test validation fails for directories."""
+        is_valid, error_msg = validate_input_file(str(tmp_path))
+        assert is_valid is False
+        assert error_msg is not None
+        assert "not a file" in error_msg
+
+    def test_validate_input_file_no_audio(self, tmp_path):
+        """Test validation fails for files without audio streams."""
+        # Create a video-only file using ffmpeg
+        video_only = tmp_path / "video_only.mp4"
+        cmd = [
+            "ffmpeg",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=blue:s=320x240:d=1",
+            "-an",  # no audio
+            "-c:v",
+            "libx264",
+            str(video_only),
+        ]
+        subprocess.run(cmd, check=True, capture_output=True)
+
+        is_valid, error_msg = validate_input_file(str(video_only))
+        assert is_valid is False
+        assert error_msg is not None
+        assert "audio" in error_msg.lower()
+
+    def test_validate_input_files_batch(self):
+        """Test batch validation with multiple files."""
+        test_dir = Path(__file__).parent
+        valid_files = [
+            str(test_dir / "test.mp4"),
+            str(test_dir / "test.m4a"),
+        ]
+
+        errors = FFmpegNormalize.validate_input_files(valid_files)
+        assert len(errors) == 0
+
+    def test_validate_input_files_batch_mixed(self):
+        """Test batch validation with mix of valid and invalid files."""
+        test_dir = Path(__file__).parent
+        files = [
+            str(test_dir / "test.mp4"),
+            "nonexistent1.mp4",
+            str(test_dir / "test.m4a"),
+            "nonexistent2.mp4",
+        ]
+
+        errors = FFmpegNormalize.validate_input_files(files)
+        assert len(errors) == 2
+        assert any("nonexistent1.mp4" in e for e in errors)
+        assert any("nonexistent2.mp4" in e for e in errors)
+
+    def test_validate_input_files_all_invalid(self):
+        """Test batch validation with all invalid files."""
+        files = [
+            "nonexistent1.mp4",
+            "nonexistent2.mp4",
+            "nonexistent3.mp4",
+        ]
+
+        errors = FFmpegNormalize.validate_input_files(files)
+        assert len(errors) == 3

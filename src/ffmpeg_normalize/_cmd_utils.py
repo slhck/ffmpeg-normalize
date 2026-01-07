@@ -190,3 +190,76 @@ def ffmpeg_has_loudnorm() -> bool:
             "Please make sure you are running ffmpeg v4.2 or above."
         )
     return supports_loudnorm
+
+
+def validate_input_file(input_file: str) -> tuple[bool, str | None]:
+    """
+    Validate that an input file exists, is readable, and contains audio streams.
+
+    This function performs a lightweight probe of the file using ffmpeg to check
+    if it can be read and contains at least one audio stream.
+
+    Args:
+        input_file: Path to the input file to validate
+
+    Returns:
+        tuple: (is_valid, error_message)
+            - is_valid: True if the file is valid, False otherwise
+            - error_message: None if valid, otherwise a descriptive error message
+    """
+    # Check if file exists
+    if not os.path.exists(input_file):
+        return False, f"File does not exist: {input_file}"
+
+    # Check if it's actually a file (not a directory)
+    if not os.path.isfile(input_file):
+        return False, f"Path is not a file: {input_file}"
+
+    # Check if file is readable
+    if not os.access(input_file, os.R_OK):
+        return False, f"File is not readable (permission denied): {input_file}"
+
+    # Check if file has audio streams using ffmpeg probe
+    ffmpeg_exe = get_ffmpeg_exe()
+    cmd = [
+        ffmpeg_exe,
+        "-i",
+        input_file,
+        "-c",
+        "copy",
+        "-t",
+        "0",
+        "-map",
+        "0",
+        "-f",
+        "null",
+        os.devnull,
+    ]
+
+    try:
+        output = CommandRunner().run_command(cmd).get_output()
+    except RuntimeError as e:
+        error_str = str(e)
+        # Extract a cleaner error message from ffmpeg output
+        if "Invalid data found" in error_str:
+            return False, f"Invalid or corrupted media file: {input_file}"
+        if "No such file or directory" in error_str:
+            return False, f"File not found or cannot be opened: {input_file}"
+        if "Permission denied" in error_str:
+            return False, f"Permission denied when reading file: {input_file}"
+        if "does not contain any stream" in error_str:
+            return False, f"File contains no media streams: {input_file}"
+        # Generic error for other ffmpeg failures
+        return False, f"Cannot read media file: {input_file}"
+
+    # Check for audio streams in the output
+    has_audio = False
+    for line in output.split("\n"):
+        if line.strip().startswith("Stream") and "Audio" in line:
+            has_audio = True
+            break
+
+    if not has_audio:
+        return False, f"File does not contain any audio streams: {input_file}"
+
+    return True, None
