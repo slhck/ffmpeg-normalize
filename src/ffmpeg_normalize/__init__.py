@@ -1,5 +1,6 @@
 import importlib.metadata
 
+from ._cmd_utils import ffmpeg_env
 from ._errors import FFmpegNormalizeError
 from ._ffmpeg_normalize import FFmpegNormalize
 from ._media_file import MediaFile
@@ -17,5 +18,6 @@ __all__ = [
     "VideoStream",
     "SubtitleStream",
     "MediaStream",
+    "ffmpeg_env",
     "__version__",
 ]
