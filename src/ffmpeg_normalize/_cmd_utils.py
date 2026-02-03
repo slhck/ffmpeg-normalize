@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import contextvars
 import logging
 import os
 import re
 import shlex
 import subprocess
+from contextlib import contextmanager
 from shutil import which
 from typing import Any, Iterator
 
@@ -13,6 +15,30 @@ from ffmpeg_progress_yield import FfmpegProgress
 from ._errors import FFmpegNormalizeError
 
 _logger = logging.getLogger(__name__)
+
+_ffmpeg_env_var: contextvars.ContextVar[dict[str, str] | None] = contextvars.ContextVar(
+    "ffmpeg_env", default=None
+)
+
+
+@contextmanager
+def ffmpeg_env(env: dict[str, str] | None) -> Iterator[None]:
+    """
+    Temporarily set the environment for subprocess.Popen.
+
+    Args:
+        env: Environment dict to pass to subprocess.Popen.
+    """
+    token = _ffmpeg_env_var.set(env)
+    try:
+        yield
+    finally:
+        _ffmpeg_env_var.reset(token)
+
+
+def _get_ffmpeg_env() -> dict[str, str] | None:
+    return _ffmpeg_env_var.get()
+
 
 DUR_REGEX = re.compile(
     r"Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})"
@@ -76,7 +102,9 @@ class CommandRunner:
         # wrapper for 'ffmpeg-progress-yield'
         _logger.debug(f"Running command: {shlex.join(cmd)}")
         with FfmpegProgress(cmd, dry_run=self.dry) as ff:
-            yield from ff.run_command_with_progress()
+            yield from ff.run_command_with_progress(
+                popen_kwargs={"env": _get_ffmpeg_env()}
+            )
 
             self.output = ff.stderr
 
@@ -107,6 +135,7 @@ class CommandRunner:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=False,
+            env=_get_ffmpeg_env(),
         )
 
         stdout_bytes, stderr_bytes = p.communicate()
