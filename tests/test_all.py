@@ -658,3 +658,27 @@ class TestFileValidation:
         # Should succeed (file exists and has audio)
         ffmpeg_normalize_call(["tests/test.mp4", "-n"])  # dry run
         # No assertion needed - if validation fails, the command will error
+
+
+def test_ffmpeg_env():
+    """Verify that ffmpeg_env context manager sets environment correctly."""
+    from ffmpeg_normalize._cmd_utils import ffmpeg_env, _get_ffmpeg_env, CommandRunner
+
+    original_env = _get_ffmpeg_env()
+    assert original_env is None
+
+    test_env = os.environ.copy()
+    test_env.update({"TEST_FFMPEG_ENV_VAR": "12345"})
+
+    with ffmpeg_env(test_env):
+        env_in_context = _get_ffmpeg_env()
+        assert env_in_context == test_env
+        # Check that commandrunner uses the env
+        cmd = CommandRunner().run_command(
+            [sys.executable, "-c", "import os; print(os.getenv('TEST_FFMPEG_ENV_VAR'))"]
+        )
+        assert cmd.get_output().strip() == "12345"
+
+    # After context, environment should be reset
+    env_after = _get_ffmpeg_env()
+    assert env_after is None
