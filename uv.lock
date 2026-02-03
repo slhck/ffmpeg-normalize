@@ -37,7 +37,7 @@ wheels = [
 
 [[package]]
 name = "ffmpeg-normalize"
-version = "1.36.1"
+version = "1.37.0"
 source = { editable = "." }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },

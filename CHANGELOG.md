@@ -1,3 +1,17 @@
+## [1.37.0] - 2026-02-03
+
+### 🐛 Bug Fixes
+
+- Update Claude workflows for fork PR permissions
+
+### 📚 Documentation
+
+- Update API examples
+
+### ⚙️ Miscellaneous Tasks
+
+- Update contriburors
+- Bump version to 1.37.0
 ## [1.36.1] - 2026-01-07
 
 ### 🚀 Features
