@@ -207,6 +207,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "randompersona1",
+      "name": "randompersona1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/74961116?v=4",
+      "profile": "https://github.com/randompersona1",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
