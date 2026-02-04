@@ -94,6 +94,37 @@ class PresetManager:
 
         return sorted(presets)
 
+    def get_presets_with_source(self) -> list[tuple[str, str]]:
+        """Get list of available presets with their source location.
+
+        Returns:
+            list[tuple[str, str]]: List of (preset_name, source) tuples where
+            source is either "user" or "builtin"
+        """
+        user_presets: set[str] = set()
+        builtin_presets: set[str] = set()
+
+        # Get presets from user config directory
+        if self.presets_dir.exists():
+            for file in self.presets_dir.glob("*.json"):
+                user_presets.add(file.stem)
+
+        # Get default presets from package
+        if self.default_presets_dir.exists():
+            for file in self.default_presets_dir.glob("*.json"):
+                builtin_presets.add(file.stem)
+
+        result = []
+        all_presets = sorted(user_presets | builtin_presets)
+        for preset in all_presets:
+            # User presets take precedence
+            if preset in user_presets:
+                result.append((preset, "user"))
+            else:
+                result.append((preset, "builtin"))
+
+        return result
+
     def load_preset(self, preset_name: str) -> dict[str, Any]:
         """Load a preset file by name.
 

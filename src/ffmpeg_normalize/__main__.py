@@ -607,13 +607,17 @@ def main() -> None:
     # Handle --list-presets
     preset_manager = PresetManager()
     if cli_args.list_presets:
-        presets = preset_manager.get_available_presets()
-        if presets:
+        presets_with_source = preset_manager.get_presets_with_source()
+        if presets_with_source:
             print("Available presets:")
-            for preset in presets:
-                print(f"  - {preset}")
+            for preset_name, source in presets_with_source:
+                source_label = "(user)" if source == "user" else "(builtin)"
+                print(f"  - {preset_name} {source_label}")
         else:
-            print(f"No presets found in {preset_manager.presets_dir}")
+            print("No presets found.")
+        print()
+        print(f"User presets directory: {preset_manager.presets_dir}")
+        print("Place custom .json preset files in this directory.")
         sys.exit(0)
 
     # Load and apply preset if specified
