@@ -1,3 +1,12 @@
+## [1.37.2] - 2026-02-04
+
+### 🚀 Features
+
+- Better preset listing
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.37.2
 ## [1.37.1] - 2026-02-04
 
 ### ⚙️ Miscellaneous Tasks
