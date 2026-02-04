@@ -1,3 +1,8 @@
+## [1.37.1] - 2026-02-04
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.37.1
 ## [1.37.0] - 2026-02-03
 
 ### 🐛 Bug Fixes
