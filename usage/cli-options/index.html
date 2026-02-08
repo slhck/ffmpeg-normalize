@@ -1,0 +1,2669 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://slhck.info/ffmpeg-normalize/usage/cli-options/">
+      
+      
+        <link rel="prev" href="../presets/">
+      
+      
+        <link rel="next" href="../../advanced/api/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>CLI Options Reference - ffmpeg-normalize</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cli-options-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ffmpeg-normalize" class="md-header__button md-logo" aria-label="ffmpeg-normalize" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 2-5 4.5v11l5-4.5zM6.5 5C4.55 5 2.45 5.4 1 6.5v14.66c0 .25.25.5.5.5.1 0 .15-.07.25-.07 1.35-.65 3.3-1.09 4.75-1.09 1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.31 4.75 1.06.1.05.15.03.25.03.25 0 .5-.25.5-.5V6.5c-.6-.45-1.25-.75-2-1V19c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6.5C10.55 5.4 8.45 5 6.5 5"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ffmpeg-normalize
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CLI Options Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/slhck/ffmpeg-normalize" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ffmpeg-normalize" class="md-nav__button md-logo" aria-label="ffmpeg-normalize" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 2-5 4.5v11l5-4.5zM6.5 5C4.55 5 2.45 5.4 1 6.5v14.66c0 .25.25.5.5.5.1 0 .15-.07.25-.07 1.35-.65 3.3-1.09 4.75-1.09 1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.31 4.75 1.06.1.05.15.03.25.03.25 0 .5-.25.5-.5V6.5c-.6-.45-1.25-.75-2-1V19c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6.5C10.55 5.4 8.45 5 6.5 5"/></svg>
+
+    </a>
+    ffmpeg-normalize
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/slhck/ffmpeg-normalize" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../file-input-output/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File Input/Output
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../normalization-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalization Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../album-batch-normalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Album/Batch Normalization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audio-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Audio Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../presets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Presets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Options Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Options Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#file-inputoutput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Input/Output
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Input/Output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-input-list-input_list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --input-list INPUT_LIST
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-o-output-output-output-output-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -o OUTPUT [OUTPUT ...], --output OUTPUT [OUTPUT ...]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-of-output_folder-output-folder-output_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -of OUTPUT_FOLDER, --output-folder OUTPUT_FOLDER
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-f-force" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -f, --force
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-d-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -d, --debug
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-v-verbose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -v, --verbose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-q-quiet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -q, --quiet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-n-dry-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -n, --dry-run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-pr-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -pr, --progress
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --version
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-preset-preset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --preset PRESET
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-list-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --list-presets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Normalization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Normalization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-nt-eburmspeak-normalization-type-eburmspeak" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -nt {ebu,rms,peak}, --normalization-type {ebu,rms,peak}
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-t-target_level-target-level-target_level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -t TARGET_LEVEL, --target-level TARGET_LEVEL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-p-print-stats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -p, --print-stats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-replaygain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --replaygain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --batch
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ebu-r128-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EBU R128 Normalization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EBU R128 Normalization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-lrt-loudness_range_target-loudness-range-target-loudness_range_target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-loudness-range-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-loudness-range-target
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-lra-above-loudness-range-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-lra-above-loudness-range-target
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-tp-true_peak-true-peak-true_peak" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -tp TRUE_PEAK, --true-peak TRUE_PEAK
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-offset-offset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --offset OFFSET
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-lower-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --lower-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-auto-lower-loudness-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --auto-lower-loudness-target
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-dual-mono" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --dual-mono
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-dynamic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --dynamic
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Encoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Audio Encoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-ca-audio_codec-audio-codec-audio_codec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -c:a AUDIO_CODEC, --audio-codec AUDIO_CODEC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ba-audio_bitrate-audio-bitrate-audio_bitrate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -b:a AUDIO_BITRATE, --audio-bitrate AUDIO_BITRATE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ar-sample_rate-sample-rate-sample_rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ar SAMPLE_RATE, --sample-rate SAMPLE_RATE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ac-audio-channels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ac, --audio-channels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-koa-keep-original-audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -koa, --keep-original-audio
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-stream-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Stream Selection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Audio Stream Selection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-as-audio_streams-audio-streams-audio_streams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -as AUDIO_STREAMS, --audio-streams AUDIO_STREAMS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-audio-default-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --audio-default-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-other-audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-other-audio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-prf-pre_filter-pre-filter-pre_filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -prf PRE_FILTER, --pre-filter PRE_FILTER
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-pof-post_filter-post-filter-post_filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -pof POST_FILTER, --post-filter POST_FILTER
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-encoding-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Encoding Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Other Encoding Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-vn-video-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -vn, --video-disable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-cv-video_codec-video-codec-video_codec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -c:v VIDEO_CODEC, --video-codec VIDEO_CODEC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-sn-subtitle-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -sn, --subtitle-disable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-mn-metadata-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -mn, --metadata-disable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-cn-chapters-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -cn, --chapters-disable
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inputoutput-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input/Output Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Input/Output Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-ei-extra_input_options-extra-input-options-extra_input_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ei EXTRA_INPUT_OPTIONS, --extra-input-options EXTRA_INPUT_OPTIONS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-e-extra_output_options-extra-output-options-extra_output_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ofmt-output_format-output-format-output_format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ofmt OUTPUT_FORMAT, --output-format OUTPUT_FORMAT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ext-extension-extension-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ext EXTENSION, --extension EXTENSION
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tmp-temp-tmpdir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TMP / TEMP / TMPDIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ffmpeg_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FFMPEG_PATH
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#file-inputoutput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Input/Output
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Input/Output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-input-list-input_list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --input-list INPUT_LIST
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-o-output-output-output-output-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -o OUTPUT [OUTPUT ...], --output OUTPUT [OUTPUT ...]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-of-output_folder-output-folder-output_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -of OUTPUT_FOLDER, --output-folder OUTPUT_FOLDER
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-f-force" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -f, --force
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-d-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -d, --debug
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-v-verbose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -v, --verbose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-q-quiet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -q, --quiet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-n-dry-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -n, --dry-run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-pr-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -pr, --progress
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --version
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-preset-preset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --preset PRESET
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-list-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --list-presets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Normalization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Normalization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-nt-eburmspeak-normalization-type-eburmspeak" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -nt {ebu,rms,peak}, --normalization-type {ebu,rms,peak}
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-t-target_level-target-level-target_level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -t TARGET_LEVEL, --target-level TARGET_LEVEL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-p-print-stats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -p, --print-stats
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-replaygain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --replaygain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --batch
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ebu-r128-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EBU R128 Normalization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EBU R128 Normalization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-lrt-loudness_range_target-loudness-range-target-loudness_range_target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-loudness-range-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-loudness-range-target
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-lra-above-loudness-range-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-lra-above-loudness-range-target
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-tp-true_peak-true-peak-true_peak" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -tp TRUE_PEAK, --true-peak TRUE_PEAK
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-offset-offset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --offset OFFSET
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-lower-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --lower-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-auto-lower-loudness-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --auto-lower-loudness-target
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-dual-mono" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --dual-mono
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-dynamic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --dynamic
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Encoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Audio Encoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-ca-audio_codec-audio-codec-audio_codec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -c:a AUDIO_CODEC, --audio-codec AUDIO_CODEC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ba-audio_bitrate-audio-bitrate-audio_bitrate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -b:a AUDIO_BITRATE, --audio-bitrate AUDIO_BITRATE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ar-sample_rate-sample-rate-sample_rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ar SAMPLE_RATE, --sample-rate SAMPLE_RATE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ac-audio-channels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ac, --audio-channels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-koa-keep-original-audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -koa, --keep-original-audio
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-stream-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Stream Selection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Audio Stream Selection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-as-audio_streams-audio-streams-audio_streams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -as AUDIO_STREAMS, --audio-streams AUDIO_STREAMS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-audio-default-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --audio-default-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-other-audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-other-audio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-prf-pre_filter-pre-filter-pre_filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -prf PRE_FILTER, --pre-filter PRE_FILTER
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-pof-post_filter-post-filter-post_filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -pof POST_FILTER, --post-filter POST_FILTER
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-encoding-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Encoding Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Other Encoding Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-vn-video-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -vn, --video-disable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-cv-video_codec-video-codec-video_codec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -c:v VIDEO_CODEC, --video-codec VIDEO_CODEC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-sn-subtitle-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -sn, --subtitle-disable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-mn-metadata-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -mn, --metadata-disable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-cn-chapters-disable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -cn, --chapters-disable
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inputoutput-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input/Output Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Input/Output Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-ei-extra_input_options-extra-input-options-extra_input_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ei EXTRA_INPUT_OPTIONS, --extra-input-options EXTRA_INPUT_OPTIONS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-e-extra_output_options-extra-output-options-extra_output_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ofmt-output_format-output-format-output_format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ofmt OUTPUT_FORMAT, --output-format OUTPUT_FORMAT
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-ext-extension-extension-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -ext EXTENSION, --extension EXTENSION
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tmp-temp-tmpdir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TMP / TEMP / TMPDIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ffmpeg_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FFMPEG_PATH
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="cli-options-reference">CLI Options Reference</h1>
+<p>This is a complete list of all command-line options supported by <code>ffmpeg-normalize</code>.</p>
+<h2 id="file-inputoutput">File Input/Output</h2>
+<h3 id="input"><code>input</code></h3>
+<p>Input media file(s)</p>
+<h3 id="-input-list-input_list"><code>--input-list INPUT_LIST</code></h3>
+<p>Path to a text file containing a line-separated list of input files.</p>
+<p>Example: <code>ffmpeg-normalize --input-list input.txt</code></p>
+<h3 id="-o-output-output-output-output-output"><code>-o OUTPUT [OUTPUT ...], --output OUTPUT [OUTPUT ...]</code></h3>
+<p>Output file names.</p>
+<p>Will be applied per input file.</p>
+<p>If no output file name is specified for an input file, the output files
+will be written to the default output folder with the name <code>&lt;input&gt;.&lt;ext&gt;</code>, where <code>&lt;ext&gt;</code> is the output extension (see <code>-ext</code> option).</p>
+<p>Example: <code>ffmpeg-normalize 1.wav 2.wav -o 1n.wav 2n.wav</code></p>
+<h3 id="-of-output_folder-output-folder-output_folder"><code>-of OUTPUT_FOLDER, --output-folder OUTPUT_FOLDER</code></h3>
+<p>Output folder (default: <code>normalized</code>)</p>
+<p>This folder will be used for input files that have no explicit output name specified.</p>
+<h2 id="general">General</h2>
+<h3 id="-f-force"><code>-f, --force</code></h3>
+<p>Force overwrite existing files</p>
+<h3 id="-d-debug"><code>-d, --debug</code></h3>
+<p>Print debugging output</p>
+<h3 id="-v-verbose"><code>-v, --verbose</code></h3>
+<p>Print verbose output</p>
+<h3 id="-q-quiet"><code>-q, --quiet</code></h3>
+<p>Only print errors</p>
+<h3 id="-n-dry-run"><code>-n, --dry-run</code></h3>
+<p>Do not run normalization, only print what would be done</p>
+<h3 id="-pr-progress"><code>-pr</code>, <code>--progress</code></h3>
+<p>Show progress bar for files and streams</p>
+<h3 id="-version"><code>--version</code></h3>
+<p>Print version and exit</p>
+<h3 id="-preset-preset"><code>--preset PRESET</code></h3>
+<p>Load options from a preset file.</p>
+<p>Preset files are JSON files located in the presets directory. The directory location depends on your OS:</p>
+<ul>
+<li><strong>Linux/macOS:</strong> <code>~/.config/ffmpeg-normalize/presets/</code></li>
+<li><strong>Windows:</strong> <code>%APPDATA%\ffmpeg-normalize\presets\</code></li>
+</ul>
+<p>Use <code>--list-presets</code> to see available presets.</p>
+<p>CLI options specified on the command line take precedence over preset values.</p>
+<p>Example: <code>ffmpeg-normalize input.mp3 --preset podcast</code></p>
+<h3 id="-list-presets"><code>--list-presets</code></h3>
+<p>List all available presets and exit.</p>
+<p>This displays both built-in presets and any custom presets installed in your config directory.</p>
+<h2 id="normalization">Normalization</h2>
+<h3 id="-nt-eburmspeak-normalization-type-eburmspeak"><code>-nt {ebu,rms,peak}, --normalization-type {ebu,rms,peak}</code></h3>
+<p>Normalization type (default: <code>ebu</code>).</p>
+<p>EBU normalization performs two passes and normalizes according to EBU R128.</p>
+<p>RMS-based normalization brings the input file to the specified RMS level.</p>
+<p>Peak normalization brings the signal to the specified peak level.</p>
+<h3 id="-t-target_level-target-level-target_level"><code>-t TARGET_LEVEL, --target-level TARGET_LEVEL</code></h3>
+<p>Normalization target level in dB/LUFS (default: -23).</p>
+<p>For EBU normalization, it corresponds to Integrated Loudness Target in LUFS. The range is -70.0 - -5.0.</p>
+<p>Otherwise, the range is -99 to 0.</p>
+<h3 id="-p-print-stats"><code>-p, --print-stats</code></h3>
+<p>Print loudness statistics for both passes formatted as JSON to stdout.</p>
+<h3 id="-replaygain"><code>--replaygain</code></h3>
+<p>Write <a href="https://en.wikipedia.org/wiki/ReplayGain">ReplayGain</a> tags to the original file without normalizing.</p>
+<p>This mode will overwrite the input file and ignore other options. It will strip all ReplayGain tags.</p>
+<p>Only works with EBU normalization, and only with .mp3, .mp4/.m4a, .ogg, .opus for now.</p>
+<h3 id="-batch"><code>--batch</code></h3>
+<p>Preserve relative loudness between files (album mode).</p>
+<p>When operating on a group of unrelated files, you usually want all of them at the same level. However, a group of music files all from the same album is generally meant to be listened to at the relative volumes they were recorded at. In batch mode, all the specified files are considered to be part of a single album and their relative volumes are preserved. This is done by averaging the loudness of all the files, computing a single adjustment from that, and applying a relative adjustment to all the files.</p>
+<p>Batch mode works with all normalization types (EBU, RMS, peak).</p>
+<p>Example: <code>ffmpeg-normalize album/*.flac --batch -nt rms -t -20</code></p>
+<p><strong>Note:</strong> For music albums, RMS or Peak normalization is recommended over EBU. See the <a href="../../advanced/faq/#how-do-i-normalize-an-album-while-preserving-relative-loudness-between-tracks">FAQ</a> for details.</p>
+<h2 id="ebu-r128-normalization">EBU R128 Normalization</h2>
+<h3 id="-lrt-loudness_range_target-loudness-range-target-loudness_range_target"><code>-lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET</code></h3>
+<p>EBU Loudness Range Target in LUFS (default: 7.0).</p>
+<p>Range is 1.0 - 50.0.</p>
+<h3 id="-keep-loudness-range-target"><code>--keep-loudness-range-target</code></h3>
+<p>Keep the input loudness range target to allow for linear normalization.</p>
+<h3 id="-keep-lra-above-loudness-range-target"><code>--keep-lra-above-loudness-range-target</code></h3>
+<p>Keep input loudness range above loudness range target.</p>
+<p>Can be used as an alternative to <code>--keep-loudness-range-target</code> to allow for linear normalization.</p>
+<h3 id="-tp-true_peak-true-peak-true_peak"><code>-tp TRUE_PEAK, --true-peak TRUE_PEAK</code></h3>
+<p>EBU Maximum True Peak in dBTP (default: -2.0).</p>
+<p>Range is -9.0 - +0.0.</p>
+<h3 id="-offset-offset"><code>--offset OFFSET</code></h3>
+<p>EBU Offset Gain (default: 0.0).</p>
+<p>The gain is applied before the true-peak limiter in the first pass only. The offset for the second pass will be automatically determined based on the first pass statistics.</p>
+<p>Range is -99.0 - +99.0.</p>
+<h3 id="-lower-only"><code>--lower-only</code></h3>
+<p>Whether the audio should not increase in loudness.</p>
+<p>If the measured loudness from the first pass is lower than the target loudness then normalization will be skipped for the audio source.</p>
+<p>This option works with all normalization types:</p>
+<ul>
+<li>For <strong>EBU</strong> normalization, this compares input integrated loudness to the target level.</li>
+<li>For <strong>peak</strong> normalization, this compares the input peak level to the target level.</li>
+<li>For <strong>RMS</strong> normalization, this compares the input RMS level to the target level.</li>
+</ul>
+<h3 id="-auto-lower-loudness-target"><code>--auto-lower-loudness-target</code></h3>
+<p>Automatically lower EBU Integrated Loudness Target.</p>
+<p>Automatically lower EBU Integrated Loudness Target to prevent falling back to dynamic filtering.</p>
+<p>Makes sure target loudness is lower than measured loudness minus peak loudness (input_i - input_tp) by a small amount.</p>
+<h3 id="-dual-mono"><code>--dual-mono</code></h3>
+<p>Treat mono input files as "dual-mono".</p>
+<p>If a mono file is intended for playback on a stereo system, its EBU R128 measurement will be perceptually incorrect. If set, this option will compensate for this effect. Multi-channel input files are not affected by this option.</p>
+<h3 id="-dynamic"><code>--dynamic</code></h3>
+<p>Force dynamic normalization mode.</p>
+<p>Instead of applying linear EBU R128 normalization, choose a dynamic normalization. This uses a one-pass algorithm and skips the initial media scan.</p>
+<p>Dynamic mode will automatically change the sample rate to 192 kHz. Use <code>-ar</code>/<code>--sample-rate</code> to specify a different output sample rate.</p>
+<h2 id="audio-encoding">Audio Encoding</h2>
+<h3 id="-ca-audio_codec-audio-codec-audio_codec"><code>-c:a AUDIO_CODEC, --audio-codec AUDIO_CODEC</code></h3>
+<p>Audio codec to use for output files.</p>
+<p>See <code>ffmpeg -encoders</code> for a list.</p>
+<p>Will use PCM audio with input stream bit depth by default.</p>
+<h3 id="-ba-audio_bitrate-audio-bitrate-audio_bitrate"><code>-b:a AUDIO_BITRATE, --audio-bitrate AUDIO_BITRATE</code></h3>
+<p>Audio bitrate in bits/s, or with K suffix.</p>
+<p>If not specified, will use codec default.</p>
+<h3 id="-ar-sample_rate-sample-rate-sample_rate"><code>-ar SAMPLE_RATE, --sample-rate SAMPLE_RATE</code></h3>
+<p>Audio sample rate to use for output files in Hz.</p>
+<p>Will use input sample rate by default, except for EBU normalization, which will change the input sample rate to 192 kHz.</p>
+<h3 id="-ac-audio-channels"><code>-ac</code>, <code>--audio-channels</code></h3>
+<p>Set the number of audio channels. If not specified, the input channel layout will be used. This is equivalent to <code>-ac</code> in ffmpeg.</p>
+<h3 id="-koa-keep-original-audio"><code>-koa, --keep-original-audio</code></h3>
+<p>Copy original, non-normalized audio streams to output file</p>
+<h2 id="audio-stream-selection">Audio Stream Selection</h2>
+<h3 id="-as-audio_streams-audio-streams-audio_streams"><code>-as AUDIO_STREAMS, --audio-streams AUDIO_STREAMS</code></h3>
+<p>Select specific audio streams to normalize by stream index (comma-separated).</p>
+<p>Example: <code>-as 1</code> normalizes only stream 1, <code>-as 1,2</code> normalizes streams 1 and 2.</p>
+<p>If not specified, all audio streams will be normalized (default behavior).</p>
+<h3 id="-audio-default-only"><code>--audio-default-only</code></h3>
+<p>Only normalize audio streams with the 'default' disposition flag.</p>
+<p>This is useful for files with multiple audio tracks where only the default track should be normalized (e.g., main audio track vs. commentary tracks).</p>
+<h3 id="-keep-other-audio"><code>--keep-other-audio</code></h3>
+<p>Keep non-selected audio streams in the output file (copy without normalization).</p>
+<p>Must be combined with either <code>-as</code>/<code>--audio-streams</code> or <code>--audio-default-only</code>.</p>
+<p>Example: <code>ffmpeg-normalize input.mkv -as 1 --keep-other-audio</code> will normalize stream 1 and copy all other audio streams unchanged.</p>
+<p><strong>Note:</strong> This option is mutually exclusive with <code>--keep-original-audio</code>. Use <code>--keep-original-audio</code> to keep all original streams alongside normalized ones, or <code>--keep-other-audio</code> to keep only non-selected streams as passthrough.</p>
+<h3 id="-prf-pre_filter-pre-filter-pre_filter"><code>-prf PRE_FILTER, --pre-filter PRE_FILTER</code></h3>
+<p>Add an audio filter chain before applying normalization.</p>
+<p>Multiple filters can be specified by comma-separating them.</p>
+<h3 id="-pof-post_filter-post-filter-post_filter"><code>-pof POST_FILTER, --post-filter POST_FILTER</code></h3>
+<p>Add an audio filter chain after applying normalization.</p>
+<p>Multiple filters can be specified by comma-separating them.</p>
+<p>For EBU, the filter will be applied during the second pass.</p>
+<h2 id="other-encoding-options">Other Encoding Options</h2>
+<h3 id="-vn-video-disable"><code>-vn, --video-disable</code></h3>
+<p>Do not write video streams to output</p>
+<h3 id="-cv-video_codec-video-codec-video_codec"><code>-c:v VIDEO_CODEC, --video-codec VIDEO_CODEC</code></h3>
+<p>Video codec to use for output files (default: 'copy').</p>
+<p>See <code>ffmpeg -encoders</code> for a list.</p>
+<p>Will attempt to copy video codec by default.</p>
+<h3 id="-sn-subtitle-disable"><code>-sn, --subtitle-disable</code></h3>
+<p>Do not write subtitle streams to output</p>
+<h3 id="-mn-metadata-disable"><code>-mn, --metadata-disable</code></h3>
+<p>Do not write metadata to output</p>
+<h3 id="-cn-chapters-disable"><code>-cn, --chapters-disable</code></h3>
+<p>Do not write chapters to output</p>
+<h2 id="inputoutput-format">Input/Output Format</h2>
+<h3 id="-ei-extra_input_options-extra-input-options-extra_input_options"><code>-ei EXTRA_INPUT_OPTIONS, --extra-input-options EXTRA_INPUT_OPTIONS</code></h3>
+<p>Extra input options list.</p>
+<p>A list of extra ffmpeg command line arguments valid for the input, applied before ffmpeg's <code>-i</code>.</p>
+<p>You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.</p>
+<p>If JSON is used, you need to wrap the whole argument in quotes to prevent shell expansion and to preserve literal quotes inside the string. If a simple string is used, you need to specify the argument with <code>-e=</code>.</p>
+<p>Examples: <code>-ei '[ "-f", "mpegts", "-r", "24" ]'</code> or <code>-ei="-f mpegts -r 24"</code></p>
+<h3 id="-e-extra_output_options-extra-output-options-extra_output_options"><code>-e EXTRA_OUTPUT_OPTIONS, --extra-output-options EXTRA_OUTPUT_OPTIONS</code></h3>
+<p>Extra output options list.</p>
+<p>A list of extra ffmpeg command line arguments valid for the output.</p>
+<p>You can either use a JSON-formatted list (i.e., a list of comma-separated, quoted elements within square brackets), or a simple string of space-separated arguments.</p>
+<p>If JSON is used, you need to wrap the whole argument in quotes to prevent shell expansion and to preserve literal quotes inside the string. If a simple string is used, you need to specify the argument with <code>-e=</code>.</p>
+<p>Examples: <code>-e '[ "-vbr", "3", "-preset:v", "ultrafast" ]'</code> or <code>-e="-vbr 3 -preset:v ultrafast"</code></p>
+<h3 id="-ofmt-output_format-output-format-output_format"><code>-ofmt OUTPUT_FORMAT, --output-format OUTPUT_FORMAT</code></h3>
+<p>Media format to use for output file(s).</p>
+<p>See <code>ffmpeg -formats</code> for a list.</p>
+<p>If not specified, the format will be inferred by ffmpeg from the output file name. If the output file name is not explicitly specified, the extension will govern the format (see '--extension' option).</p>
+<h3 id="-ext-extension-extension-extension"><code>-ext EXTENSION, --extension EXTENSION</code></h3>
+<p>Output file extension to use for output files that were not explicitly specified. (Default: <code>mkv</code>)</p>
+<h2 id="environment-variables">Environment Variables</h2>
+<p>The program additionally respects environment variables:</p>
+<h3 id="tmp-temp-tmpdir"><code>TMP</code> / <code>TEMP</code> / <code>TMPDIR</code></h3>
+<p>Sets the path to the temporary directory in which files are
+stored before being moved to the final output directory.
+Note: You need to use full paths.</p>
+<h3 id="ffmpeg_path"><code>FFMPEG_PATH</code></h3>
+<p>Sets the full path to an <code>ffmpeg</code> executable other than
+the system default or you can provide a file name available on $PATH</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../presets/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Presets">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Presets
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../advanced/api/" class="md-footer__link md-footer__link--next" aria-label="Next: API">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                API
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
