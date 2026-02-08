@@ -676,12 +676,14 @@ class TestFileValidation:
             mp3 = MP3(str(temp_input), ID3=ID3)
             if not mp3.tags:
                 mp3.add_tags()
+            assert mp3.tags is not None
             mp3.tags.add(TXXX(desc="REPLAYGAIN_TRACK_GAIN", text=["-5.00 dB"]))
             mp3.tags.add(TXXX(desc="REPLAYGAIN_TRACK_PEAK", text=["0.950000"]))
             mp3.save()
 
             # Verify tags were added
             mp3_check = MP3(str(temp_input), ID3=ID3)
+            assert mp3_check.tags is not None
             assert "TXXX:REPLAYGAIN_TRACK_GAIN" in mp3_check.tags
             assert "TXXX:REPLAYGAIN_TRACK_PEAK" in mp3_check.tags
 
@@ -725,12 +727,14 @@ class TestFileValidation:
             mp4 = MP4(str(temp_input))
             if not mp4.tags:
                 mp4.add_tags()
+            assert mp4.tags is not None
             mp4.tags["----:com.apple.iTunes:REPLAYGAIN_TRACK_GAIN"] = [b"-5.00 dB"]
             mp4.tags["----:com.apple.iTunes:REPLAYGAIN_TRACK_PEAK"] = [b"0.950000"]
             mp4.save()
 
             # Verify tags were added
             mp4_check = MP4(str(temp_input))
+            assert mp4_check.tags is not None
             assert "----:com.apple.iTunes:REPLAYGAIN_TRACK_GAIN" in mp4_check.tags
             assert "----:com.apple.iTunes:REPLAYGAIN_TRACK_PEAK" in mp4_check.tags
 
