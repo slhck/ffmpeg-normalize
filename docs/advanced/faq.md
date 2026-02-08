@@ -30,6 +30,8 @@ You can use the `--replaygain` option to write ReplayGain tags to the original f
 
 If you decide to run `ffmpeg-normalize` with the default options, it will encode the audio with PCM audio (the default), and the resulting files will be very large. You can also choose to re-encode the files with MP3 or AAC, but you will inevitably introduce [generation loss](https://en.wikipedia.org/wiki/Generation_loss). Therefore, I do not recommend running this kind of destructive operation on your precious music collection, unless you have a backup of the originals or accept potential quality reduction.
 
+**Note:** When normalizing files (without the `--replaygain` option), any existing ReplayGain tags from the input file are automatically stripped from the output, as they are no longer accurate after normalization.
+
 ## Why are my output files MKV?
 
 I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.

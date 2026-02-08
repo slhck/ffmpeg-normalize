@@ -332,8 +332,10 @@ class MediaFile:
                 "ReplayGain tagging is enabled. Proceeding with tag calculation/application."
             )
             self._run_replaygain()
-
-        if not self.ffmpeg_normalize.replaygain:
+        else:
+            # Strip any existing ReplayGain tags from the output file
+            # since they are no longer accurate after normalization
+            self._strip_replaygain_tags(self.output_file)
             _logger.info(f"Normalized file written to {self.output_file}")
 
     def _run_replaygain(self) -> None:
@@ -460,6 +462,103 @@ class MediaFile:
         _logger.info(
             f"Successfully wrote replaygain tags to input file {self.input_file}"
         )
+
+    def _strip_replaygain_tags(self, output_file: str) -> None:
+        """
+        Strip ReplayGain tags from the output file after normalization.
+
+        This ensures that old ReplayGain tags from the input are removed,
+        since they are no longer accurate after normalization.
+
+        Args:
+            output_file (str): Path to the output file to strip tags from
+        """
+        _logger.debug(f"Stripping ReplayGain tags from {output_file}")
+
+        output_file_ext = os.path.splitext(output_file)[1]
+        if output_file_ext == ".mp3":
+            try:
+                mp3 = MP3(output_file, ID3=ID3)
+                if not mp3.tags:
+                    return
+                # Remove REPLAYGAIN_* tags
+                tags_to_remove = [
+                    key for key in mp3.tags if key.startswith("TXXX:REPLAYGAIN_")
+                ]
+                for tag in tags_to_remove:
+                    del mp3.tags[tag]
+                if tags_to_remove:
+                    mp3.save()
+                    _logger.debug(
+                        f"Stripped {len(tags_to_remove)} ReplayGain tag(s) from {output_file}"
+                    )
+            except Exception as e:
+                _logger.warning(
+                    f"Could not strip ReplayGain tags from {output_file}: {e}"
+                )
+        elif output_file_ext in [".mp4", ".m4a", ".m4v", ".mov"]:
+            try:
+                mp4 = MP4(output_file)
+                if not mp4.tags:
+                    return
+                # Remove REPLAYGAIN_* tags
+                tags_to_remove = [
+                    key
+                    for key in mp4.tags
+                    if "REPLAYGAIN_" in key.upper() or "REPLAYGAIN" in key.upper()
+                ]
+                for tag in tags_to_remove:
+                    del mp4.tags[tag]
+                if tags_to_remove:
+                    mp4.save()
+                    _logger.debug(
+                        f"Stripped {len(tags_to_remove)} ReplayGain tag(s) from {output_file}"
+                    )
+            except Exception as e:
+                _logger.warning(
+                    f"Could not strip ReplayGain tags from {output_file}: {e}"
+                )
+        elif output_file_ext == ".ogg":
+            try:
+                ogg = OggVorbis(output_file)
+                # Remove REPLAYGAIN_* tags (case-insensitive)
+                tags_to_remove = [
+                    key for key in ogg.keys() if key.upper().startswith("REPLAYGAIN_")
+                ]
+                for tag in tags_to_remove:
+                    del ogg[tag]
+                if tags_to_remove:
+                    ogg.save()
+                    _logger.debug(
+                        f"Stripped {len(tags_to_remove)} ReplayGain tag(s) from {output_file}"
+                    )
+            except Exception as e:
+                _logger.warning(
+                    f"Could not strip ReplayGain tags from {output_file}: {e}"
+                )
+        elif output_file_ext == ".opus":
+            try:
+                opus = OggOpus(output_file)
+                # Remove R128_* tags (Opus uses R128 instead of REPLAYGAIN, case-insensitive)
+                tags_to_remove = [
+                    key for key in opus.keys() if key.upper().startswith("R128_")
+                ]
+                for tag in tags_to_remove:
+                    del opus[tag]
+                if tags_to_remove:
+                    opus.save()
+                    _logger.debug(
+                        f"Stripped {len(tags_to_remove)} R128 tag(s) from {output_file}"
+                    )
+            except Exception as e:
+                _logger.warning(
+                    f"Could not strip ReplayGain tags from {output_file}: {e}"
+                )
+        else:
+            # For other formats, we don't need to strip tags
+            _logger.debug(
+                f"Skipping ReplayGain tag stripping for {output_file_ext} (not supported/needed)"
+            )
 
     def _can_write_output_video(self) -> bool:
         """

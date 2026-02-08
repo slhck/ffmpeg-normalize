@@ -659,6 +659,194 @@ class TestFileValidation:
         ffmpeg_normalize_call(["tests/test.mp4", "-n"])  # dry run
         # No assertion needed - if validation fails, the command will error
 
+    def test_replaygain_tags_stripped_after_normalization(self, tmp_path):
+        """Test that ReplayGain tags are stripped after normalization."""
+        import shutil
+        from mutagen.id3 import ID3, TXXX
+        from mutagen.mp3 import MP3
+
+        temp_input = tmp_path / "test_with_replaygain.mp3"
+        temp_output = tmp_path / "normalized_output.mp3"
+
+        try:
+            # Create a temporary copy of test.mp3 with ReplayGain tags
+            shutil.copy("tests/test.mp3", temp_input)
+
+            # Add ReplayGain tags to the input file
+            mp3 = MP3(str(temp_input), ID3=ID3)
+            if not mp3.tags:
+                mp3.add_tags()
+            mp3.tags.add(TXXX(desc="REPLAYGAIN_TRACK_GAIN", text=["-5.00 dB"]))
+            mp3.tags.add(TXXX(desc="REPLAYGAIN_TRACK_PEAK", text=["0.950000"]))
+            mp3.save()
+
+            # Verify tags were added
+            mp3_check = MP3(str(temp_input), ID3=ID3)
+            assert "TXXX:REPLAYGAIN_TRACK_GAIN" in mp3_check.tags
+            assert "TXXX:REPLAYGAIN_TRACK_PEAK" in mp3_check.tags
+
+            # Normalize the file
+            ffmpeg_normalize_call(
+                [str(temp_input), "-o", str(temp_output), "-c:a", "libmp3lame"]
+            )
+
+            # Check that output file exists
+            assert temp_output.exists()
+
+            # Check that ReplayGain tags were stripped from the output
+            mp3_output = MP3(str(temp_output), ID3=ID3)
+            if mp3_output.tags:
+                assert "TXXX:REPLAYGAIN_TRACK_GAIN" not in mp3_output.tags, (
+                    "REPLAYGAIN_TRACK_GAIN tag should be stripped"
+                )
+                assert "TXXX:REPLAYGAIN_TRACK_PEAK" not in mp3_output.tags, (
+                    "REPLAYGAIN_TRACK_PEAK tag should be stripped"
+                )
+        finally:
+            # Clean up temp files even if test fails
+            if temp_input.exists():
+                temp_input.unlink()
+            if temp_output.exists():
+                temp_output.unlink()
+
+    def test_replaygain_tags_stripped_m4a(self, tmp_path):
+        """Test that ReplayGain tags are stripped from M4A files after normalization."""
+        import shutil
+        from mutagen.mp4 import MP4
+
+        temp_input = tmp_path / "test_with_replaygain.m4a"
+        temp_output = tmp_path / "normalized_output.m4a"
+
+        try:
+            # Create a temporary copy of test.m4a with ReplayGain tags
+            shutil.copy("tests/test.m4a", temp_input)
+
+            # Add ReplayGain tags to the input file
+            mp4 = MP4(str(temp_input))
+            if not mp4.tags:
+                mp4.add_tags()
+            mp4.tags["----:com.apple.iTunes:REPLAYGAIN_TRACK_GAIN"] = [b"-5.00 dB"]
+            mp4.tags["----:com.apple.iTunes:REPLAYGAIN_TRACK_PEAK"] = [b"0.950000"]
+            mp4.save()
+
+            # Verify tags were added
+            mp4_check = MP4(str(temp_input))
+            assert "----:com.apple.iTunes:REPLAYGAIN_TRACK_GAIN" in mp4_check.tags
+            assert "----:com.apple.iTunes:REPLAYGAIN_TRACK_PEAK" in mp4_check.tags
+
+            # Normalize the file
+            ffmpeg_normalize_call(
+                [str(temp_input), "-o", str(temp_output), "-c:a", "aac"]
+            )
+
+            # Check that output file exists
+            assert temp_output.exists()
+
+            # Check that ReplayGain tags were stripped from the output
+            mp4_output = MP4(str(temp_output))
+            if mp4_output.tags:
+                assert (
+                    "----:com.apple.iTunes:REPLAYGAIN_TRACK_GAIN" not in mp4_output.tags
+                ), "REPLAYGAIN_TRACK_GAIN tag should be stripped"
+                assert (
+                    "----:com.apple.iTunes:REPLAYGAIN_TRACK_PEAK" not in mp4_output.tags
+                ), "REPLAYGAIN_TRACK_PEAK tag should be stripped"
+        finally:
+            # Clean up temp files even if test fails
+            if temp_input.exists():
+                temp_input.unlink()
+            if temp_output.exists():
+                temp_output.unlink()
+
+    def test_replaygain_tags_stripped_ogg(self, tmp_path):
+        """Test that ReplayGain tags are stripped from OGG files after normalization."""
+        import shutil
+        from mutagen.oggvorbis import OggVorbis
+
+        temp_input = tmp_path / "test_with_replaygain.ogg"
+        temp_output = tmp_path / "normalized_output.ogg"
+
+        try:
+            # Create a temporary copy of test.ogg with ReplayGain tags
+            shutil.copy("tests/test.ogg", temp_input)
+
+            # Add ReplayGain tags to the input file
+            ogg = OggVorbis(str(temp_input))
+            ogg["REPLAYGAIN_TRACK_GAIN"] = ["-5.00 dB"]
+            ogg["REPLAYGAIN_TRACK_PEAK"] = ["0.950000"]
+            ogg.save()
+
+            # Verify tags were added
+            ogg_check = OggVorbis(str(temp_input))
+            assert "REPLAYGAIN_TRACK_GAIN" in ogg_check
+            assert "REPLAYGAIN_TRACK_PEAK" in ogg_check
+
+            # Normalize the file
+            ffmpeg_normalize_call(
+                [str(temp_input), "-o", str(temp_output), "-c:a", "libvorbis"]
+            )
+
+            # Check that output file exists
+            assert temp_output.exists()
+
+            # Check that ReplayGain tags were stripped from the output
+            ogg_output = OggVorbis(str(temp_output))
+            # OGG stores tags in lowercase
+            assert "replaygain_track_gain" not in ogg_output, (
+                "replaygain_track_gain tag should be stripped"
+            )
+            assert "replaygain_track_peak" not in ogg_output, (
+                "replaygain_track_peak tag should be stripped"
+            )
+        finally:
+            # Clean up temp files even if test fails
+            if temp_input.exists():
+                temp_input.unlink()
+            if temp_output.exists():
+                temp_output.unlink()
+
+    def test_replaygain_tags_stripped_opus(self, tmp_path):
+        """Test that R128 tags are stripped from OPUS files after normalization."""
+        import shutil
+        from mutagen.oggopus import OggOpus
+
+        temp_input = tmp_path / "test_with_r128.opus"
+        temp_output = tmp_path / "normalized_output.opus"
+
+        try:
+            # Create a temporary copy of test.opus with R128 tags
+            shutil.copy("tests/test.opus", temp_input)
+
+            # Add R128 tags to the input file (Opus uses R128 instead of REPLAYGAIN)
+            opus = OggOpus(str(temp_input))
+            opus["R128_TRACK_GAIN"] = ["-1280"]  # -5.00 dB * 256
+            opus.save()
+
+            # Verify tags were added
+            opus_check = OggOpus(str(temp_input))
+            assert "R128_TRACK_GAIN" in opus_check
+
+            # Normalize the file
+            ffmpeg_normalize_call(
+                [str(temp_input), "-o", str(temp_output), "-c:a", "libopus"]
+            )
+
+            # Check that output file exists
+            assert temp_output.exists()
+
+            # Check that R128 tags were stripped from the output
+            opus_output = OggOpus(str(temp_output))
+            # OPUS stores tags in lowercase
+            assert "r128_track_gain" not in opus_output, (
+                "r128_track_gain tag should be stripped"
+            )
+        finally:
+            # Clean up temp files even if test fails
+            if temp_input.exists():
+                temp_input.unlink()
+            if temp_output.exists():
+                temp_output.unlink()
+
 
 def test_ffmpeg_env():
     """Verify that ffmpeg_env context manager sets environment correctly."""

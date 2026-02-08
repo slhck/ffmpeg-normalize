@@ -93,6 +93,8 @@ When adding, removing, or modifying CLI options, YOU MUST:
 
 This ensures users have accurate documentation and working shell completions for all CLI flags.
 
+**Important:** When modifying CLI descriptions (help texts), make sure to update the corresponding documentation in `docs/usage/cli-options.md` to keep them consistent, as well as the shell completions.
+
 ### Dependencies
 
 The project uses:

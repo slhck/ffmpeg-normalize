@@ -110,7 +110,7 @@ Print loudness statistics for both passes formatted as JSON to stdout.
 
 Write [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) tags to the original file without normalizing.
 
-This mode will overwrite the input file and ignore other options.
+This mode will overwrite the input file and ignore other options. It will strip all ReplayGain tags.
 
 Only works with EBU normalization, and only with .mp3, .mp4/.m4a, .ogg, .opus for now.
 

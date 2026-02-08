@@ -5,7 +5,7 @@
 
 _shtab_ffmpeg_normalize_commands() {
   local _commands=(
-    
+
   )
   _describe 'ffmpeg-normalize commands' _commands
 }
@@ -63,7 +63,7 @@ Otherwise, the range is -99 to 0.
 ]:target_level:"
   {-p,--print-stats}"[Print loudness statistics for both passes formatted as JSON to stdout.]"
   "--replaygain[Write ReplayGain tags to the original file without normalizing.
-This mode will overwrite the input file and ignore other options.
+This mode will overwrite the input file and ignore other options. It will strip all ReplayGain tags.
 Only works with EBU normalization, and only with .mp3, .mp4\/.m4a, .ogg, .opus for now.
 ]"
   "--batch[Preserve relative loudness between files (album mode).
@@ -231,7 +231,7 @@ _shtab_ffmpeg_normalize() {
       (( CURRENT += 1 ))
       curcontext="${curcontext%:*:*}:_shtab_ffmpeg_normalize-$line[1]:"
       case $line[1] in
-        
+
       esac
   esac
 }
