@@ -1,3 +1,14 @@
+## [1.37.3] - 2026-02-08
+
+### 🐛 Bug Fixes
+
+- Restore uv/ffmpeg setup and allowed tools in CI workflows
+- Restore write permissions for Claude CI workflows
+- Strip ReplayGain tags after normalization, fixes #308
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.37.3
 ## [1.37.2] - 2026-02-04
 
 ### 🚀 Features
