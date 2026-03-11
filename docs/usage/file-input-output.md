@@ -30,19 +30,40 @@ Normalize a number of videos in the current folder and write them to a folder ca
 ffmpeg-normalize *.mkv -c:a aac -b:a 192k
 ```
 
-## Use Windows loops for multiple files
+## Use Windows for multiple files
 
-For Windows CMD (Batch), the above would be written as a loop:
+Windows does not expand wildcards like `*.mkv` automatically. There are several ways to handle multiple files:
+
+### PowerShell (recommended)
+
+Pass all matched files as arguments in a single command:
+
+```powershell
+ffmpeg-normalize (Get-ChildItem *.mkv).FullName -c:a aac -b:a 192k
+```
+
+This passes all files at once, so options like `--batch` work correctly.
+
+### Input list
+
+Create a text file listing your input files (one per line), then use `--input-list`:
+
+```bat
+dir /b *.mkv > filelist.txt
+ffmpeg-normalize --input-list filelist.txt -c:a aac -b:a 192k
+```
+
+This also passes all files in a single invocation, so `--batch` works correctly.
+
+### CMD loop
 
 ```bat
 for %i in (*.mkv) do ffmpeg-normalize "%i" -c:a aac -b:a 192k
 ```
 
-With PowerShell:
+!!! warning
 
-```powershell
-ls *.mkv | ForEach-Object { ffmpeg-normalize $_.FullName -c:a aac -b:a 192k }
-```
+    CMD loops run `ffmpeg-normalize` once per file. This means `--batch` mode will **not** work, because each invocation only sees a single file. Use one of the methods above if you need batch normalization.
 
 ## Create an MP3 file as output
 

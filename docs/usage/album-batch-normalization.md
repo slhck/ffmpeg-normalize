@@ -31,6 +31,27 @@ ffmpeg-normalize album/*.flac --batch -nt rms -t -20
 ffmpeg-normalize album/*.wav --batch -nt peak -t -1
 ```
 
+## Windows Usage
+
+On Windows, wildcards like `*.flac` are not expanded by the shell. Use one of these approaches instead:
+
+With PowerShell (recommended):
+
+```powershell
+ffmpeg-normalize (Get-ChildItem album\*.flac).FullName --batch -nt rms -t -20
+```
+
+With an input list:
+
+```bat
+dir /b album\*.flac > filelist.txt
+ffmpeg-normalize --input-list filelist.txt --batch -nt rms -t -20
+```
+
+!!! warning
+
+    Do **not** use a CMD `for` loop with `--batch`. The loop runs `ffmpeg-normalize` once per file, so batch mode has no effect — each file is normalized independently.
+
 ## Best Practices
 
 - Use RMS (`-nt rms`) for most music albums
