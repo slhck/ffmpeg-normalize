@@ -30,15 +30,32 @@ For most cases, linear mode is recommended. Dynamic mode should only be used whe
 
 At this time, the `loudnorm` filter in ffmpeg does not provide a way to force linear mode when the input loudness range exceeds the target or when the true peak would be exceeded. There are some options to mitigate this:
 
-- The `--keep-lra-above-loudness-range-target` option can be used to keep the input loudness range above the specified target, but it will not force linear mode in all cases.
-- Similarly, the `--keep-loudness-range-target` option can be used to keep the input loudness range target.
-- The `--lower-only` option can be used to skip the normalization pass completely if the measured loudness is lower than the target loudness.
+- `--keep-loudness-range-target`: Sets the target LRA to the input file's measured LRA, preventing dynamic fallback caused by the input LRA exceeding the target.
+- `--keep-lra-above-loudness-range-target`: Similar to the above, but only adjusts the target LRA when the input LRA is above it. This is a less aggressive alternative.
+- `--auto-lower-loudness-target`: Automatically lowers the integrated loudness target so that the required gain does not push the true peak above the limit. This prevents the other common cause of dynamic fallback.
+- `--lower-only`: Skips normalization entirely if the measured loudness is already lower than the target. This avoids amplification (and thus any risk of dynamic fallback from true peak issues).
+
+### Recommended settings for linear normalization
+
+If you want to maximize the chance that normalization stays in linear mode, combine the LRA and true peak mitigations:
+
+```bash
+ffmpeg-normalize input.wav --keep-loudness-range-target --auto-lower-loudness-target
+```
+
+This tells `ffmpeg-normalize` to preserve the input's loudness range (avoiding LRA-based fallback) and to automatically lower the loudness target if needed (avoiding true-peak-based fallback). For most content, this will result in purely linear gain adjustment with no dynamic processing.
+
+If you don't need EBU R128 at all and just want a simple linear gain to a target level, peak normalization is always linear and never falls back to dynamic mode:
+
+```bash
+ffmpeg-normalize input.wav -nt peak -t -1
+```
 
 If instead you want to use dynamic mode, you can use the `--dynamic` option; this will also speed up the normalization process because only one pass is needed.
 
 ## When to use peak versus RMS normalization
 
-R128 normalizaion may not always be the best choice for every situation due to the complex settings, so peak/RMS are valid alternatives.
+R128 normalization may not always be the best choice for every situation due to the complex settings, so peak/RMS are valid alternatives.
 
 Peak normalization simply looks at the loudest single point in your audio and scales everything so that this peak hits your target level (usually 0 dB). It doesn't account for the perceived loudness of the audio though. You might end up with audio that technically peaks at the right level but sounds much quieter than you'd expect because there was one short peak that you normalized to, but the majority of the file was more quiet. This approach is useful when you have technical requirements to prevent clipping or when working with audio that needs strict headroom for downstream processing.
 

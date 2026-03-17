@@ -72,7 +72,12 @@ Finally, make sure you use a recent version of ffmpeg. The [static builds](https
 
 ## Couldn't I just run `loudnorm` with ffmpeg?
 
-You absolutely can. However, you can get better accuracy and linear normalization with two passes of the filter. Since ffmpeg does not allow you to automatically run these two passes, you have to do it yourself and parse the output values from the first run.
+You absolutely can. However, a single-pass `loudnorm` uses dynamic mode by default, which applies compression and may alter the dynamics of your audio. For linear normalization (a constant gain adjustment that preserves dynamics), you need two passes:
+
+1. A first pass that measures the input loudness, loudness range, true peak, and threshold.
+2. A second pass that feeds those measured values back into `loudnorm` with `linear=true`.
+
+This is exactly what `ffmpeg-normalize` automates. It also handles edge cases like adjusting the target LRA and loudness to avoid silent fallback to dynamic mode (see [recommended settings for linear normalization](../usage/normalization-options.md#recommended-settings-for-linear-normalization)).
 
 If ffmpeg-normalize is too over-engineered for you, you could also use an approach such as featured [in this Ruby script](https://gist.github.com/kylophone/84ba07f6205895e65c9634a956bf6d54) that performs the two `loudnorm` passes.
 

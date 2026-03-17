@@ -172,11 +172,11 @@ This option works with all normalization types:
 
 ### `--auto-lower-loudness-target`
 
-Automatically lower EBU Integrated Loudness Target.
+Automatically lower the EBU Integrated Loudness Target to prevent falling back to dynamic mode.
 
-Automatically lower EBU Integrated Loudness Target to prevent falling back to dynamic filtering.
+When the required gain to reach the target loudness would push the true peak above the specified limit, the `loudnorm` filter silently falls back to dynamic processing. This option prevents that by lowering the target loudness so that the gain stays within safe limits. Specifically, it ensures that the target is lower than `input_i - input_tp + true_peak` by a small margin (0.1 LUFS).
 
-Makes sure target loudness is lower than measured loudness minus peak loudness (input_i - input_tp) by a small amount.
+This is commonly combined with `--keep-loudness-range-target` to maximize the chance of staying in linear mode. See [normalization options](../usage/normalization-options.md#recommended-settings-for-linear-normalization) for details.
 
 ### `--dual-mono`
 
