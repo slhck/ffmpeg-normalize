@@ -15,7 +15,7 @@ ffmpeg-normalize is a Python utility for audio normalization using ffmpeg. It su
 ### Code Quality
 - `uv run ruff check .` - Linting
 - `uv run ruff format .` - Code formatting
-- `uv run mypy src/ffmpeg_normalize` - Type checking
+- `uv run ty check` - Type checking
 
 ### Installation
 - `uv sync --dev` - Install all dependencies (runtime and development)

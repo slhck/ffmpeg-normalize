@@ -52,19 +52,12 @@ package-data = {"ffmpeg_normalize" = ["data/**/*.json"]}
 dev = [
     "pytest>=8.1.1,<9",
     "ruff>=0.12.11",
-    "mypy>=1.0.0",
     "types-tqdm",
     "shtab>=1.7.0",
+    "ty>=0.0.24",
 ]
 
-[tool.mypy]
-python_version = "3.13"
-ignore_missing_imports = true
-exclude = ["build"]
-namespace_packages = false
-no_implicit_optional = true
-check_untyped_defs = true
-warn_return_any = true
-warn_unused_ignores = true
-show_error_codes = true
+[tool.ty.rules]
+invalid-argument-type = "warn"
+too-many-positional-arguments = "warn"
 
