@@ -1,3 +1,19 @@
+## [1.37.4] - 2026-03-30
+
+### 🐛 Bug Fixes
+
+- Add type assertions for mypy in ReplayGain tag tests
+
+### 📚 Documentation
+
+- Update file and batch handling under powershell/CMD
+- Update linear recommendations
+
+### ⚙️ Miscellaneous Tasks
+
+- Replace mypy with ty for type checking
+- *(build)* Relax uv_build upper bound to <1.0.0
+- Bump version to 1.37.4
 ## [1.37.3] - 2026-02-08
 
 ### 🐛 Bug Fixes
