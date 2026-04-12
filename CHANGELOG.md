@@ -1,3 +1,12 @@
+## [1.37.5] - 2026-04-12
+
+### 🐛 Bug Fixes
+
+- Output logs with file names, fixes #313
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.37.5
 ## [1.37.4] - 2026-03-30
 
 ### 🐛 Bug Fixes
