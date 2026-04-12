@@ -9,6 +9,19 @@ from typing import Any, Dict, List, Literal, Tuple, cast
 import pytest
 
 
+def _has_encoder(encoder_name: str) -> bool:
+    """Check if a given encoder is available in the local ffmpeg build."""
+    try:
+        result = subprocess.run(
+            ["ffmpeg", "-encoders"],
+            capture_output=True,
+            text=True,
+        )
+        return encoder_name in result.stdout
+    except FileNotFoundError:
+        return False
+
+
 def ffmpeg_normalize_call(args: List[str]) -> Tuple[str, str]:
     cmd = [sys.executable, "-m", "ffmpeg_normalize"]
     cmd.extend(args)
@@ -770,6 +783,11 @@ class TestFileValidation:
         temp_input = tmp_path / "test_with_replaygain.ogg"
         temp_output = tmp_path / "normalized_output.ogg"
 
+        encoder = "libvorbis" if _has_encoder("libvorbis") else "vorbis"
+        extra_args = (
+            [] if encoder == "libvorbis" else ["-e", "-strict experimental -ac 2"]
+        )
+
         try:
             # Create a temporary copy of test.ogg with ReplayGain tags
             shutil.copy("tests/test.ogg", temp_input)
@@ -787,7 +805,7 @@ class TestFileValidation:
 
             # Normalize the file
             ffmpeg_normalize_call(
-                [str(temp_input), "-o", str(temp_output), "-c:a", "libvorbis"]
+                [str(temp_input), "-o", str(temp_output), "-c:a", encoder] + extra_args
             )
 
             # Check that output file exists
