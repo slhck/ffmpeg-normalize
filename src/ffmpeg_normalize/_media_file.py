@@ -888,8 +888,8 @@ class MediaFile:
                     continue
                 if pass2_stats["normalization_type"] == "dynamic":
                     _logger.warning(
-                        "You specified linear normalization, but the loudnorm filter reverted to dynamic normalization. "
-                        "This may lead to unexpected results."
+                        f"{self.input_file}: You specified linear normalization, but the loudnorm filter reverted to dynamic normalization. "
+                        "This may lead to unexpected results. "
                         "Consider your input settings, e.g. choose a lower target level or higher target loudness range."
                     )
 

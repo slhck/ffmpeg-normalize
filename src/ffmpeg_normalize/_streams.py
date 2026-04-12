@@ -201,7 +201,7 @@ class AudioStream(MediaStream):
             return f"pcm_s{self.bit_depth}le"
         else:
             _logger.warning(
-                f"Unsupported bit depth {self.bit_depth}, falling back to pcm_s16le"
+                f"{self.media_file.input_file}: Unsupported bit depth {self.bit_depth}, falling back to pcm_s16le"
             )
             return "pcm_s16le"
 
@@ -483,7 +483,7 @@ class AudioStream(MediaStream):
 
         if float(self.loudness_statistics["ebu_pass1"]["input_i"]) > 0:
             _logger.warning(
-                "Input file had measured input loudness greater than zero "
+                f"{self.media_file.input_file}: Input file had measured input loudness greater than zero "
                 f"({self.loudness_statistics['ebu_pass1']['input_i']}), capping at 0"
             )
             self.loudness_statistics["ebu_pass1"]["input_i"] = 0
@@ -497,7 +497,7 @@ class AudioStream(MediaStream):
             input_lra = self.loudness_statistics["ebu_pass1"]["input_lra"]
             if input_lra < 1 or input_lra > 50:
                 _logger.warning(
-                    "Input file had measured loudness range outside of [1,50] "
+                    f"{self.media_file.input_file}: Input file had measured loudness range outside of [1,50] "
                     f"({input_lra}), capping to allowed range"
                 )
 
@@ -527,7 +527,7 @@ class AudioStream(MediaStream):
             and not will_use_dynamic_mode
         ):
             _logger.warning(
-                f"Input file had loudness range of {self.loudness_statistics['ebu_pass1']['input_lra']}. "
+                f"{self.media_file.input_file}: Input file had loudness range of {self.loudness_statistics['ebu_pass1']['input_lra']}. "
                 f"This is larger than the loudness range target ({self.media_file.ffmpeg_normalize.loudness_range_target}). "
                 "Normalization will revert to dynamic mode. Choose a higher target loudness range if you want linear normalization. "
                 "Alternatively, use the --keep-loudness-range-target or --keep-lra-above-loudness-range-target option to keep the target loudness range from "
@@ -552,7 +552,7 @@ class AudioStream(MediaStream):
             if safe_target < self.ffmpeg_normalize.target_level:
                 target_level = safe_target
                 _logger.warning(
-                    f"Using loudness target {target_level} because --auto-lower-loudness-target given.",
+                    f"{self.media_file.input_file}: Using loudness target {target_level} because --auto-lower-loudness-target given.",
                 )
 
         stats = self.loudness_statistics["ebu_pass1"]
@@ -654,6 +654,8 @@ class AudioStream(MediaStream):
 
         clip_amount = self.loudness_statistics["max"] + adjustment
         if clip_amount > 0:
-            _logger.warning(f"Adjusting will lead to clipping of {clip_amount} dB")
+            _logger.warning(
+                f"{self.media_file.input_file}: Adjusting will lead to clipping of {clip_amount} dB"
+            )
 
         return f"volume={adjustment}dB"
