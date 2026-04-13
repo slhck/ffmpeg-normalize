@@ -880,17 +880,50 @@ class MediaFile:
                     "This can happen when normalization is skipped (e.g., with --lower-only)."
                 )
 
-        # warn if self.media_file.ffmpeg_normalize.dynamic == False and any of the second pass stats contain "normalization_type" == "dynamic"
+        # warn if dynamic == False and any of the second pass stats contain "normalization_type" == "dynamic"
         if self.ffmpeg_normalize.dynamic is False:
             for audio_stream in self.streams["audio"].values():
                 pass2_stats = audio_stream.get_stats()["ebu_pass2"]
                 if pass2_stats is None:
                     continue
                 if pass2_stats["normalization_type"] == "dynamic":
+                    pass1_stats = audio_stream.get_stats()["ebu_pass1"]
+
+                    reason = ""
+                    if pass1_stats is not None:
+                        linear_gain = (
+                            self.ffmpeg_normalize.target_level - pass1_stats["input_i"]
+                        )
+                        estimated_tp = pass1_stats["input_tp"] + linear_gain
+                        if estimated_tp > self.ffmpeg_normalize.true_peak:
+                            min_tp = estimated_tp
+                            max_target = (
+                                self.ffmpeg_normalize.true_peak
+                                - pass1_stats["input_tp"]
+                                + pass1_stats["input_i"]
+                            )
+                            reason = (
+                                f" Reason: the input true peak ({pass1_stats['input_tp']:.2f} dBTP) is too high — "
+                                f"after linear gain of {linear_gain:.2f} dB, "
+                                f"the estimated true peak would be {estimated_tp:.2f} dBTP, "
+                                f"exceeding the target of {self.ffmpeg_normalize.true_peak} dBTP. "
+                                f"To avoid this, raise --true-peak (-tp) to at least {min_tp:.1f}, "
+                                f"or lower the target level (-t) to at most {max_target:.1f}."
+                            )
+                        elif (
+                            pass1_stats["input_lra"]
+                            > self.ffmpeg_normalize.loudness_range_target
+                        ):
+                            reason = (
+                                f" Reason: the input loudness range ({pass1_stats['input_lra']:.2f} LU) "
+                                f"exceeds the target ({self.ffmpeg_normalize.loudness_range_target:.2f} LU). "
+                                "Consider raising the target loudness range or using "
+                                "--keep-loudness-range-target / --keep-lra-above-loudness-range-target."
+                            )
+
                     _logger.warning(
-                        f"{self.input_file}: You specified linear normalization, but the loudnorm filter reverted to dynamic normalization. "
-                        "This may lead to unexpected results. "
-                        "Consider your input settings, e.g. choose a lower target level or higher target loudness range."
+                        f"{self.input_file}: You specified linear normalization, but the loudnorm filter "
+                        f"reverted to dynamic normalization.{reason}"
                     )
 
         _logger.debug("Normalization finished")

@@ -557,6 +557,30 @@ class AudioStream(MediaStream):
 
         stats = self.loudness_statistics["ebu_pass1"]
 
+        # Check if the true peak constraint will force dynamic mode.
+        # In linear mode, a uniform gain of (target - input_i) is applied.
+        # If that would leave the true peak above the TP limit, loudnorm
+        # cannot satisfy both constraints linearly and will fall back to
+        # dynamic processing.
+        if not will_use_dynamic_mode:
+            linear_gain = target_level - stats["input_i"]
+            estimated_tp = stats["input_tp"] + linear_gain
+            if estimated_tp > self.media_file.ffmpeg_normalize.true_peak:
+                min_tp = estimated_tp
+                max_target = (
+                    self.media_file.ffmpeg_normalize.true_peak
+                    - stats["input_tp"]
+                    + stats["input_i"]
+                )
+                _logger.warning(
+                    f"{self.media_file.input_file}: Linear normalization would result in an estimated true peak of "
+                    f"{estimated_tp:.2f} dBTP (input true peak {stats['input_tp']:.2f} dBTP + gain of {linear_gain:.2f} dB), "
+                    f"which exceeds the target true peak of {self.media_file.ffmpeg_normalize.true_peak} dBTP. "
+                    "The loudnorm filter will likely use dynamic mode instead. "
+                    f"To avoid this, raise --true-peak (-tp) to at least {min_tp:.1f}, "
+                    f"or lower the target level (-t) to at most {max_target:.1f}."
+                )
+
         # Adjust target level for batch mode to preserve relative loudness
         if batch_reference is not None:
             input_i = float(stats["input_i"])
