@@ -1,3 +1,17 @@
+## [1.37.6] - 2026-04-13
+
+### 🚀 Features
+
+- Improved warning messages for dynamic reversion, fixes #314
+
+### 🧪 Testing
+
+- Fix
+
+### ⚙️ Miscellaneous Tasks
+
+- Update ffmpeg
+- Bump version to 1.37.6
 ## [1.37.5] - 2026-04-12
 
 ### 🐛 Bug Fixes
