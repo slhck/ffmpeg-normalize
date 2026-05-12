@@ -1,3 +1,9 @@
+## [1.37.7] - 2026-05-12
+
+### ⚙️ Miscellaneous Tasks
+
+- Update ffmpeg
+- Bump version to 1.37.7
 ## [1.37.6] - 2026-04-13
 
 ### 🚀 Features
