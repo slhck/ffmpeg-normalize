@@ -210,6 +210,10 @@ class AudioStream(MediaStream):
         Get a filter string for current_filter, with the pre-filter
         added before. Applies the input label before.
 
+        If a target channel count is set via ``audio_channels``, a channel
+        layout conversion is inserted before the analysis/normalization
+        filter so that measurements reflect the downmixed signal.
+
         Args:
             current_filter (str): The current filter.
 
@@ -220,9 +224,32 @@ class AudioStream(MediaStream):
         filter_chain = []
         if self.media_file.ffmpeg_normalize.pre_filter:
             filter_chain.append(self.media_file.ffmpeg_normalize.pre_filter)
+        channel_conversion = self._get_channel_conversion_filter()
+        if channel_conversion:
+            filter_chain.append(channel_conversion)
         filter_chain.append(current_filter)
         filter_str = input_label + ",".join(filter_chain)
         return filter_str
+
+    def _get_channel_conversion_filter(self) -> str | None:
+        """
+        Return an ``aformat`` filter string that downmixes/upmixes to the
+        requested channel count, or None if no conversion is configured.
+
+        The ``Nc`` channel-layout notation matches ffmpeg's default layout
+        selection for ``-ac N``, so the analysis pass measures the same
+        signal that the output will contain.
+
+        A float planar sample format is requested so the downmix is not
+        attenuated to fit an integer range. This is what the analysis
+        measurement should reflect, since the volume gain is applied in
+        the filter graph (where samples are also float) before being
+        written to the output codec.
+        """
+        audio_channels = self.media_file.ffmpeg_normalize.audio_channels
+        if not audio_channels:
+            return None
+        return f"aformat=sample_fmts=fltp:channel_layouts={audio_channels}c"
 
     def parse_astats(self) -> Iterator[float]:
         """

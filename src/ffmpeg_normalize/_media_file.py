@@ -660,6 +660,14 @@ class MediaFile:
             if self.ffmpeg_normalize.pre_filter:
                 filter_chain.append(self.ffmpeg_normalize.pre_filter)
 
+            # Apply channel conversion before normalization so that the
+            # normalization filter operates on the same channel layout that
+            # was measured in the first pass. See issue #316.
+            if self.ffmpeg_normalize.audio_channels:
+                filter_chain.append(
+                    f"aformat=sample_fmts=fltp:channel_layouts={self.ffmpeg_normalize.audio_channels}c"
+                )
+
             filter_chain.append(normalization_filter)
 
             if self.ffmpeg_normalize.post_filter:

@@ -519,6 +519,36 @@ class TestFFmpegNormalize:
         stream_info = _get_stream_info("normalized/test2.wav")[0]
         assert stream_info["channels"] == 2
 
+    def test_peak_with_downmix(self):
+        """
+        Regression test for https://github.com/slhck/ffmpeg-normalize/issues/316:
+        peak normalization combined with -ac downmix should result in the
+        target peak in the downmixed output.
+        """
+        target = -1.0
+        ffmpeg_normalize_call(
+            [
+                "tests/test.mp4",
+                "-nt",
+                "peak",
+                "-t",
+                str(target),
+                "-ac",
+                "2",
+                "-o",
+                "normalized/test.mkv",
+            ]
+        )
+        assert os.path.isfile("normalized/test.mkv")
+        stats = _get_stats("normalized/test.mkv", "peak")
+        # Both audio streams in the source should end up close to the target peak.
+        for stream_stats in stats:
+            assert stream_stats["max"] is not None
+            assert abs(stream_stats["max"] - target) < 0.1, (
+                f"Stream {stream_stats['stream_id']} peak {stream_stats['max']} "
+                f"is not close to target {target}"
+            )
+
     def test_replaygain(self):
         REPLAYGAIN_FILES = [
             "tests/test.mp4",
