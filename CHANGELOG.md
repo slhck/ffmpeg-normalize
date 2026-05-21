@@ -1,3 +1,13 @@
+## [1.37.8] - 2026-05-21
+
+### 🐛 Bug Fixes
+
+- Fix issue #316, handle audio channels
+
+### ⚙️ Miscellaneous Tasks
+
+- Drop Python 3.9 support, bump pytest to >=9.0.3
+- Bump version to 1.37.8
 ## [1.37.7] - 2026-05-12
 
 ### ⚙️ Miscellaneous Tasks
