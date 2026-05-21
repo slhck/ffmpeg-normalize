@@ -15,6 +15,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
