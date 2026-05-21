@@ -6,7 +6,7 @@ Thank you for your interest in contributing to ffmpeg-normalize! This guide will
 
 ### Prerequisites
 
-- Python 3.9 or higher
+- Python 3.10 or higher
 - FFmpeg installed and available in PATH
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) (recommended) or pip
 

@@ -1,6 +1,6 @@
 # Requirements
 
-You need Python 3.9 or higher, and ffmpeg.
+You need Python 3.10 or higher, and ffmpeg.
 
 ## ffmpeg
 

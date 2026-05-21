@@ -118,6 +118,6 @@ Tests use pytest and include actual media files in the `tests/` directory. The t
 
 ### Requirements
 
-- Python 3.9+
+- Python 3.10+
 - FFmpeg binary must be available in PATH
 - The tool checks for FFmpeg loudnorm filter availability at runtime

@@ -13,7 +13,7 @@ Batch processing of several input files is possible, including video files.
 ## Quick Start
 
 
-1. Install a recent version of [ffmpeg](https://ffmpeg.org/download.html)
+1. Install a recent version of [ffmpeg](https://ffmpeg.org/download.html) and Python 3.10 or higher
 2. Run `pip3 install ffmpeg-normalize` and `ffmpeg-normalize /path/to/your/file.mp4`, alternatively install [`uv`](https://docs.astral.sh/uv/getting-started/installation/) and run `uvx ffmpeg-normalize /path/to/your/file.mp4`
 3. Done! 🎧 (the normalized file will be called `normalized/file.mkv`)
 
