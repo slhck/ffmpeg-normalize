@@ -297,14 +297,14 @@ class MediaFile:
                 f"Batch mode: Skipping first pass (already completed), using batch reference = {batch_reference:.2f}"
             )
 
-        # for second pass, create a temp file
-        temp_dir = mkdtemp()
-        self.temp_file = os.path.join(temp_dir, f"out.{self.output_ext}")
+        temp_dir = None
 
         if self.ffmpeg_normalize.replaygain:
             _logger.debug(
                 "ReplayGain mode: Second pass will run with temporary file to get stats."
             )
+            temp_dir = mkdtemp()
+            self.temp_file = os.path.join(temp_dir, f"out.{self.output_ext}")
             self.output_file = self.temp_file
 
         # run the second pass as a whole.
@@ -322,7 +322,7 @@ class MediaFile:
                 pass
 
         # remove temp dir; this will remove the temp file as well if it has not been renamed (e.g. for replaygain)
-        if os.path.exists(temp_dir):
+        if temp_dir and os.path.exists(temp_dir):
             rmtree(temp_dir, ignore_errors=True)
 
         # This will use stats from ebu_pass2 if available (from the main second pass),
@@ -840,13 +840,7 @@ class MediaFile:
         temp_dir = None
         temp_file = None
 
-        # special case: if output is a null device, write directly to it
-        if self.output_file == os.devnull:
-            cmd.append(self.output_file)
-        else:
-            temp_dir = mkdtemp()
-            temp_file = os.path.join(temp_dir, f"out.{self.output_ext}")
-            cmd.append(temp_file)
+        cmd.append(self.output_file)
 
         cmd_runner = CommandRunner()
         try:
