@@ -581,6 +581,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#where-the-output-is-written" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the output is written
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#overwrite-the-input-file" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1126,6 +1137,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#where-the-output-is-written" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the output is written
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#overwrite-the-input-file" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1249,10 +1271,14 @@
 <p class="admonition-title">Tip</p>
 <p>If these are part of an album, you might want to use the <a href="../normalization-options/#albumbatch-normalization"><code>--batch</code> option</a> to ensure consistent normalization across all files.</p>
 </div>
+<h2 id="where-the-output-is-written">Where the output is written</h2>
+<p>By default, <code>ffmpeg-normalize</code> writes the normalized file directly to its final destination, just like <code>ffmpeg</code> itself does. Versions prior to v1.38.0 used a temporary directory.</p>
+<p>Note: if the second pass is interrupted, the destination may be left with a partial or overwritten file.</p>
 <h2 id="overwrite-the-input-file">Overwrite the input file</h2>
 <p>You can (if you really need to!) also overwrite your input file. Warning, this will destroy data:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp4<span class="w"> </span>-o<span class="w"> </span>input.mp4<span class="w"> </span>-f
 </code></pre></div>
+<p>In this case, <code>ffmpeg</code> cannot read from and write to the same file at once, so the file is first encoded to a temporary file next to the output and then moved over the original once the encode succeeds. The temporary file lives in the same directory as the output, so the move is a fast, atomic rename rather than a copy across filesystems.</p>
 <h2 id="normalize-videos-compress-audio">Normalize videos, compress audio</h2>
 <p>Normalize a number of videos in the current folder and write them to a folder called <code>normalized</code>, converting all audio streams to AAC with 192 kBit/s.</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>*.mkv<span class="w"> </span>-c:a<span class="w"> </span>aac<span class="w"> </span>-b:a<span class="w"> </span>192k
