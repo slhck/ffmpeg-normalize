@@ -33,6 +33,8 @@ This program normalizes media files to a certain loudness level using the EBU R1
 
 ## 🆕 What's New
 
+- Version 1.38.0 writes the normalized output  directly to the destination without using temporary files
+
 - Version 1.36.0 introduces **presets** with `--preset`! Save and reuse your favorite normalization configurations for different use cases. Comes with three built-in presets: `podcast` (AES standard), `music` (RMS-based batch normalization), and `streaming-video` (video content). Create custom presets too!
 
     Example:

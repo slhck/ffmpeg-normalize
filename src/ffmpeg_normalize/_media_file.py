@@ -4,8 +4,8 @@ import logging
 import os
 import re
 import shlex
-from shutil import move, rmtree
-from tempfile import mkdtemp
+from shutil import rmtree
+from tempfile import mkdtemp, mkstemp
 from typing import TYPE_CHECKING, Iterable, Iterator, Literal, TypedDict, Union
 
 from mutagen.id3 import ID3, TXXX
@@ -836,33 +836,44 @@ class MediaFile:
             yield 100
             return
 
-        # track temp_dir for cleanup
-        temp_dir = None
-        temp_file = None
+        is_in_place_overwrite = os.path.realpath(self.input_file) == os.path.realpath(
+            self.output_file
+        )
 
-        cmd.append(self.output_file)
+        temp_file: Union[str, None] = None
+        if is_in_place_overwrite:
+            # need to create a temporary file because we cannot override
+            # the same input file
+            output_dir = os.path.dirname(self.output_file) or "."
+            fd, temp_file = mkstemp(
+                suffix=f".{self.output_ext}",
+                prefix=f".{os.path.splitext(os.path.basename(self.output_file))[0]}.",
+                dir=output_dir,
+            )
+            os.close(fd)
+            _logger.debug(
+                f"Output file is the same as the input file, "
+                f"encoding to temporary file {temp_file} first"
+            )
+            cmd.append(temp_file)
+        else:
+            cmd.append(self.output_file)
 
         cmd_runner = CommandRunner()
         try:
             yield from cmd_runner.run_ffmpeg_command(cmd)
         except Exception as e:
             _logger.error(f"Error while running command {shlex.join(cmd)}! Error: {e}")
+            if temp_file and os.path.exists(temp_file):
+                os.remove(temp_file)
             raise e
         else:
-            # only move the temp file if it's not a null device and ReplayGain is not enabled!
-            if (
-                self.output_file != os.devnull
-                and temp_file
-                and not self.ffmpeg_normalize.replaygain
-            ):
+            # for in-place normalization, move the finished temp file over the input
+            if temp_file:
                 _logger.debug(
                     f"Moving temporary file from {temp_file} to {self.output_file}"
                 )
-                move(temp_file, self.output_file)
-        finally:
-            # clean up temp directory if it was created
-            if temp_dir and os.path.exists(temp_dir):
-                rmtree(temp_dir, ignore_errors=True)
+                os.replace(temp_file, self.output_file)
 
         output = cmd_runner.get_output()
         # in the second pass, we do not normalize stream-by-stream, so we set the stats based on the

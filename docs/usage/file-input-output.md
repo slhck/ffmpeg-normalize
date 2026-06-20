@@ -14,6 +14,12 @@ ffmpeg-normalize file1.wav file2.wav -o file1-normalized.wav file2-normalized.wa
 
     If these are part of an album, you might want to use the [`--batch` option](normalization-options.md#albumbatch-normalization) to ensure consistent normalization across all files.
 
+## Where the output is written
+
+By default, `ffmpeg-normalize` writes the normalized file directly to its final destination, just like `ffmpeg` itself does. Versions prior to v1.38.0 used a temporary directory.
+
+Note: if the second pass is interrupted, the destination may be left with a partial or overwritten file.
+
 ## Overwrite the input file
 
 You can (if you really need to!) also overwrite your input file. Warning, this will destroy data:
@@ -21,6 +27,8 @@ You can (if you really need to!) also overwrite your input file. Warning, this w
 ```bash
 ffmpeg-normalize input.mp4 -o input.mp4 -f
 ```
+
+In this case, `ffmpeg` cannot read from and write to the same file at once, so the file is first encoded to a temporary file next to the output and then moved over the original once the encode succeeds. The temporary file lives in the same directory as the output, so the move is a fast, atomic rename rather than a copy across filesystems.
 
 ## Normalize videos, compress audio
 

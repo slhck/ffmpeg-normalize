@@ -209,6 +209,19 @@ class TestFFmpegNormalize:
         _, stderr = ffmpeg_normalize_call(["tests/test.mp4", "-v"])
         assert "exists" in stderr
 
+    def test_in_place_overwrite(self, tmp_path):
+        # See issues #22 and #317.
+        test_file = tmp_path / "test.mp3"
+        shutil.copy("tests/test.mp3", test_file)
+        original_bytes = test_file.read_bytes()
+
+        ffmpeg_normalize_call(
+            [str(test_file), "-o", str(test_file), "-c:a", "libmp3lame", "-f"]
+        )
+
+        assert test_file.stat().st_size > 0
+        assert test_file.read_bytes() != original_bytes
+
     def test_dry(self):
         ffmpeg_normalize_call(["tests/test.mp4", "-n"])
         assert not os.path.isfile("normalized/test.mkv")
@@ -705,6 +718,7 @@ class TestFileValidation:
     def test_replaygain_tags_stripped_after_normalization(self, tmp_path):
         """Test that ReplayGain tags are stripped after normalization."""
         import shutil
+
         from mutagen.id3 import ID3, TXXX
         from mutagen.mp3 import MP3
 
@@ -757,6 +771,7 @@ class TestFileValidation:
     def test_replaygain_tags_stripped_m4a(self, tmp_path):
         """Test that ReplayGain tags are stripped from M4A files after normalization."""
         import shutil
+
         from mutagen.mp4 import MP4
 
         temp_input = tmp_path / "test_with_replaygain.m4a"
@@ -808,6 +823,7 @@ class TestFileValidation:
     def test_replaygain_tags_stripped_ogg(self, tmp_path):
         """Test that ReplayGain tags are stripped from OGG files after normalization."""
         import shutil
+
         from mutagen.oggvorbis import OggVorbis
 
         temp_input = tmp_path / "test_with_replaygain.ogg"
@@ -860,6 +876,7 @@ class TestFileValidation:
     def test_replaygain_tags_stripped_opus(self, tmp_path):
         """Test that R128 tags are stripped from OPUS files after normalization."""
         import shutil
+
         from mutagen.oggopus import OggOpus
 
         temp_input = tmp_path / "test_with_r128.opus"
@@ -902,7 +919,7 @@ class TestFileValidation:
 
 def test_ffmpeg_env():
     """Verify that ffmpeg_env context manager sets environment correctly."""
-    from ffmpeg_normalize._cmd_utils import ffmpeg_env, _get_ffmpeg_env, CommandRunner
+    from ffmpeg_normalize._cmd_utils import CommandRunner, _get_ffmpeg_env, ffmpeg_env
 
     original_env = _get_ffmpeg_env()
     assert original_env is None
