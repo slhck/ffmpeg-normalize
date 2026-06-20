@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import argparse
+
+# Import version from package
+import importlib.metadata
 import json
 import logging
 import os
@@ -14,9 +17,6 @@ from ._errors import FFmpegNormalizeError
 from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
 from ._logger import setup_cli_logger
 from ._presets import PresetManager
-
-# Import version from package
-import importlib.metadata
 
 __version__ = importlib.metadata.version("ffmpeg-normalize")
 
@@ -42,6 +42,7 @@ def create_parser() -> argparse.ArgumentParser:
               - `TMP` / `TEMP` / `TMPDIR`
                     Sets the path to the temporary directory in which files are
                     stored before being moved to the final output directory.
+                    Only valid for ReplayGain and when the input file == output file.
                     Note: You need to use full paths.
 
               - `FFMPEG_PATH`

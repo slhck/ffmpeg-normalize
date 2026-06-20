@@ -334,6 +334,7 @@ The program additionally respects environment variables:
 
 Sets the path to the temporary directory in which files are
 stored before being moved to the final output directory.
+Only valid for ReplayGain and when the input file == output file.
 Note: You need to use full paths.
 
 ### `FFMPEG_PATH`
