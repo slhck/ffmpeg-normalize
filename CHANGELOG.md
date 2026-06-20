@@ -1,3 +1,18 @@
+## [1.38.0] - 2026-06-20
+
+### 🚀 Features
+
+- Remove use of temporary files
+
+### 🐛 Bug Fixes
+
+- Do not create a temp file for the second pass except for replay gain
+
+### ⚙️ Miscellaneous Tasks
+
+- Prevent gh-pages race between docs deploy workflows
+- Update docs
+- Bump version to 1.38.0
 ## [1.37.8] - 2026-05-21
 
 ### 🐛 Bug Fixes
