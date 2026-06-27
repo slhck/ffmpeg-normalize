@@ -87,6 +87,9 @@ class MediaFile:
         self.streams: StreamDict = {"audio": {}, "video": {}, "subtitle": {}}
         self.temp_file: Union[str, None] = None
         self.batch_reference: float | None = None
+        # Input (access, modification) times captured before processing, used
+        # when the keep_mtime option is enabled.
+        self.input_timestamps: tuple[float, float] | None = None
 
         self.parse_streams()
 
@@ -280,6 +283,17 @@ class MediaFile:
         # Store batch reference for use in second pass
         self.batch_reference = batch_reference
 
+        # Capture the input file's timestamps before processing, since an
+        # in-place overwrite would otherwise lose the original modification time.
+        if self.ffmpeg_normalize.keep_mtime:
+            try:
+                stat = os.stat(self.input_file)
+                self.input_timestamps = (stat.st_atime, stat.st_mtime)
+            except OSError as e:
+                _logger.warning(
+                    f"Could not read timestamps from {self.input_file}: {e}"
+                )
+
         # run the first pass to get loudness stats, unless in dynamic EBU mode or batch mode
         # (in batch mode, first pass is already done in FFmpegNormalize.run_normalization)
         if batch_reference is None:
@@ -336,7 +350,31 @@ class MediaFile:
             # Strip any existing ReplayGain tags from the output file
             # since they are no longer accurate after normalization
             self._strip_replaygain_tags(self.output_file)
+            # Copy input timestamps last, after any tag modifications, so the
+            # output ends up with the original modification time.
+            if self.ffmpeg_normalize.keep_mtime and not self.ffmpeg_normalize.dry_run:
+                self._apply_input_timestamps()
             _logger.info(f"Normalized file written to {self.output_file}")
+
+    def _apply_input_timestamps(self) -> None:
+        """
+        Copy the input file's access and modification times to the output file.
+
+        Used when the ``keep_mtime`` option is enabled. Only the access and
+        modification times are copied; a file's creation time (which some
+        operating systems such as Windows track separately) is not affected.
+        """
+        if self.input_timestamps is None:
+            return
+        atime, mtime = self.input_timestamps
+        try:
+            os.utime(self.output_file, (atime, mtime))
+            _logger.debug(
+                f"Copied input timestamps to {self.output_file} "
+                f"(atime={atime}, mtime={mtime})"
+            )
+        except OSError as e:
+            _logger.warning(f"Could not copy timestamps to {self.output_file}: {e}")
 
     def _run_replaygain(self) -> None:
         """

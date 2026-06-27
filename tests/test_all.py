@@ -643,6 +643,73 @@ class TestFFmpegNormalize:
         )
         assert "Cannot use both" in stderr
 
+    def test_keep_mtime(self, tmp_path):
+        """The output file should inherit the input file's modification time."""
+        input_file = tmp_path / "test.wav"
+        output_file = tmp_path / "out.wav"
+        # Create a small wav source and give it a known, old modification time
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=440:duration=1",
+                "-sample_fmt",
+                "s16",
+                str(input_file),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        old_mtime = 1577880000  # 2020-01-01 12:00:00 UTC
+        os.utime(input_file, (old_mtime, old_mtime))
+
+        ffmpeg_normalize_call(
+            [
+                str(input_file),
+                "-o",
+                str(output_file),
+                "-nt",
+                "peak",
+                "-t",
+                "0",
+                "-f",
+                "--keep-mtime",
+            ]
+        )
+        assert output_file.is_file()
+        assert abs(output_file.stat().st_mtime - old_mtime) < 1
+
+    def test_keep_mtime_not_set_by_default(self, tmp_path):
+        """Without --keep-mtime, the output file should have a fresh mtime."""
+        input_file = tmp_path / "test.wav"
+        output_file = tmp_path / "out.wav"
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=440:duration=1",
+                "-sample_fmt",
+                "s16",
+                str(input_file),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        old_mtime = 1577880000  # 2020-01-01 12:00:00 UTC
+        os.utime(input_file, (old_mtime, old_mtime))
+
+        ffmpeg_normalize_call(
+            [str(input_file), "-o", str(output_file), "-nt", "peak", "-t", "0", "-f"]
+        )
+        assert output_file.is_file()
+        assert output_file.stat().st_mtime > old_mtime
+
     def test_keep_other_and_keep_original_conflict(self):
         """Test that using both --keep-other-audio and --keep-original-audio fails"""
         _, stderr = ffmpeg_normalize_call(

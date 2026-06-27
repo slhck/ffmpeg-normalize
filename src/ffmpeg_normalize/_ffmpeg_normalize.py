@@ -88,6 +88,7 @@ class FFmpegNormalize:
         audio_streams (list[int] | None, optional): List of audio stream indices to normalize. Defaults to None (all streams).
         audio_default_only (bool, optional): Only normalize audio streams with default disposition. Defaults to False.
         keep_other_audio (bool, optional): Keep non-selected audio streams in output (copy without normalization). Defaults to False.
+        keep_mtime (bool, optional): Copy the input file's modification time to the output file. Defaults to False.
 
     Raises:
         FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
@@ -133,6 +134,7 @@ class FFmpegNormalize:
         "audio_streams": None,
         "audio_default_only": False,
         "keep_other_audio": False,
+        "keep_mtime": False,
     }
 
     def __init__(
@@ -174,6 +176,7 @@ class FFmpegNormalize:
         audio_streams: list[int] | None = None,
         audio_default_only: bool = False,
         keep_other_audio: bool = False,
+        keep_mtime: bool = False,
     ):
         self.ffmpeg_exe = get_ffmpeg_exe()
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
@@ -262,6 +265,8 @@ class FFmpegNormalize:
         self.audio_streams = audio_streams
         self.audio_default_only = audio_default_only
         self.keep_other_audio = keep_other_audio
+
+        self.keep_mtime = keep_mtime
 
         if (
             self.audio_codec is None or "pcm" in self.audio_codec

@@ -94,6 +94,18 @@ def create_parser() -> argparse.ArgumentParser:
         ),
         default=FFmpegNormalize.DEFAULTS["output_folder"],
     )
+    group_io.add_argument(
+        "--keep-mtime",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+            Copy the input file's modification time to the output file.
+
+            Only the access and modification times are copied; a file's creation
+            time (tracked separately on some operating systems) is not affected.
+        """
+        ),
+    )
 
     group_general = parser.add_argument_group("General Options")
     group_general.add_argument(
@@ -708,6 +720,7 @@ def main() -> None:
         audio_streams=audio_streams,
         audio_default_only=cli_args.audio_default_only,
         keep_other_audio=cli_args.keep_other_audio,
+        keep_mtime=cli_args.keep_mtime,
     )
 
     if cli_args.output and len(cli_args.input) > len(cli_args.output):
