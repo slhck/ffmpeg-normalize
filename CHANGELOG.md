@@ -1,3 +1,12 @@
+## [1.40.0] - 2026-06-27
+
+### 🚀 Features
+
+- Add --threshold to skip files already at target
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.40.0
 ## [1.39.0] - 2026-06-27
 
 ### 🚀 Features
