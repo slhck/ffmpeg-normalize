@@ -1,3 +1,17 @@
+## [1.39.0] - 2026-06-27
+
+### 🚀 Features
+
+- Add --keep-mtime to preserve input mtime
+- Preserve input bit depth by default
+
+### 📚 Documentation
+
+- Document --keep-mtime and bit-depth preservation
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.39.0
 ## [1.38.0] - 2026-06-20
 
 ### 🚀 Features
