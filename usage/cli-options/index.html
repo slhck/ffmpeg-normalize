@@ -964,6 +964,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-threshold-threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --threshold THRESHOLD
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1967,6 +1978,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-threshold-threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --threshold THRESHOLD
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2495,6 +2517,7 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <p>Otherwise, the range is -99 to 0.</p>
 <h3 id="-p-print-stats"><code>-p, --print-stats</code></h3>
 <p>Print loudness statistics for both passes formatted as JSON to stdout.</p>
+<p>Each entry also includes a <code>status</code> field with the per-file result: <code>normalized</code>, <code>skipped</code> (already within the <code>--threshold</code> of the target, see below), or <code>error</code>. When the status is <code>error</code>, an additional <code>error</code> field has the error message.</p>
 <h3 id="-replaygain"><code>--replaygain</code></h3>
 <p>Write <a href="https://en.wikipedia.org/wiki/ReplayGain">ReplayGain</a> tags to the original file without normalizing.</p>
 <p>This mode will overwrite the input file and ignore other options. It will strip all ReplayGain tags.</p>
@@ -2505,6 +2528,11 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <p>Batch mode works with all normalization types (EBU, RMS, peak).</p>
 <p>Example: <code>ffmpeg-normalize album/*.flac --batch -nt rms -t -20</code></p>
 <p><strong>Note:</strong> For music albums, RMS or Peak normalization is recommended over EBU. See the <a href="../../advanced/faq/#how-do-i-normalize-an-album-while-preserving-relative-loudness-between-tracks">FAQ</a> for details.</p>
+<h3 id="-threshold-threshold"><code>--threshold THRESHOLD</code></h3>
+<p>Skip normalization when a file is already within this many dB/LU of the target level (default: 0, i.e. disabled).</p>
+<p>When set to a positive value, a file whose measured level is within the threshold of the target is considered already normalized and copied through unchanged instead of being re-encoded. Its status is reported as <code>skipped</code> in the <code>--print-stats</code> output.</p>
+<p>For EBU normalization, the measured integrated loudness is compared to the target level; for peak and RMS, the measured peak/RMS level is used. The true peak and loudness range are not considered for this decision.</p>
+<p>The default of 0 always normalizes. This option has no effect in batch or ReplayGain mode, or when a pre/post filter or channel downmix is used. Skipped files are only copied verbatim when the output keeps the input's extension; if the output format differs, the file is normalized normally so the requested format is produced.</p>
 <h2 id="ebu-r128-normalization">EBU R128 Normalization</h2>
 <h3 id="-lrt-loudness_range_target-loudness-range-target-loudness_range_target"><code>-lrt LOUDNESS_RANGE_TARGET, --loudness-range-target LOUDNESS_RANGE_TARGET</code></h3>
 <p>EBU Loudness Range Target in LUFS (default: 7.0).</p>

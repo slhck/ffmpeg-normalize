@@ -1110,6 +1110,8 @@
 <li><strong>RMS-based normalization</strong> — Adjust audio to a specific RMS level</li>
 <li><strong>Peak normalization</strong> — Adjust audio to a specific peak level</li>
 <li><strong>Selective audio stream normalization</strong> — Normalize specific audio streams or only default streams</li>
+<li><strong>Skip files already at target</strong> — Avoid re-encoding files already within a threshold of the target level</li>
+<li><strong>Per-file outcome reporting</strong> — <code>status</code> field in <code>--print-stats</code> plus exit codes for scripting</li>
 <li><strong>Video file support</strong> — Process video files while preserving video streams</li>
 <li><strong>Docker support</strong> — Run via Docker container</li>
 <li><strong>Python API</strong> — Use programmatically in your Python projects</li>
@@ -1118,6 +1120,12 @@
 </ul>
 <h2 id="whats-new">🆕 What's New</h2>
 <ul>
+<li>
+<p>Version 1.40.0 can optionally <strong>skip files that are already at the target level</strong> via <code>--threshold</code> (e.g. <code>--threshold 0.5</code>, disabled by default). Such files are copied through unchanged instead of being re-encoded. The <code>--print-stats</code> output now includes a per-file <code>status</code> (<code>normalized</code>, <code>skipped</code>, or <code>error</code>, plus an <code>error</code> message on failure), and the exit code is non-zero if any file failed to process, so a script can tell what happened to each file.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.flac<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span>-c:a<span class="w"> </span>flac<span class="w"> </span>--print-stats<span class="w"> </span>-o<span class="w"> </span>output.flac
+</code></pre></div>
+</li>
 <li>
 <p>Version 1.39.0 preserves the <strong>input bit depth</strong> by default when encoding to formats like FLAC, so 16-bit input stays 16-bit without needing <code>-e "-sample_fmt s16"</code>. Use <code>--no-keep-bit-depth</code> to opt out. It also adds <code>--keep-mtime</code> to copy the input file's modification time to the output, which is useful for preserving when a track was added to a music library.</p>
 <p>Example:</p>
