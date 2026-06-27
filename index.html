@@ -1119,6 +1119,12 @@
 <h2 id="whats-new">🆕 What's New</h2>
 <ul>
 <li>
+<p>Version 1.39.0 preserves the <strong>input bit depth</strong> by default when encoding to formats like FLAC, so 16-bit input stays 16-bit without needing <code>-e "-sample_fmt s16"</code>. Use <code>--no-keep-bit-depth</code> to opt out. It also adds <code>--keep-mtime</code> to copy the input file's modification time to the output, which is useful for preserving when a track was added to a music library.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.flac<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span>-c:a<span class="w"> </span>flac<span class="w"> </span>--keep-mtime<span class="w"> </span>-o<span class="w"> </span>output.flac
+</code></pre></div>
+</li>
+<li>
 <p>Version 1.38.0 writes the normalized output directly to its destination without using temporary files</p>
 </li>
 <li>

@@ -765,6 +765,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-keep-mtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-mtime
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1135,6 +1146,17 @@
     <span class="md-ellipsis">
       
         -koa, --keep-original-audio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keep-bit-depth-no-keep-bit-depth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-bit-depth, --no-keep-bit-depth
       
     </span>
   </a>
@@ -1746,6 +1768,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-keep-mtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-mtime
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2122,6 +2155,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-keep-bit-depth-no-keep-bit-depth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --keep-bit-depth, --no-keep-bit-depth
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2408,6 +2452,9 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <h3 id="-of-output_folder-output-folder-output_folder"><code>-of OUTPUT_FOLDER, --output-folder OUTPUT_FOLDER</code></h3>
 <p>Output folder (default: <code>normalized</code>)</p>
 <p>This folder will be used for input files that have no explicit output name specified.</p>
+<h3 id="-keep-mtime"><code>--keep-mtime</code></h3>
+<p>Copy the input file's modification time to the output file.</p>
+<p>This is useful when you want to preserve the time a file was originally added to your collection (e.g. for sorting in a music library). Only the access and modification times are copied; a file's creation time (which some operating systems such as Windows track separately) is not affected.</p>
 <h2 id="general">General</h2>
 <h3 id="-f-force"><code>-f, --force</code></h3>
 <p>Force overwrite existing files</p>
@@ -2509,6 +2556,11 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <p>Set the number of audio channels. If not specified, the input channel layout will be used. This is equivalent to <code>-ac</code> in ffmpeg.</p>
 <h3 id="-koa-keep-original-audio"><code>-koa, --keep-original-audio</code></h3>
 <p>Copy original, non-normalized audio streams to output file</p>
+<h3 id="-keep-bit-depth-no-keep-bit-depth"><code>--keep-bit-depth</code>, <code>--no-keep-bit-depth</code></h3>
+<p>Carry the detected input bit depth through to the output encoder. This is enabled by default.</p>
+<p>When you specify a non-PCM encoder (e.g. <code>-c:a flac</code>), ffmpeg would otherwise pick its own default sample format, which can promote 16-bit audio to 24-bit. With bit-depth preservation, the matching output sample format is set for you, so you no longer need to pass it via <code>-e</code>/<code>--extra-output-options</code> (e.g. <code>-e "-sample_fmt s16"</code>). Use <code>--no-keep-bit-depth</code> to let the encoder choose its own sample format instead.</p>
+<p>The chosen sample format is constrained to what the encoder actually supports. Note that ffmpeg has no 24-bit sample format, so 24-bit audio is carried in the 32-bit <code>s32</code> format (and the encoder stores it accordingly). Floating-point sources are left to the encoder, and for lossy encoders that only support floating-point formats (e.g. AAC) this has no effect.</p>
+<p>Example: <code>ffmpeg-normalize input.flac -nt peak -t 0 -c:a flac -o output.flac</code></p>
 <h2 id="audio-stream-selection">Audio Stream Selection</h2>
 <h3 id="-as-audio_streams-audio-streams-audio_streams"><code>-as AUDIO_STREAMS, --audio-streams AUDIO_STREAMS</code></h3>
 <p>Select specific audio streams to normalize by stream index (comma-separated).</p>
