@@ -181,8 +181,9 @@ class MediaFile:
                 sample_rate = (
                     int(sample_rate_match.group(1)) if sample_rate_match else None
                 )
-                bit_depth_match = re.search(r"[sfu](\d+)(p|le|be)?", line)
-                bit_depth = int(bit_depth_match.group(1)) if bit_depth_match else None
+                bit_depth_match = re.search(r"([sfu])(\d+)(p|le|be)?", line)
+                bit_depth = int(bit_depth_match.group(2)) if bit_depth_match else None
+                is_float = bit_depth_match.group(1) == "f" if bit_depth_match else False
                 self.streams["audio"][stream_id] = AudioStream(
                     self.ffmpeg_normalize,
                     self,
@@ -191,6 +192,7 @@ class MediaFile:
                     bit_depth,
                     duration,
                     is_default,
+                    is_float,
                 )
 
             elif "Video" in line:
@@ -843,6 +845,15 @@ class MediaFile:
             # Only apply to normalized streams
             for idx in range(len(streams_to_normalize)):
                 cmd.extend([f"-ac:a:{idx}", str(self.ffmpeg_normalize.audio_channels)])
+
+        # carry the input bit depth through to the output encoder, if requested
+        if self.ffmpeg_normalize.keep_bit_depth:
+            for idx, audio_stream in enumerate(streams_to_normalize):
+                sample_fmt = audio_stream.get_output_sample_fmt(
+                    self.ffmpeg_normalize.audio_codec
+                )
+                if sample_fmt is not None:
+                    cmd.extend([f"-sample_fmt:a:{idx}", sample_fmt])
 
         # ... and subtitles
         if not self.ffmpeg_normalize.subtitle_disable:

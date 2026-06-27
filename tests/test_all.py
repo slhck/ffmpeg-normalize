@@ -710,6 +710,107 @@ class TestFFmpegNormalize:
         assert output_file.is_file()
         assert output_file.stat().st_mtime > old_mtime
 
+    @pytest.mark.skipif(not _has_encoder("flac"), reason="flac encoder not available")
+    def test_keep_bit_depth_flac(self, tmp_path):
+        """Bit depth is preserved by default; --no-keep-bit-depth opts out."""
+        input_file = tmp_path / "in.flac"
+        out_default = tmp_path / "out_default.flac"
+        out_no_keep = tmp_path / "out_no_keep.flac"
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=440:duration=1",
+                "-sample_fmt",
+                "s16",
+                "-c:a",
+                "flac",
+                str(input_file),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        assert _get_stream_info(str(input_file))[0]["sample_fmt"] == "s16"
+
+        # By default, the 16-bit depth is preserved
+        ffmpeg_normalize_call(
+            [
+                str(input_file),
+                "-o",
+                str(out_default),
+                "-nt",
+                "peak",
+                "-t",
+                "0",
+                "-c:a",
+                "flac",
+                "-f",
+            ]
+        )
+        assert _get_stream_info(str(out_default))[0]["sample_fmt"] == "s16"
+
+        # With --no-keep-bit-depth, ffmpeg promotes the FLAC output to s32
+        ffmpeg_normalize_call(
+            [
+                str(input_file),
+                "-o",
+                str(out_no_keep),
+                "-nt",
+                "peak",
+                "-t",
+                "0",
+                "-c:a",
+                "flac",
+                "--no-keep-bit-depth",
+                "-f",
+            ]
+        )
+        assert _get_stream_info(str(out_no_keep))[0]["sample_fmt"] == "s32"
+
+    @pytest.mark.skipif(not _has_encoder("flac"), reason="flac encoder not available")
+    def test_keep_bit_depth_float_left_to_encoder(self, tmp_path):
+        """A floating-point source is left to the encoder, not forced to integer."""
+        input_file = tmp_path / "float.wav"
+        output_file = tmp_path / "out.flac"
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=440:duration=1",
+                "-c:a",
+                "pcm_f32le",
+                str(input_file),
+            ],
+            check=True,
+            capture_output=True,
+        )
+        assert _get_stream_info(str(input_file))[0]["sample_fmt"] == "flt"
+
+        # Default keep-bit-depth must not crash on a float source; the encoder
+        # picks the format (FLAC stores float input as s32).
+        ffmpeg_normalize_call(
+            [
+                str(input_file),
+                "-o",
+                str(output_file),
+                "-nt",
+                "peak",
+                "-t",
+                "0",
+                "-c:a",
+                "flac",
+                "-f",
+            ]
+        )
+        assert output_file.is_file()
+        assert _get_stream_info(str(output_file))[0]["sample_fmt"] == "s32"
+
     def test_keep_other_and_keep_original_conflict(self):
         """Test that using both --keep-other-audio and --keep-original-audio fails"""
         _, stderr = ffmpeg_normalize_call(

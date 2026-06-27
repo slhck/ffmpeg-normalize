@@ -464,6 +464,26 @@ def create_parser() -> argparse.ArgumentParser:
         help="Copy original, non-normalized audio streams to output file",
     )
     group_acodec.add_argument(
+        "--keep-bit-depth",
+        action=argparse.BooleanOptionalAction,
+        default=FFmpegNormalize.DEFAULTS["keep_bit_depth"],
+        help=textwrap.dedent(
+            """\
+        Carry the detected input bit depth through to the output encoder
+        (default: enabled).
+
+        By default, the matching output sample format is set for the chosen
+        encoder (e.g. FLAC), so you do not need to pass it via
+        `-e`/`--extra-output-options` yourself. Use `--no-keep-bit-depth` to let
+        the encoder pick its own sample format instead.
+
+        The chosen sample format is constrained to what the encoder supports.
+        ffmpeg has no 24-bit sample format, so 24-bit audio is carried in the
+        32-bit `s32` format. Floating-point sources are left to the encoder.
+        """
+        ),
+    )
+    group_acodec.add_argument(
         "-prf",
         "--pre-filter",
         type=str,
@@ -721,6 +741,7 @@ def main() -> None:
         audio_default_only=cli_args.audio_default_only,
         keep_other_audio=cli_args.keep_other_audio,
         keep_mtime=cli_args.keep_mtime,
+        keep_bit_depth=cli_args.keep_bit_depth,
     )
 
     if cli_args.output and len(cli_args.input) > len(cli_args.output):

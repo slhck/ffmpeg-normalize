@@ -204,6 +204,44 @@ def get_ffmpeg_exe() -> str:
     return ff_path
 
 
+_encoder_sample_formats_cache: dict[str, list[str]] = {}
+
+
+def get_encoder_sample_formats(encoder: str) -> list[str]:
+    """
+    Return the list of sample formats supported by an ffmpeg audio encoder.
+
+    The result is parsed from ``ffmpeg -h encoder=<encoder>`` and cached per
+    encoder for the lifetime of the process.
+
+    Args:
+        encoder: Name of the ffmpeg audio encoder (e.g. "flac").
+
+    Returns:
+        list[str]: Supported sample formats (e.g. ["s16", "s32"]), or an empty
+            list if they could not be determined.
+    """
+    if encoder in _encoder_sample_formats_cache:
+        return _encoder_sample_formats_cache[encoder]
+
+    formats: list[str] = []
+    try:
+        output = (
+            CommandRunner()
+            .run_command([get_ffmpeg_exe(), "-hide_banner", "-h", f"encoder={encoder}"])
+            .get_output()
+        )
+        if match := re.search(r"Supported sample formats:\s*(.+)", output):
+            formats = match.group(1).split()
+    except (RuntimeError, FFmpegNormalizeError) as e:
+        _logger.debug(
+            f"Could not determine sample formats for encoder '{encoder}': {e}"
+        )
+
+    _encoder_sample_formats_cache[encoder] = formats
+    return formats
+
+
 def ffmpeg_has_loudnorm() -> bool:
     """
     Run feature detection on ffmpeg to see if it supports the loudnorm filter.

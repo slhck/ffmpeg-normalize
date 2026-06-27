@@ -89,6 +89,7 @@ class FFmpegNormalize:
         audio_default_only (bool, optional): Only normalize audio streams with default disposition. Defaults to False.
         keep_other_audio (bool, optional): Keep non-selected audio streams in output (copy without normalization). Defaults to False.
         keep_mtime (bool, optional): Copy the input file's modification time to the output file. Defaults to False.
+        keep_bit_depth (bool, optional): Carry the detected input bit depth through to the output encoder. Defaults to True.
 
     Raises:
         FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
@@ -135,6 +136,7 @@ class FFmpegNormalize:
         "audio_default_only": False,
         "keep_other_audio": False,
         "keep_mtime": False,
+        "keep_bit_depth": True,
     }
 
     def __init__(
@@ -177,6 +179,7 @@ class FFmpegNormalize:
         audio_default_only: bool = False,
         keep_other_audio: bool = False,
         keep_mtime: bool = False,
+        keep_bit_depth: bool = True,
     ):
         self.ffmpeg_exe = get_ffmpeg_exe()
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
@@ -267,6 +270,7 @@ class FFmpegNormalize:
         self.keep_other_audio = keep_other_audio
 
         self.keep_mtime = keep_mtime
+        self.keep_bit_depth = keep_bit_depth
 
         if (
             self.audio_codec is None or "pcm" in self.audio_codec

@@ -6,7 +6,11 @@ import os
 import re
 from typing import TYPE_CHECKING, Iterator, Literal, TypedDict, cast
 
-from ._cmd_utils import CommandRunner, dict_to_filter_opts
+from ._cmd_utils import (
+    CommandRunner,
+    dict_to_filter_opts,
+    get_encoder_sample_formats,
+)
 from ._errors import FFmpegNormalizeError
 
 if TYPE_CHECKING:
@@ -16,6 +20,23 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 _loudnorm_pattern = re.compile(r"\[Parsed_loudnorm_(\d+)")
+
+# Maps ffmpeg sample formats to (bit size, is_float). Planar variants share the
+# same characteristics as their packed counterparts.
+_SAMPLE_FMT_INFO: dict[str, tuple[int, bool]] = {
+    "u8": (8, False),
+    "u8p": (8, False),
+    "s16": (16, False),
+    "s16p": (16, False),
+    "s32": (32, False),
+    "s32p": (32, False),
+    "s64": (64, False),
+    "s64p": (64, False),
+    "flt": (32, True),
+    "fltp": (32, True),
+    "dbl": (64, True),
+    "dblp": (64, True),
+}
 
 
 class EbuLoudnessStatistics(TypedDict):
@@ -100,6 +121,7 @@ class AudioStream(MediaStream):
         bit_depth: int | None,
         duration: float | None,
         is_default: bool = False,
+        is_float: bool = False,
     ):
         """
         Create an AudioStream object.
@@ -112,6 +134,7 @@ class AudioStream(MediaStream):
             bit_depth (int): bit depth in bits
             duration (float): duration in seconds
             is_default (bool): Whether this stream has the default disposition flag
+            is_float (bool): Whether the stream uses a floating-point sample format
         """
         super().__init__(ffmpeg_normalize, media_file, "audio", stream_id)
 
@@ -127,6 +150,7 @@ class AudioStream(MediaStream):
 
         self.duration = duration
         self.is_default = is_default
+        self.is_float = is_float
 
     @staticmethod
     def _constrain(
@@ -204,6 +228,84 @@ class AudioStream(MediaStream):
                 f"{self.media_file.input_file}: Unsupported bit depth {self.bit_depth}, falling back to pcm_s16le"
             )
             return "pcm_s16le"
+
+    def get_output_sample_fmt(self, codec: str | None) -> str | None:
+        """
+        Choose an output sample format for the given encoder that preserves the
+        detected input bit depth as closely as possible.
+
+        Used by the ``keep_bit_depth`` option (enabled by default) so that
+        encoders such as FLAC, which would otherwise pick their own default
+        sample format, retain the input bit depth. Only integer formats are
+        considered, and floating-point sources are left to the encoder, since
+        keeping bit depth is only meaningful for integer PCM sources.
+
+        Note that ffmpeg has no 24-bit sample format; 24-bit audio is carried in
+        the 32-bit ``s32`` format, and the encoder stores it accordingly.
+
+        Args:
+            codec: The output audio codec name, or None for the PCM default.
+
+        Returns:
+            str | None: The chosen sample format, or None if none should be set
+                (unknown bit depth, floating-point source, no explicit codec, no
+                encoder info, or an encoder without integer sample formats). In
+                all of these cases the encoder default is used.
+        """
+        if not self.bit_depth:
+            _logger.debug(
+                f"{self.media_file.input_file}: Could not determine input bit depth "
+                f"for stream {self.stream_id}; leaving the sample format to the encoder."
+            )
+            return None
+
+        if self.is_float:
+            # Pinning an integer sample format would silently convert a
+            # floating-point source to integer, so leave it to the encoder.
+            _logger.debug(
+                f"{self.media_file.input_file}: Stream {self.stream_id} is "
+                "floating-point; leaving the sample format to the encoder."
+            )
+            return None
+
+        if codec is None:
+            # The PCM default path already derives the bit depth from the input
+            # via get_pcm_codec(), so there is nothing to set here.
+            _logger.debug(
+                "keep_bit_depth has no effect for the default PCM output; the "
+                "input bit depth is already preserved."
+            )
+            return None
+
+        supported = get_encoder_sample_formats(codec)
+        if not supported:
+            _logger.debug(
+                f"Could not determine supported sample formats for codec '{codec}'; "
+                "not setting an explicit sample format."
+            )
+            return None
+
+        # Only consider integer formats, since keeping bit depth is meaningful
+        # for integer PCM sources (e.g. FLAC, ALAC).
+        int_formats = [
+            fmt
+            for fmt in supported
+            if fmt in _SAMPLE_FMT_INFO and not _SAMPLE_FMT_INFO[fmt][1]
+        ]
+        if not int_formats:
+            _logger.debug(
+                f"Encoder '{codec}' supports no integer sample formats; "
+                "leaving the sample format to the encoder."
+            )
+            return None
+
+        # Prefer the smallest integer format that holds at least the input bit
+        # depth; fall back to the largest available if none is big enough.
+        candidates = sorted(int_formats, key=lambda fmt: _SAMPLE_FMT_INFO[fmt][0])
+        for fmt in candidates:
+            if _SAMPLE_FMT_INFO[fmt][0] >= self.bit_depth:
+                return fmt
+        return candidates[-1]
 
     def _get_filter_str_with_pre_filter(self, current_filter: str) -> str:
         """
