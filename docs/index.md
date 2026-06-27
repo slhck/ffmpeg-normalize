@@ -31,6 +31,14 @@ Batch processing of several input files is possible, including video files.
 
 ## 🆕 What's New
 
+- Version 1.39.0 preserves the **input bit depth** by default when encoding to formats like FLAC, so 16-bit input stays 16-bit without needing `-e "-sample_fmt s16"`. Use `--no-keep-bit-depth` to opt out. It also adds `--keep-mtime` to copy the input file's modification time to the output, which is useful for preserving when a track was added to a music library.
+
+    Example:
+
+    ```bash
+    ffmpeg-normalize input.flac -nt peak -t 0 -c:a flac --keep-mtime -o output.flac
+    ```
+
 - Version 1.38.0 writes the normalized output directly to its destination without using temporary files
 
 - Version 1.36.0 introduces **presets** with `--preset`! Save and reuse your favorite normalization configurations for different use cases. Comes with three built-in presets: `podcast` (AES standard), `music` (RMS-based batch normalization), and `streaming-video` (video content). Create custom presets too!

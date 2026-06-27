@@ -10,6 +10,7 @@ _ffmpeg_normalize()
     opts="--input-list \
           -o --output \
           -of --output-folder \
+          --keep-mtime \
           -f --force \
           -d --debug \
           -v --verbose \
@@ -38,6 +39,7 @@ _ffmpeg_normalize()
           -ar --sample-rate \
           -ac --audio-channels \
           -koa --keep-original-audio \
+          --keep-bit-depth --no-keep-bit-depth \
           -prf --pre-filter \
           -pof --post-filter \
           -vn --video-disable \

@@ -31,6 +31,12 @@ Output folder (default: `normalized`)
 
 This folder will be used for input files that have no explicit output name specified.
 
+### `--keep-mtime`
+
+Copy the input file's modification time to the output file.
+
+This is useful when you want to preserve the time a file was originally added to your collection (e.g. for sorting in a music library). Only the access and modification times are copied; a file's creation time (which some operating systems such as Windows track separately) is not affected.
+
 ## General
 
 ### `-f, --force`
@@ -221,6 +227,16 @@ Set the number of audio channels. If not specified, the input channel layout wil
 ### `-koa, --keep-original-audio`
 
 Copy original, non-normalized audio streams to output file
+
+### `--keep-bit-depth`, `--no-keep-bit-depth`
+
+Carry the detected input bit depth through to the output encoder. This is enabled by default.
+
+When you specify a non-PCM encoder (e.g. `-c:a flac`), ffmpeg would otherwise pick its own default sample format, which can promote 16-bit audio to 24-bit. With bit-depth preservation, the matching output sample format is set for you, so you no longer need to pass it via `-e`/`--extra-output-options` (e.g. `-e "-sample_fmt s16"`). Use `--no-keep-bit-depth` to let the encoder choose its own sample format instead.
+
+The chosen sample format is constrained to what the encoder actually supports. Note that ffmpeg has no 24-bit sample format, so 24-bit audio is carried in the 32-bit `s32` format (and the encoder stores it accordingly). Floating-point sources are left to the encoder, and for lossy encoders that only support floating-point formats (e.g. AAC) this has no effect.
+
+Example: `ffmpeg-normalize input.flac -nt peak -t 0 -c:a flac -o output.flac`
 
 ## Audio Stream Selection
 

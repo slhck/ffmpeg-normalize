@@ -10,6 +10,7 @@ _ffmpeg_normalize() {
     '--input-list[Read input list from file]:input list:_files'
     '(-o --output)'{-o,--output}'[Output file names]:output file:_files'
     '(-of --output-folder)'{-of,--output-folder}'[Output folder (default: normalized)]:directory:_files -/'
+    '--keep-mtime[Copy the input file modification time to the output file]'
 
     # General Options
     '(-f --force)'{-f,--force}'[Force overwrite existing files]'
@@ -46,6 +47,7 @@ _ffmpeg_normalize() {
     '(-ar --sample-rate)'{-ar,--sample-rate}'[Audio sample rate]:sample rate:'
     '(-ac --audio-channels)'{-ac,--audio-channels}'[Number of audio channels]:channels:'
     '(-koa --keep-original-audio)'{-koa,--keep-original-audio}'[Keep original audio streams]'
+    '(--keep-bit-depth --no-keep-bit-depth)'{--keep-bit-depth,--no-keep-bit-depth}'[Carry the input bit depth through to the output encoder (default: on)]'
     '(-prf --pre-filter)'{-prf,--pre-filter}'[Pre-normalization audio filter]:filter:'
     '(-pof --post-filter)'{-pof,--post-filter}'[Post-normalization audio filter]:filter:'
 

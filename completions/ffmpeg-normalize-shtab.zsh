@@ -5,7 +5,7 @@
 
 _shtab_ffmpeg_normalize_commands() {
   local _commands=(
-
+    
   )
   _describe 'ffmpeg-normalize commands' _commands
 }
@@ -26,6 +26,11 @@ Example\: ffmpeg-normalize 1.wav 2.wav -o 1n.wav 2n.wav
 This folder will be used for input files that have no explicit output
 name specified.
 ]:output_folder:"
+  "--keep-mtime[Copy the input file\'s modification time to the output file.
+
+Only the access and modification times are copied\; a file\'s creation
+time (tracked separately on some operating systems) is not affected.
+]"
   {-f,--force}"[Force overwrite existing files]"
   {-d,--debug}"[Print debugging output]"
   {-v,--verbose}"[Print verbose output]"
@@ -54,7 +59,7 @@ level.
 
 Peak normalization brings the signal to the specified peak level.
 ]:normalization_type:(ebu rms peak)"
-  {-t,--target-level}"[Normalization target level in dB\/LUFS (default\: -23).
+  {-t,--target-level}"[Normalization target level in dB\/LUFS (default\: -23.0).
 
 For EBU normalization, it corresponds to Integrated Loudness Target
 in LUFS. The range is -70.0 - -5.0.
@@ -155,6 +160,18 @@ which will change the input sample rate to 192 kHz.
 If not specified, the input channel layout will be used.
 ]:audio_channels:"
   {-koa,--keep-original-audio}"[Copy original, non-normalized audio streams to output file]"
+  {--keep-bit-depth,--no-keep-bit-depth}"[Carry the detected input bit depth through to the output encoder
+(default\: enabled).
+
+By default, the matching output sample format is set for the chosen
+encoder (e.g. FLAC), so you do not need to pass it via
+\`-e\`\/\`--extra-output-options\` yourself. Use \`--no-keep-bit-depth\` to let
+the encoder pick its own sample format instead.
+
+The chosen sample format is constrained to what the encoder supports.
+ffmpeg has no 24-bit sample format, so 24-bit audio is carried in the
+32-bit \`s32\` format. Floating-point sources are left to the encoder.
+]:keep_bit_depth:"
   {-prf,--pre-filter}"[Add an audio filter chain before applying normalization.
 Multiple filters can be specified by comma-separating them.
 ]:pre_filter:"
@@ -231,7 +248,7 @@ _shtab_ffmpeg_normalize() {
       (( CURRENT += 1 ))
       curcontext="${curcontext%:*:*}:_shtab_ffmpeg_normalize-$line[1]:"
       case $line[1] in
-
+        
       esac
   esac
 }
