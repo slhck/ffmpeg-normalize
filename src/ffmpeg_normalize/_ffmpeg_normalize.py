@@ -55,6 +55,7 @@ class FFmpegNormalize:
         normalization_type (str, optional): Normalization type. Defaults to "ebu".
         target_level (float, optional): Target level. Defaults to -23.0.
         print_stats (bool, optional): Print loudnorm stats. Defaults to False.
+        threshold (float, optional): When set to a positive value, skip normalization when the input is already within this many dB/LU of the target level, copying it through unchanged. Defaults to 0 (disabled, always normalize).
         loudness_range_target (float, optional): Loudness range target. Defaults to 7.0.
         keep_loudness_range_target (bool, optional): Keep loudness range target. Defaults to False.
         keep_lra_above_loudness_range_target (bool, optional): Keep input loudness range above loudness range target. Defaults to False.
@@ -101,6 +102,7 @@ class FFmpegNormalize:
         "normalization_type": "ebu",
         "target_level": -23.0,
         "print_stats": False,
+        "threshold": 0.0,
         "loudness_range_target": 7.0,
         "keep_loudness_range_target": False,
         "keep_lra_above_loudness_range_target": False,
@@ -144,7 +146,7 @@ class FFmpegNormalize:
         normalization_type: Literal["ebu", "rms", "peak"] = "ebu",
         target_level: float = -23.0,
         print_stats: bool = False,
-        # threshold=0.5,
+        threshold: float = 0.0,
         loudness_range_target: float = 7.0,
         keep_loudness_range_target: bool = False,
         keep_lra_above_loudness_range_target: bool = False,
@@ -203,7 +205,7 @@ class FFmpegNormalize:
 
         self.print_stats = print_stats
 
-        # self.threshold = float(threshold)
+        self.threshold = check_range(threshold, 0, 99, name="threshold")
 
         self.loudness_range_target = check_range(
             loudness_range_target, 1, 50, name="loudness_range_target"
@@ -458,13 +460,10 @@ class FFmpegNormalize:
                             "Dynamic EBU mode: First pass skipped for this file."
                         )
                 except Exception as e:
-                    if len(self.media_files) > 1:
-                        _logger.error(
-                            f"Error analyzing input file {media_file}, will "
-                            f"continue batch-processing. Error was: {e}"
-                        )
-                    else:
-                        raise e
+                    media_file.status = "error"
+                    media_file.error = str(e)
+                    _logger.error(f"Error analyzing input file {media_file}: {e}")
+                    continue
 
             # Phase 2: Calculate batch reference loudness
             batch_reference = self._calculate_batch_reference()
@@ -479,6 +478,11 @@ class FFmpegNormalize:
                     position=0,
                 )
             ):
+                # Skip files that already failed during analysis
+                if media_file.status == "error":
+                    _logger.debug(f"Skipping {media_file} because its analysis failed")
+                    continue
+
                 _logger.info(
                     f"Normalizing file {media_file} ({index + 1} of {self.file_count})"
                 )
@@ -486,13 +490,10 @@ class FFmpegNormalize:
                 try:
                     media_file.run_normalization(batch_reference=batch_reference)
                 except Exception as e:
-                    if len(self.media_files) > 1:
-                        _logger.error(
-                            f"Error processing input file {media_file}, will "
-                            f"continue batch-processing. Error was: {e}"
-                        )
-                    else:
-                        raise e
+                    media_file.status = "error"
+                    media_file.error = str(e)
+                    _logger.error(f"Error processing input file {media_file}: {e}")
+                    continue
         else:
             # Non-batch mode: process each file completely before moving to the next
             for index, media_file in enumerate(
@@ -507,13 +508,10 @@ class FFmpegNormalize:
                 try:
                     media_file.run_normalization()
                 except Exception as e:
-                    if len(self.media_files) > 1:
-                        _logger.error(
-                            f"Error processing input file {media_file}, will "
-                            f"continue batch-processing. Error was: {e}"
-                        )
-                    else:
-                        raise e
+                    media_file.status = "error"
+                    media_file.error = str(e)
+                    _logger.error(f"Error processing input file {media_file}: {e}")
+                    continue
 
         if self.print_stats:
             json.dump(

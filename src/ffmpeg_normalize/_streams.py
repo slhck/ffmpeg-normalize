@@ -59,10 +59,15 @@ class LoudnessStatistics(TypedDict):
     max: float | None
 
 
-class LoudnessStatisticsWithMetadata(LoudnessStatistics):
+class _OptionalStatisticsMetadata(TypedDict, total=False):
+    error: str
+
+
+class LoudnessStatisticsWithMetadata(LoudnessStatistics, _OptionalStatisticsMetadata):
     input_file: str
     output_file: str
     stream_id: int
+    status: str
 
 
 class MediaStream:
@@ -195,7 +200,12 @@ class AudioStream(MediaStream):
             "ebu_pass2": self.loudness_statistics["ebu_pass2"],
             "mean": self.loudness_statistics["mean"],
             "max": self.loudness_statistics["max"],
+            "status": self.media_file.status,
         }
+        # Only present when the file failed to process, per the per-file outcome
+        # reporting (status is "error").
+        if self.media_file.error is not None:
+            stats["error"] = self.media_file.error
         return stats
 
     def set_second_pass_stats(self, stats: EbuLoudnessStatistics) -> None:

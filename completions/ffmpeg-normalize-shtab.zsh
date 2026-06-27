@@ -82,6 +82,20 @@ that, and applying a relative adjustment to all the files.
 
 Batch mode works with all normalization types (EBU, RMS, peak).
 ]"
+  "--threshold[Skip normalization when a file is already within this many dB\/LU of the
+target level (default\: 0.0, i.e. disabled).
+
+When set to a positive value, a file whose measured level is within the
+threshold of the target is considered already normalized and copied
+through unchanged instead of being re-encoded. Its status is reported as
+\"skipped\" in the \`--print-stats\` output.
+
+For EBU normalization, the measured integrated loudness is compared to
+the target level\; for peak and RMS, the measured peak\/RMS level is used.
+
+The default of 0 always normalizes. Has no effect in batch or ReplayGain
+mode, or when a pre\/post filter or channel downmix is used.
+]:threshold:"
   {-lrt,--loudness-range-target}"[EBU Loudness Range Target in LUFS (default\: 7.0).
 Range is 1.0 - 50.0.
 ]:loudness_range_target:"

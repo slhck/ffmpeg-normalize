@@ -23,6 +23,8 @@ Batch processing of several input files is possible, including video files.
 - **RMS-based normalization** — Adjust audio to a specific RMS level
 - **Peak normalization** — Adjust audio to a specific peak level
 - **Selective audio stream normalization** — Normalize specific audio streams or only default streams
+- **Skip files already at target** — Avoid re-encoding files already within a threshold of the target level
+- **Per-file outcome reporting** — `status` field in `--print-stats` plus exit codes for scripting
 - **Video file support** — Process video files while preserving video streams
 - **Docker support** — Run via Docker container
 - **Python API** — Use programmatically in your Python projects
@@ -30,6 +32,14 @@ Batch processing of several input files is possible, including video files.
 - **Album Batch normalization** – Process files jointly, preserving relative loudness
 
 ## 🆕 What's New
+
+- Version 1.40.0 can optionally **skip files that are already at the target level** via `--threshold` (e.g. `--threshold 0.5`, disabled by default). Such files are copied through unchanged instead of being re-encoded. The `--print-stats` output now includes a per-file `status` (`normalized`, `skipped`, or `error`, plus an `error` message on failure), and the exit code is non-zero if any file failed to process, so a script can tell what happened to each file.
+
+    Example:
+
+    ```bash
+    ffmpeg-normalize input.flac -nt peak -t 0 -c:a flac --print-stats -o output.flac
+    ```
 
 - Version 1.39.0 preserves the **input bit depth** by default when encoding to formats like FLAC, so 16-bit input stays 16-bit without needing `-e "-sample_fmt s16"`. Use `--no-keep-bit-depth` to opt out. It also adds `--keep-mtime` to copy the input file's modification time to the output, which is useful for preserving when a track was added to a music library.
 

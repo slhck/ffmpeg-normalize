@@ -234,16 +234,28 @@ def create_parser() -> argparse.ArgumentParser:
         ),
     )
 
-    # group_normalization.add_argument(
-    #     '--threshold',
-    #     type=float,
-    #     help=textwrap.dedent("""\
-    #     Threshold below which normalization should not be run.
+    group_normalization.add_argument(
+        "--threshold",
+        type=float,
+        help=textwrap.dedent(
+            f"""\
+        Skip normalization when a file is already within this many dB/LU of the
+        target level (default: {FFmpegNormalize.DEFAULTS["threshold"]}, i.e. disabled).
 
-    #     If the stream falls within the threshold, it will simply be copied.
-    #     """),
-    #     default=0.5
-    # )
+        When set to a positive value, a file whose measured level is within the
+        threshold of the target is considered already normalized and copied
+        through unchanged instead of being re-encoded. Its status is reported as
+        "skipped" in the `--print-stats` output.
+
+        For EBU normalization, the measured integrated loudness is compared to
+        the target level; for peak and RMS, the measured peak/RMS level is used.
+
+        The default of 0 always normalizes. Has no effect in batch or ReplayGain
+        mode, or when a pre/post filter or channel downmix is used.
+        """
+        ),
+        default=FFmpegNormalize.DEFAULTS["threshold"],
+    )
 
     group_ebu = parser.add_argument_group("EBU R128 Normalization")
     group_ebu.add_argument(
@@ -707,8 +719,8 @@ def main() -> None:
         normalization_type=cli_args.normalization_type,
         target_level=cli_args.target_level,
         print_stats=cli_args.print_stats,
+        threshold=cli_args.threshold,
         loudness_range_target=cli_args.loudness_range_target,
-        # threshold=cli_args.threshold,
         keep_loudness_range_target=cli_args.keep_loudness_range_target,
         keep_lra_above_loudness_range_target=cli_args.keep_lra_above_loudness_range_target,
         true_peak=cli_args.true_peak,
@@ -825,6 +837,20 @@ def main() -> None:
         ffmpeg_normalize.run_normalization()
     except FFmpegNormalizeError as e:
         error(e)
+
+    # Report per-file failures and exit non-zero if any file failed to process.
+    # Files that were skipped because they were already at the target level are
+    # not errors and do not affect the exit code.
+    failed_files = [
+        media_file
+        for media_file in ffmpeg_normalize.media_files
+        if media_file.status == "error"
+    ]
+    if failed_files:
+        _logger.error(f"{len(failed_files)} file(s) failed to process:")
+        for media_file in failed_files:
+            _logger.error(f"  - {media_file.input_file}: {media_file.error}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

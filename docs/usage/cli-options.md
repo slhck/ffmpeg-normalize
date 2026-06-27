@@ -112,6 +112,8 @@ Otherwise, the range is -99 to 0.
 
 Print loudness statistics for both passes formatted as JSON to stdout.
 
+Each entry also includes a `status` field with the per-file result: `normalized`, `skipped` (already within the `--threshold` of the target, see below), or `error`. When the status is `error`, an additional `error` field has the error message.
+
 ### `--replaygain`
 
 Write [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) tags to the original file without normalizing.
@@ -131,6 +133,16 @@ Batch mode works with all normalization types (EBU, RMS, peak).
 Example: `ffmpeg-normalize album/*.flac --batch -nt rms -t -20`
 
 **Note:** For music albums, RMS or Peak normalization is recommended over EBU. See the [FAQ](../advanced/faq.md#how-do-i-normalize-an-album-while-preserving-relative-loudness-between-tracks) for details.
+
+### `--threshold THRESHOLD`
+
+Skip normalization when a file is already within this many dB/LU of the target level (default: 0, i.e. disabled).
+
+When set to a positive value, a file whose measured level is within the threshold of the target is considered already normalized and copied through unchanged instead of being re-encoded. Its status is reported as `skipped` in the `--print-stats` output.
+
+For EBU normalization, the measured integrated loudness is compared to the target level; for peak and RMS, the measured peak/RMS level is used. The true peak and loudness range are not considered for this decision.
+
+The default of 0 always normalizes. This option has no effect in batch or ReplayGain mode, or when a pre/post filter or channel downmix is used. Skipped files are only copied verbatim when the output keeps the input's extension; if the output format differs, the file is normalized normally so the requested format is produced.
 
 ## EBU R128 Normalization
 

@@ -4,7 +4,7 @@ import logging
 import os
 import re
 import shlex
-from shutil import rmtree
+from shutil import copyfile, rmtree
 from tempfile import mkdtemp, mkstemp
 from typing import TYPE_CHECKING, Iterable, Iterator, Literal, TypedDict, Union
 
@@ -70,6 +70,12 @@ class MediaFile:
         """
         self.ffmpeg_normalize = ffmpeg_normalize
         self.skip = False
+        # Per-file outcome, reported in the --print-stats output: "normalized"
+        # (default), "skipped" (already within threshold of target), or "error".
+        # "error" is set by FFmpegNormalize.run_normalization when processing
+        # fails; on failure, self.error holds the error message.
+        self.status: str = "normalized"
+        self.error: str | None = None
         self.input_file = input_file
         self.output_file = output_file
         current_ext = os.path.splitext(output_file)[1][1:]
@@ -313,6 +319,14 @@ class MediaFile:
                 f"Batch mode: Skipping first pass (already completed), using batch reference = {batch_reference:.2f}"
             )
 
+        # If the file is already within the configured threshold of the target
+        # level, skip normalization entirely and copy the input through to the
+        # output unchanged. This avoids needless re-encoding of files that are
+        # already at the target level.
+        if self._is_within_threshold():
+            self._handle_skip()
+            return
+
         temp_dir = None
 
         if self.ffmpeg_normalize.replaygain:
@@ -357,6 +371,115 @@ class MediaFile:
             if self.ffmpeg_normalize.keep_mtime and not self.ffmpeg_normalize.dry_run:
                 self._apply_input_timestamps()
             _logger.info(f"Normalized file written to {self.output_file}")
+
+    def _is_within_threshold(self) -> bool:
+        """
+        Return whether every stream selected for normalization is already
+        within the configured threshold of the target level, meaning the file
+        can be copied through unchanged instead of being re-normalized.
+
+        The check compares the measured level against the absolute target level
+        (integrated loudness for EBU, peak/RMS level otherwise). It is disabled
+        when the threshold is zero or less, in batch mode (where files are
+        adjusted relative to a shared reference rather than an absolute target),
+        in ReplayGain mode (which only writes tags), when a pre/post filter or
+        channel downmix is requested (since these change the audio), and when
+        the output extension differs from the input (since the file is copied
+        verbatim, a container change would otherwise produce an invalid file).
+
+        Returns:
+            bool: True if the file should be skipped, False otherwise.
+        """
+        threshold = self.ffmpeg_normalize.threshold
+        if threshold <= 0:
+            return False
+
+        if self.ffmpeg_normalize.batch or self.ffmpeg_normalize.replaygain:
+            return False
+
+        if (
+            self.ffmpeg_normalize.pre_filter
+            or self.ffmpeg_normalize.post_filter
+            or self.ffmpeg_normalize.audio_channels
+        ):
+            return False
+
+        # A skipped file is copied verbatim, which only yields a valid file when
+        # the container stays the same. If the output extension differs, fall
+        # back to normal normalization so the requested format is produced.
+        input_ext = os.path.splitext(self.input_file)[1][1:].lower()
+        if input_ext != self.output_ext.lower():
+            return False
+
+        norm_type = self.ffmpeg_normalize.normalization_type
+        target = self.ffmpeg_normalize.target_level
+        streams = self._get_streams_to_normalize()
+        if not streams:
+            return False
+
+        for stream in streams:
+            measured: float | None
+            if norm_type == "ebu":
+                ebu_stats = stream.loudness_statistics["ebu_pass1"]
+                if ebu_stats is None:
+                    return False
+                measured = ebu_stats["input_i"]
+            elif norm_type == "peak":
+                measured = stream.loudness_statistics["max"]
+            else:  # rms
+                measured = stream.loudness_statistics["mean"]
+
+            if measured is None:
+                return False
+            if abs(target - float(measured)) > threshold:
+                return False
+
+        return True
+
+    def _handle_skip(self) -> None:
+        """
+        Mark this file as skipped (already at target) and copy the input
+        through to the output unchanged.
+
+        The input is copied verbatim (codec and other output options are not
+        applied to skipped files; use a threshold of 0 to always re-encode).
+        Stale ReplayGain tags are still stripped from the output, and the input
+        modification time is preserved if requested.
+        """
+        self.status = "skipped"
+        _logger.info(
+            f"{self.input_file}: already within {self.ffmpeg_normalize.threshold} "
+            f"of target level {self.ffmpeg_normalize.target_level}, "
+            "skipping normalization"
+        )
+
+        if self.ffmpeg_normalize.dry_run:
+            _logger.warning("Dry run used, not actually copying the file")
+            return
+
+        if self.output_file == os.devnull:
+            return
+
+        if os.path.realpath(self.input_file) != os.path.realpath(self.output_file):
+            try:
+                copyfile(self.input_file, self.output_file)
+            except OSError as e:
+                raise FFmpegNormalizeError(
+                    f"Could not copy {self.input_file} to {self.output_file}: {e}"
+                )
+        else:
+            _logger.debug(
+                "Output file is the same as the input file, leaving it unchanged"
+            )
+
+        # Remove any existing ReplayGain tags from the output, matching the
+        # behavior of a normal run.
+        self._strip_replaygain_tags(self.output_file)
+
+        if self.ffmpeg_normalize.keep_mtime:
+            self._apply_input_timestamps()
+
+        _logger.info(f"Skipped file copied to {self.output_file}")
 
     def _apply_input_timestamps(self) -> None:
         """

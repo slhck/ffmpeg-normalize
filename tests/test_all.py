@@ -48,6 +48,12 @@ def _get_stats(
         [input_file, "-f", "-n", "--print-stats", "-nt", normalization_type]
     )
     stats = cast(dict, json.loads(stdout))
+    # Drop the per-file outcome fields here; the loudness ground-truth tests
+    # only compare measured statistics. Status/skip behavior is tested
+    # separately.
+    for stream_stats in stats:
+        stream_stats.pop("status", None)
+        stream_stats.pop("error", None)
     print(json.dumps(stats, indent=4))
     return stats
 
@@ -335,6 +341,114 @@ class TestFFmpegNormalize:
                 },
             ],
         )
+
+    def test_threshold_skips_file_at_target(self, tmp_path):
+        """A file already within the threshold of the target is skipped and
+        copied through verbatim, reported as 'skipped' in the stats."""
+        # tests/test.m4a is at roughly -22.5 LUFS, within 0.5 of the -23 default
+        input_file = tmp_path / "in.m4a"
+        shutil.copy("tests/test.m4a", input_file)
+        output_file = tmp_path / "out.m4a"
+
+        stdout, _ = ffmpeg_normalize_call(
+            [
+                str(input_file),
+                "-o",
+                str(output_file),
+                "-c:a",
+                "aac",
+                "--threshold",
+                "0.5",
+                "--print-stats",
+            ]
+        )
+        assert output_file.exists()
+        # the skipped file is copied through unchanged
+        assert output_file.read_bytes() == input_file.read_bytes()
+
+        stats = json.loads(stdout)
+        assert len(stats) > 0
+        assert all(s["status"] == "skipped" for s in stats)
+
+    def test_threshold_disabled_by_default(self, tmp_path):
+        """By default (threshold 0), a file at the target is still normalized."""
+        input_file = tmp_path / "in.m4a"
+        shutil.copy("tests/test.m4a", input_file)
+        output_file = tmp_path / "out.m4a"
+
+        # no --threshold given, and an explicit 0 should behave the same way
+        for extra_args in ([], ["--threshold", "0"]):
+            stdout, _ = ffmpeg_normalize_call(
+                [
+                    str(input_file),
+                    "-o",
+                    str(output_file),
+                    "-c:a",
+                    "aac",
+                    "-f",
+                    "--print-stats",
+                    *extra_args,
+                ]
+            )
+            stats = json.loads(stdout)
+            assert len(stats) > 0
+            assert all(s["status"] == "normalized" for s in stats)
+
+    def test_status_normalized_when_not_at_target(self):
+        """A file far from the target is normalized and reported as such."""
+        # tests/test.mp4 is at roughly -40 LUFS, far from the -23 default
+        stdout, _ = ffmpeg_normalize_call(["tests/test.mp4", "-f", "--print-stats"])
+        stats = json.loads(stdout)
+        assert len(stats) > 0
+        assert all(s["status"] == "normalized" for s in stats)
+        # no error key for successfully processed files
+        assert all("error" not in s for s in stats)
+
+    def test_skip_exit_code_is_zero(self, tmp_path):
+        """Skipping a file (already at target) is not an error: exit code 0."""
+        input_file = tmp_path / "in.m4a"
+        shutil.copy("tests/test.m4a", input_file)
+        output_file = tmp_path / "out.m4a"
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "ffmpeg_normalize",
+                str(input_file),
+                "-o",
+                str(output_file),
+                "-c:a",
+                "aac",
+                "--threshold",
+                "0.5",
+            ],
+            capture_output=True,
+        )
+        assert result.returncode == 0
+
+    def test_error_status_and_nonzero_exit_code(self, tmp_path):
+        """A processing failure is reported per-file and yields a non-zero exit
+        code, while still printing stats with the error attribute."""
+        output_file = tmp_path / "out.mkv"
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "ffmpeg_normalize",
+                "tests/test.mp4",
+                "-o",
+                str(output_file),
+                "-c:a",
+                "definitelynotacodec",
+                "--print-stats",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode != 0
+        stats = json.loads(result.stdout)
+        assert any(s["status"] == "error" for s in stats)
+        assert any(s.get("error") for s in stats)
 
     def test_acodec(self):
         ffmpeg_normalize_call(["tests/test.mp4", "-c:a", "aac"])
