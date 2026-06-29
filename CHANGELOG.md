@@ -1,3 +1,12 @@
+## [1.41.0] - 2026-06-29
+
+### 🚀 Features
+
+- Implement automatic audio codec selection based on output container
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.41.0
 ## [1.40.0] - 2026-06-27
 
 ### 🚀 Features
