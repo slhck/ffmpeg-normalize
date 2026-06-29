@@ -36,6 +36,12 @@ If you decide to run `ffmpeg-normalize` with the default options, it will encode
 
 I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.
 
+## Which audio codec is used for my output?
+
+If you do not set `-c:a`/`--audio-codec`, the codec is chosen for you based on the output container: PCM (lossless) for containers that support it (such as WAV or MKV), or — for containers that cannot store PCM, like MP3, MP4, FLAC, or Opus — the same default codec your ffmpeg would use for that container (e.g. `.mp3` → MP3, `.m4a` → AAC, `.flac` → FLAC, `.opus` → Opus).
+
+See also: [How the output audio codec is chosen](../usage/file-input-output.md#how-the-output-audio-codec-is-chosen).
+
 ## I get a "Could not write header for output file" error
 
 See the [next section](#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error).
@@ -54,7 +60,7 @@ One possible reason is that the input file contains some streams that cannot be 
 
 - You are trying to normalize a movie file, writing to a `.wav` or `.mp3` file. WAV/MP3 files only support audio, not video. Disable video and subtitles with `-vn` and `-sn`, or choose a container that supports video (e.g. `.mkv`).
 
-- You are trying to normalize a file, writing to an `.mp4` container. This program defaults to PCM audio, but MP4 does not support PCM audio. Make sure that your audio codec is set to something MP4 containers support (e.g. `-c:a aac`).
+- You explicitly requested PCM audio (e.g. `-c:a pcm_s16le`) while writing to a container that cannot store PCM, such as `.mp4`, `.flac`, or `.opus`. Either drop the `-c:a` option, in which case a suitable codec is [chosen automatically](../usage/file-input-output.md#how-the-output-audio-codec-is-chosen), or pick a codec the container supports (e.g. `-c:a aac` for MP4).
 
 The default output container is `.mkv` as it will support most input stream types. If you want a different output container, [make sure that it supports](https://en.wikipedia.org/wiki/Comparison_of_container_file_formats) your input file's video, audio, and subtitle streams (if any).
 

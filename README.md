@@ -34,6 +34,8 @@ This program normalizes media files to a certain loudness level using the EBU R1
 
 ## 🆕 What's New
 
+- Version 1.41.0 automatically picks the correct output audio codec for the output container, so you no longer need to specify `-c:a`/`--audio-codec` unless you want to override the default. PCM is chosen for containers that support it; others will use teh default that ffmpeg picks. See [the usage guide](https://slhck.info/ffmpeg-normalize/usage/file-input-output/#how-the-output-audio-codec-is-chosen) for details.
+
 - Version 1.40.0 can optionally **skip files that are already at the target level** via `--threshold` (e.g. `--threshold 0.5`, disabled by default). Such files are copied through unchanged instead of being re-encoded. The `--print-stats` output now includes a per-file `status` (`normalized`, `skipped`, or `error`, plus an `error` message on failure), and the exit code is non-zero if any file failed to process, so a script can tell what happened to each file.
 
     Example:

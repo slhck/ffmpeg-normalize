@@ -73,9 +73,25 @@ for %i in (*.mkv) do ffmpeg-normalize "%i" -c:a aac -b:a 192k
 
     CMD loops run `ffmpeg-normalize` once per file. This means `--batch` mode will **not** work, because each invocation only sees a single file. Use one of the methods above if you need batch normalization.
 
+## How the output audio codec is chosen
+
+When you do not pass `-c:a`/`--audio-codec`, `ffmpeg-normalize` picks the audio codec for you, based on the output container:
+
+- For containers that can store uncompressed audio (such as WAV, MKV, or MOV), it uses **PCM** audio, matching the input bit depth. This is lossless, but produces large files.
+- For containers that cannot store PCM (MP3, MP4/M4A, FLAC, Ogg, Opus, WebM), it uses the **same default codec that ffmpeg itself would pick for that container**, so you do not have to specify one. For example:
+
+    - `.mp3` → MP3 (`libmp3lame`)
+    - `.m4a` / `.mp4` → AAC
+    - `.flac` → FLAC
+    - `.opus` → Opus (`libopus`)
+
+The exact codec is read from your ffmpeg build at runtime rather than hardcoded, so it always matches what plain ffmpeg would do. This means it can differ between builds: for example, on some builds `.ogg` defaults to FLAC rather than Vorbis. To see what your ffmpeg would choose for a given container, run e.g. `ffmpeg -h muxer=flac` and look at the "Default audio codec" line.
+
+You can always override this by setting `-c:a` explicitly, for example `-c:a libvorbis` to force an Ogg Vorbis file. Note that re-encoding to a lossy codec (MP3, AAC, Opus, …) introduces [generation loss](https://en.wikipedia.org/wiki/Generation_loss); to keep your audio lossless, use a PCM-capable container (WAV, MKV) or a lossless codec such as FLAC.
+
 ## Create an MP3 file as output
 
-Normalize an MP3 file and write an MP3 file (you have to explicitly specify the encoder):
+Normalize an MP3 file and write an MP3 file. The codec is chosen automatically (MP3 via `libmp3lame`), but you can specify the encoder and bitrate explicitly to control quality:
 
 ```bash
 ffmpeg-normalize input.mp3 -c:a libmp3lame -b:a 320k -o output.mp3

@@ -499,7 +499,8 @@ class TestFFmpegNormalize:
         # FIXME: some better test that options are respected?
         assert os.path.isfile("normalized/test.mkv")
 
-    def test_ofmt_fail(self):
+    def test_ofmt_pcm_fail(self):
+        # Explicitly asking for PCM in a container that cannot hold it still fails.
         _, stderr = ffmpeg_normalize_call(
             [
                 "tests/test.mp4",
@@ -507,6 +508,8 @@ class TestFFmpegNormalize:
                 "mp3",
                 "-o",
                 "normalized/test.mp3",
+                "-c:a",
+                "pcm_s16le",
                 "-vn",
                 "-sn",
             ]
@@ -529,13 +532,60 @@ class TestFFmpegNormalize:
         )
         assert os.path.isfile("normalized/test.mp3")
 
-    def test_ext_fail(self):
-        _, stderr = ffmpeg_normalize_call(["tests/test.mp4", "-ext", "mp3"])
+    def test_ofmt_mp3_auto_codec(self):
+        # Without -c:a, the codec is taken from the output format.
+        ffmpeg_normalize_call(
+            [
+                "tests/test.mp4",
+                "-ofmt",
+                "mp3",
+                "-o",
+                "normalized/test.mp3",
+                "-vn",
+                "-sn",
+            ]
+        )
+        assert os.path.isfile("normalized/test.mp3")
+        assert _get_stream_info("normalized/test.mp3")[0]["codec_name"] == "mp3"
+
+    def test_ext_pcm_fail(self):
+        # Explicitly asking for PCM in a container that cannot hold it still fails.
+        _, stderr = ffmpeg_normalize_call(
+            ["tests/test.mp4", "-ext", "mp3", "-c:a", "pcm_s16le"]
+        )
         assert "does not support" in stderr
 
     def test_ext_mp3(self):
         ffmpeg_normalize_call(["tests/test.mp4", "-ext", "mp3", "-c:a", "libmp3lame"])
         assert os.path.isfile("normalized/test.mp3")
+
+    def test_ext_mp3_auto_codec(self):
+        # Without -c:a, the codec is taken from the output extension.
+        ffmpeg_normalize_call(["tests/test.mp4", "-ext", "mp3"])
+        assert os.path.isfile("normalized/test.mp3")
+        assert _get_stream_info("normalized/test.mp3")[0]["codec_name"] == "mp3"
+
+    def test_ext_flac_auto_codec(self):
+        ffmpeg_normalize_call(["tests/test.m4a", "-ext", "flac"])
+        assert os.path.isfile("normalized/test.flac")
+        assert _get_stream_info("normalized/test.flac")[0]["codec_name"] == "flac"
+
+    @pytest.mark.skipif(
+        not _has_encoder("libopus"), reason="libopus encoder not available"
+    )
+    def test_ext_opus_auto_codec(self):
+        ffmpeg_normalize_call(["tests/test.m4a", "-o", "normalized/test.opus"])
+        assert os.path.isfile("normalized/test.opus")
+        assert _get_stream_info("normalized/test.opus")[0]["codec_name"] == "opus"
+
+    def test_muxer_default_audio_encoder(self):
+        # The resolver mirrors ffmpeg's own default codec per container.
+        from ffmpeg_normalize._cmd_utils import get_muxer_default_audio_encoder
+
+        assert get_muxer_default_audio_encoder("flac") == "flac"
+        assert get_muxer_default_audio_encoder("mp4") == "aac"
+        # m4a's muxer is registered as "ipod", which must be resolved.
+        assert get_muxer_default_audio_encoder("m4a") == "aac"
 
     def test_version(self):
         stdout, _ = ffmpeg_normalize_call(["--version"])

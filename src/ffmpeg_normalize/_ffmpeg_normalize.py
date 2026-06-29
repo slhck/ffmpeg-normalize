@@ -9,7 +9,14 @@ from typing import TYPE_CHECKING, Literal
 
 from tqdm import tqdm
 
-from ._cmd_utils import ffmpeg_has_loudnorm, get_ffmpeg_exe, validate_input_file
+from ._cmd_utils import (
+    PCM_INCOMPATIBLE_EXTS,
+    PCM_INCOMPATIBLE_FORMATS,
+    ffmpeg_has_loudnorm,
+    get_ffmpeg_exe,
+    get_muxer_default_audio_encoder,
+    validate_input_file,
+)
 from ._errors import FFmpegNormalizeError
 from ._media_file import MediaFile
 
@@ -19,8 +26,6 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 NORMALIZATION_TYPES = ("ebu", "rms", "peak")
-PCM_INCOMPATIBLE_FORMATS = {"flac", "mp3", "mp4", "ogg", "oga", "opus", "webm"}
-PCM_INCOMPATIBLE_EXTS = {"flac", "mp3", "mp4", "m4a", "ogg", "oga", "opus", "webm"}
 
 
 def check_range(number: object, min_r: float, max_r: float, name: str = "") -> float:
@@ -274,13 +279,21 @@ class FFmpegNormalize:
         self.keep_mtime = keep_mtime
         self.keep_bit_depth = keep_bit_depth
 
-        if (
-            self.audio_codec is None or "pcm" in self.audio_codec
-        ) and self.output_format in PCM_INCOMPATIBLE_FORMATS:
-            raise FFmpegNormalizeError(
-                f"Output format {self.output_format} does not support PCM audio. "
-                "Please choose a suitable audio codec with the -c:a option."
-            )
+        if self.output_format in PCM_INCOMPATIBLE_FORMATS:
+            if self.audio_codec is not None and "pcm" in self.audio_codec:
+                raise FFmpegNormalizeError(
+                    f"Output format {self.output_format} does not support PCM audio. "
+                    "Please choose a suitable audio codec with the -c:a option."
+                )
+            if (
+                self.audio_codec is None
+                and get_muxer_default_audio_encoder(self.output_format) is None
+            ):
+                raise FFmpegNormalizeError(
+                    f"Output format {self.output_format} does not support PCM audio, "
+                    "and a default audio codec could not be determined. Please choose "
+                    "a suitable audio codec with the -c:a option."
+                )
 
         # replaygain only works for EBU for now
         if self.replaygain and self.normalization_type != "ebu":
@@ -316,14 +329,22 @@ class FFmpegNormalize:
         if not os.path.exists(input_file):
             raise FFmpegNormalizeError(f"file {input_file} does not exist")
 
-        ext = os.path.splitext(output_file)[1][1:]
-        if (
-            self.audio_codec is None or "pcm" in self.audio_codec
-        ) and ext in PCM_INCOMPATIBLE_EXTS:
-            raise FFmpegNormalizeError(
-                f"Output extension {ext} does not support PCM audio. "
-                "Please choose a suitable audio codec with the -c:a option."
-            )
+        ext = os.path.splitext(output_file)[1][1:].lower()
+        if ext in PCM_INCOMPATIBLE_EXTS:
+            if self.audio_codec is not None and "pcm" in self.audio_codec:
+                raise FFmpegNormalizeError(
+                    f"Output extension {ext} does not support PCM audio. "
+                    "Please choose a suitable audio codec with the -c:a option."
+                )
+            if (
+                self.audio_codec is None
+                and get_muxer_default_audio_encoder(ext) is None
+            ):
+                raise FFmpegNormalizeError(
+                    f"Output extension {ext} does not support PCM audio, and a "
+                    "default audio codec could not be determined. Please choose a "
+                    "suitable audio codec with the -c:a option."
+                )
 
         self.media_files.append(MediaFile(self, input_file, output_file))
         self.file_count += 1

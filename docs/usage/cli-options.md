@@ -218,7 +218,7 @@ Audio codec to use for output files.
 
 See `ffmpeg -encoders` for a list.
 
-Will use PCM audio with input stream bit depth by default.
+Will use PCM audio with input stream bit depth by default. For output containers that cannot store PCM (e.g. MP3, FLAC, Opus), the codec that ffmpeg uses by default for that container is chosen automatically, so you usually do not need to set this.
 
 ### `-b:a AUDIO_BITRATE, --audio-bitrate AUDIO_BITRATE`
 

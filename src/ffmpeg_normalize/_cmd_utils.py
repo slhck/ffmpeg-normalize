@@ -44,6 +44,27 @@ DUR_REGEX = re.compile(
     r"Duration: (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})\.(?P<ms>\d{2})"
 )
 
+# Containers that cannot store raw PCM audio. For these, the bit-depth-aware PCM
+# default cannot be used, so a real audio codec has to be chosen (either via the
+# -c:a option or by falling back to ffmpeg's own default for the container, see
+# get_muxer_default_audio_encoder()). PCM_INCOMPATIBLE_FORMATS is matched against
+# the -f/--output-format value, PCM_INCOMPATIBLE_EXTS against the output file
+# extension (which additionally lists m4a).
+PCM_INCOMPATIBLE_FORMATS = {"flac", "mp3", "mp4", "ogg", "oga", "opus", "webm"}
+PCM_INCOMPATIBLE_EXTS = {"flac", "mp3", "mp4", "m4a", "ogg", "oga", "opus", "webm"}
+
+# Output extensions whose ffmpeg muxer is registered under a different name.
+# ffmpeg's av_guess_format() resolves these internally; for the "-h muxer="
+# query in get_muxer_default_audio_encoder() we need the muxer's own name.
+_MUXER_NAME_FOR_EXT = {
+    "m4a": "ipod",
+    "m4b": "ipod",
+    "m4v": "ipod",
+    "aac": "adts",
+    "mka": "matroska",
+    "mkv": "matroska",
+}
+
 
 class CommandRunner:
     """
@@ -240,6 +261,114 @@ def get_encoder_sample_formats(encoder: str) -> list[str]:
 
     _encoder_sample_formats_cache[encoder] = formats
     return formats
+
+
+_codec_encoders_cache: dict[str, list[str]] | None = None
+_muxer_default_encoder_cache: dict[str, str | None] = {}
+
+
+def _get_codec_encoders() -> dict[str, list[str]]:
+    """
+    Map each ffmpeg codec name to its available encoders.
+
+    Parsed once from ``ffmpeg -codecs`` and cached for the process lifetime. A
+    codec with no explicit ``(encoders: ...)`` list uses an encoder of the same
+    name, so it maps to an empty list here.
+
+    Returns:
+        dict[str, list[str]]: Mapping of codec name to encoder names.
+    """
+    global _codec_encoders_cache
+    if _codec_encoders_cache is not None:
+        return _codec_encoders_cache
+
+    encoders: dict[str, list[str]] = {}
+    try:
+        output = (
+            CommandRunner()
+            .run_command([get_ffmpeg_exe(), "-hide_banner", "-codecs"])
+            .get_output()
+        )
+        for line in output.splitlines():
+            # Rows look like: " DEAIL. opus  Opus ... (encoders: opus libopus)"
+            match = re.match(r"\s*[D.][E.][AVS.][I.][L.][S.]\s+([A-Za-z0-9_]+)", line)
+            if not match:
+                continue
+            enc_match = re.search(r"\(encoders:([^)]*)\)", line)
+            encoders[match.group(1)] = enc_match.group(1).split() if enc_match else []
+    except (RuntimeError, FFmpegNormalizeError) as e:
+        _logger.debug(f"Could not list ffmpeg codecs: {e}")
+
+    _codec_encoders_cache = encoders
+    return encoders
+
+
+def _resolve_encoder_for_codec(codec_id: str) -> str:
+    """
+    Return the encoder ffmpeg uses by default for a codec id.
+
+    This mirrors ffmpeg's own selection when no encoder is given on the command
+    line: the external library wrapper (e.g. ``libopus``) is preferred over an
+    experimental native encoder of the same name (``opus``). Codecs without an
+    explicit encoder list use an encoder named like the codec itself.
+
+    Args:
+        codec_id: The codec id as reported by ffmpeg (e.g. "opus", "flac").
+
+    Returns:
+        str: The encoder name to pass to ``-c:a``.
+    """
+    encoders = _get_codec_encoders().get(codec_id, [])
+    lib_variant = f"lib{codec_id}"
+    if lib_variant in encoders:
+        return lib_variant
+    if encoders:
+        return encoders[0]
+    return codec_id
+
+
+def get_muxer_default_audio_encoder(container: str) -> str | None:
+    """
+    Return the audio encoder ffmpeg would use by default for a container.
+
+    This replicates ffmpeg's own per-container choice when no ``-c:a`` is given,
+    rather than hardcoding a table, so it tracks whatever the installed ffmpeg
+    does (e.g. ``.ogg`` may default to flac on some builds). The container's
+    default audio codec is read from ``ffmpeg -h muxer=<name>`` and then mapped
+    to a concrete, non-experimental encoder via _resolve_encoder_for_codec().
+
+    Results are cached per container for the process lifetime, so batch runs only
+    query ffmpeg once per container.
+
+    Args:
+        container: Output file extension or ffmpeg format name without a leading
+            dot (e.g. "flac", "m4a", "ipod").
+
+    Returns:
+        str | None: The encoder name (e.g. "flac", "libopus"), or None if it
+            could not be determined.
+    """
+    container = container.lower()
+    if container in _muxer_default_encoder_cache:
+        return _muxer_default_encoder_cache[container]
+
+    muxer = _MUXER_NAME_FOR_EXT.get(container, container)
+    encoder: str | None = None
+    try:
+        output = (
+            CommandRunner()
+            .run_command([get_ffmpeg_exe(), "-hide_banner", "-h", f"muxer={muxer}"])
+            .get_output()
+        )
+        if match := re.search(r"Default audio codec:\s*([A-Za-z0-9_]+)", output):
+            encoder = _resolve_encoder_for_codec(match.group(1))
+    except (RuntimeError, FFmpegNormalizeError) as e:
+        _logger.debug(
+            f"Could not determine default audio codec for container '{container}': {e}"
+        )
+
+    _muxer_default_encoder_cache[container] = encoder
+    return encoder
 
 
 def ffmpeg_has_loudnorm() -> bool:

@@ -15,7 +15,13 @@ from mutagen.oggopus import OggOpus
 from mutagen.oggvorbis import OggVorbis
 from tqdm import tqdm
 
-from ._cmd_utils import DUR_REGEX, CommandRunner
+from ._cmd_utils import (
+    DUR_REGEX,
+    PCM_INCOMPATIBLE_EXTS,
+    PCM_INCOMPATIBLE_FORMATS,
+    CommandRunner,
+    get_muxer_default_audio_encoder,
+)
 from ._errors import FFmpegNormalizeError
 from ._streams import (
     AudioStream,
@@ -842,6 +848,40 @@ class MediaFile:
 
         return filter_complex_cmd, output_labels
 
+    def _get_audio_codec(self) -> str | None:
+        """
+        Return the audio encoder to use for normalized streams, or None to use
+        the bit-depth-aware PCM default.
+
+        An explicit ``--audio-codec`` (``-c:a``) always takes precedence.
+        Otherwise, for a container that cannot store PCM (e.g. FLAC, MP3, Opus),
+        fall back to the codec ffmpeg itself would default to for that container,
+        so audio-only outputs work without requiring ``-c:a``. PCM-friendly
+        containers (e.g. WAV, Matroska) keep the lossless PCM default regardless
+        of their own muxer default.
+
+        Returns:
+            str | None: The encoder name, or None to use the PCM default.
+        """
+        if self.ffmpeg_normalize.audio_codec:
+            return self.ffmpeg_normalize.audio_codec
+
+        output_format = self.ffmpeg_normalize.output_format
+        if output_format in PCM_INCOMPATIBLE_FORMATS:
+            container = output_format
+        elif self.output_ext.lower() in PCM_INCOMPATIBLE_EXTS:
+            container = self.output_ext
+        else:
+            return None
+
+        encoder = get_muxer_default_audio_encoder(container)
+        if encoder is not None:
+            _logger.debug(
+                f"No audio codec set; using ffmpeg's default '{encoder}' for "
+                f"container '{container}'"
+            )
+        return encoder
+
     def _second_pass(self) -> Iterator[float]:
         """
         Construct the second pass command and run it.
@@ -934,12 +974,14 @@ class MediaFile:
         # Track output audio stream index for codec assignment
         output_audio_idx = 0
 
+        # Resolve the audio codec once: an explicit --audio-codec wins, otherwise
+        # fall back to ffmpeg's own default codec for the output container (None
+        # means use the bit-depth-aware PCM default).
+        audio_codec = self._get_audio_codec()
+
         # set audio codec for normalized streams
         for audio_stream in streams_to_normalize:
-            if self.ffmpeg_normalize.audio_codec:
-                codec = self.ffmpeg_normalize.audio_codec
-            else:
-                codec = audio_stream.get_pcm_codec()
+            codec = audio_codec if audio_codec else audio_stream.get_pcm_codec()
             cmd.extend([f"-c:a:{output_audio_idx}", codec])
             output_audio_idx += 1
 
@@ -950,7 +992,7 @@ class MediaFile:
 
         # other audio options (if any) - only apply to normalized streams
         if self.ffmpeg_normalize.audio_bitrate:
-            if self.ffmpeg_normalize.audio_codec == "libvorbis":
+            if audio_codec == "libvorbis":
                 # libvorbis takes just a "-b" option, for some reason
                 # https://github.com/slhck/ffmpeg-normalize/issues/277
                 cmd.extend(["-b", str(self.ffmpeg_normalize.audio_bitrate)])
@@ -972,9 +1014,7 @@ class MediaFile:
         # carry the input bit depth through to the output encoder, if requested
         if self.ffmpeg_normalize.keep_bit_depth:
             for idx, audio_stream in enumerate(streams_to_normalize):
-                sample_fmt = audio_stream.get_output_sample_fmt(
-                    self.ffmpeg_normalize.audio_codec
-                )
+                sample_fmt = audio_stream.get_output_sample_fmt(audio_codec)
                 if sample_fmt is not None:
                     cmd.extend([f"-sample_fmt:a:{idx}", sample_fmt])
 
