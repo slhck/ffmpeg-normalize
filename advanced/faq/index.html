@@ -880,6 +880,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#which-audio-codec-is-used-for-my-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which audio codec is used for my output?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#i-get-a-could-not-write-header-for-output-file-error" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1197,6 +1208,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#which-audio-codec-is-used-for-my-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which audio codec is used for my output?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#i-get-a-could-not-write-header-for-output-file-error" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1312,6 +1334,9 @@
 <p><strong>Note:</strong> When normalizing files (without the <code>--replaygain</code> option), any existing ReplayGain tags from the input file are automatically stripped from the output, as they are no longer accurate after normalization.</p>
 <h2 id="why-are-my-output-files-mkv">Why are my output files MKV?</h2>
 <p>I chose MKV as a default output container since it handles almost every possible combination of audio, video, and subtitle codecs. If you know which audio/video codec you want, and which container is supported, use the output options to specify the encoder and output file name manually.</p>
+<h2 id="which-audio-codec-is-used-for-my-output">Which audio codec is used for my output?</h2>
+<p>If you do not set <code>-c:a</code>/<code>--audio-codec</code>, the codec is chosen for you based on the output container: PCM (lossless) for containers that support it (such as WAV or MKV), or — for containers that cannot store PCM, like MP3, MP4, FLAC, or Opus — the same default codec your ffmpeg would use for that container (e.g. <code>.mp3</code> → MP3, <code>.m4a</code> → AAC, <code>.flac</code> → FLAC, <code>.opus</code> → Opus).</p>
+<p>See also: <a href="../../usage/file-input-output/#how-the-output-audio-codec-is-chosen">How the output audio codec is chosen</a>.</p>
 <h2 id="i-get-a-could-not-write-header-for-output-file-error">I get a "Could not write header for output file" error</h2>
 <p>See the <a href="#the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error">next section</a>.</p>
 <h2 id="the-conversion-does-not-work-and-i-get-a-cryptic-ffmpeg-error">The conversion does not work and I get a cryptic ffmpeg error!</h2>
@@ -1329,7 +1354,7 @@
 <p>You are trying to normalize a movie file, writing to a <code>.wav</code> or <code>.mp3</code> file. WAV/MP3 files only support audio, not video. Disable video and subtitles with <code>-vn</code> and <code>-sn</code>, or choose a container that supports video (e.g. <code>.mkv</code>).</p>
 </li>
 <li>
-<p>You are trying to normalize a file, writing to an <code>.mp4</code> container. This program defaults to PCM audio, but MP4 does not support PCM audio. Make sure that your audio codec is set to something MP4 containers support (e.g. <code>-c:a aac</code>).</p>
+<p>You explicitly requested PCM audio (e.g. <code>-c:a pcm_s16le</code>) while writing to a container that cannot store PCM, such as <code>.mp4</code>, <code>.flac</code>, or <code>.opus</code>. Either drop the <code>-c:a</code> option, in which case a suitable codec is <a href="../../usage/file-input-output/#how-the-output-audio-codec-is-chosen">chosen automatically</a>, or pick a codec the container supports (e.g. <code>-c:a aac</code> for MP4).</p>
 </li>
 </ul>
 <p>The default output container is <code>.mkv</code> as it will support most input stream types. If you want a different output container, <a href="https://en.wikipedia.org/wiki/Comparison_of_container_file_formats">make sure that it supports</a> your input file's video, audio, and subtitle streams (if any).</p>

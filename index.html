@@ -1121,6 +1121,9 @@
 <h2 id="whats-new">🆕 What's New</h2>
 <ul>
 <li>
+<p>Version 1.41.0 automatically picks the correct output audio codec for the output container, so you no longer need to specify <code>-c:a</code>/<code>--audio-codec</code> unless you want to override the default. PCM is chosen for containers that support it; others will use teh default that ffmpeg picks. See <a href="https://slhck.info/ffmpeg-normalize/usage/file-input-output/#how-the-output-audio-codec-is-chosen">the usage guide</a> for details.</p>
+</li>
+<li>
 <p>Version 1.40.0 can optionally <strong>skip files that are already at the target level</strong> via <code>--threshold</code> (e.g. <code>--threshold 0.5</code>, disabled by default). Such files are copied through unchanged instead of being re-encoded. The <code>--print-stats</code> output now includes a per-file <code>status</code> (<code>normalized</code>, <code>skipped</code>, or <code>error</code>, plus an <code>error</code> message on failure), and the exit code is non-zero if any file failed to process, so a script can tell what happened to each file.</p>
 <p>Example:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.flac<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span>-c:a<span class="w"> </span>flac<span class="w"> </span>--print-stats<span class="w"> </span>-o<span class="w"> </span>output.flac

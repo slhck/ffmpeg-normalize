@@ -664,6 +664,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-the-output-audio-codec-is-chosen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the output audio codec is chosen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#create-an-mp3-file-as-output" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1220,6 +1231,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-the-output-audio-codec-is-chosen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the output audio codec is chosen
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#create-an-mp3-file-as-output" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1303,8 +1325,24 @@ ffmpeg-normalize --input-list filelist.txt -c:a aac -b:a 192k
 <p class="admonition-title">Warning</p>
 <p>CMD loops run <code>ffmpeg-normalize</code> once per file. This means <code>--batch</code> mode will <strong>not</strong> work, because each invocation only sees a single file. Use one of the methods above if you need batch normalization.</p>
 </div>
+<h2 id="how-the-output-audio-codec-is-chosen">How the output audio codec is chosen</h2>
+<p>When you do not pass <code>-c:a</code>/<code>--audio-codec</code>, <code>ffmpeg-normalize</code> picks the audio codec for you, based on the output container:</p>
+<ul>
+<li>For containers that can store uncompressed audio (such as WAV, MKV, or MOV), it uses <strong>PCM</strong> audio, matching the input bit depth. This is lossless, but produces large files.</li>
+<li>
+<p>For containers that cannot store PCM (MP3, MP4/M4A, FLAC, Ogg, Opus, WebM), it uses the <strong>same default codec that ffmpeg itself would pick for that container</strong>, so you do not have to specify one. For example:</p>
+<ul>
+<li><code>.mp3</code> → MP3 (<code>libmp3lame</code>)</li>
+<li><code>.m4a</code> / <code>.mp4</code> → AAC</li>
+<li><code>.flac</code> → FLAC</li>
+<li><code>.opus</code> → Opus (<code>libopus</code>)</li>
+</ul>
+</li>
+</ul>
+<p>The exact codec is read from your ffmpeg build at runtime rather than hardcoded, so it always matches what plain ffmpeg would do. This means it can differ between builds: for example, on some builds <code>.ogg</code> defaults to FLAC rather than Vorbis. To see what your ffmpeg would choose for a given container, run e.g. <code>ffmpeg -h muxer=flac</code> and look at the "Default audio codec" line.</p>
+<p>You can always override this by setting <code>-c:a</code> explicitly, for example <code>-c:a libvorbis</code> to force an Ogg Vorbis file. Note that re-encoding to a lossy codec (MP3, AAC, Opus, …) introduces <a href="https://en.wikipedia.org/wiki/Generation_loss">generation loss</a>; to keep your audio lossless, use a PCM-capable container (WAV, MKV) or a lossless codec such as FLAC.</p>
 <h2 id="create-an-mp3-file-as-output">Create an MP3 file as output</h2>
-<p>Normalize an MP3 file and write an MP3 file (you have to explicitly specify the encoder):</p>
+<p>Normalize an MP3 file and write an MP3 file. The codec is chosen automatically (MP3 via <code>libmp3lame</code>), but you can specify the encoder and bitrate explicitly to control quality:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp3<span class="w"> </span>-c:a<span class="w"> </span>libmp3lame<span class="w"> </span>-b:a<span class="w"> </span>320k<span class="w"> </span>-o<span class="w"> </span>output.mp3
 </code></pre></div>
 <h2 id="change-the-output-container-from-the-default-mkv">Change the output container from the default (MKV)</h2>

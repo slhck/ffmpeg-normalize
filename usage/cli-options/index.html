@@ -2573,7 +2573,7 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <h3 id="-ca-audio_codec-audio-codec-audio_codec"><code>-c:a AUDIO_CODEC, --audio-codec AUDIO_CODEC</code></h3>
 <p>Audio codec to use for output files.</p>
 <p>See <code>ffmpeg -encoders</code> for a list.</p>
-<p>Will use PCM audio with input stream bit depth by default.</p>
+<p>Will use PCM audio with input stream bit depth by default. For output containers that cannot store PCM (e.g. MP3, FLAC, Opus), the codec that ffmpeg uses by default for that container is chosen automatically, so you usually do not need to set this.</p>
 <h3 id="-ba-audio_bitrate-audio-bitrate-audio_bitrate"><code>-b:a AUDIO_BITRATE, --audio-bitrate AUDIO_BITRATE</code></h3>
 <p>Audio bitrate in bits/s, or with K suffix.</p>
 <p>If not specified, will use codec default.</p>
