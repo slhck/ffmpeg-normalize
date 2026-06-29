@@ -1197,7 +1197,12 @@
 
 <h1 id="basic-usage">Basic Usage</h1>
 <h2 id="what-does-the-program-do">What does the program do?</h2>
-<p>The program takes one or more input files and, by default, writes them to a folder called <code>normalized</code>, using an <code>.mkv</code> container. The reason for choosing the MKV container is that it can handle almost any codec combination without any additional configuration.</p>
+<p>The program takes one or more input files and, by default, writes them to a folder called <code>normalized</code>, using an <code>.mkv</code> container.</p>
+<div class="admonition tip">
+<p class="admonition-title">Need a different output container?</p>
+<p>The reason for choosing the MKV container is that it can handle almost any codec combination without any additional configuration.</p>
+<p>You can choose another output file with <code>-o output.m4a</code> and the program will automatically pick a suitable codec for that container.</p>
+</div>
 <p>All audio streams will be normalized so that they have the same (perceived) volume according to the <a href="https://tech.ebu.ch/docs/r/r128.pdf">EBU R128</a> standard. This is done by analyzing the audio streams and applying a filter to bring them to a target level. This ensures that multiple files normalized with this filter will have the same perceived loudness.</p>
 <p>Under the hood, the <code>ffmpeg-normalize</code> program uses <a href="https://ffmpeg.org/ffmpeg-filters.html#loudnorm">ffmpeg's <code>loudnorm</code> filter</a> to do this; the filter was <a href="https://k.ylo.ph/2016/04/04/loudnorm.html">originally written by Kyle Swanson</a>.</p>
 <h2 id="how-do-i-specify-the-input">How do I specify the input?</h2>
@@ -1212,21 +1217,18 @@
 <p>You can customize the normalization and output format with various options. For example:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp3<span class="w"> </span>-c:a<span class="w"> </span>aac<span class="w"> </span>-b:a<span class="w"> </span>192k
 </code></pre></div>
-<p>This uses the AAC codec at 192 kbps bitrate instead of PCM to keep file size manageable.</p>
+<p>This uses the AAC codec at 192 kbps bitrate instead of PCM to keep file size manageable. It will still write to an MKV file.</p>
 <p>To process multiple files, just list them all as input using wildcards (Linux):</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>*.mp3<span class="w"> </span>-c:a<span class="w"> </span>libmp3lame<span class="w"> </span>-b:a<span class="w"> </span>320k<span class="w"> </span>-ext<span class="w"> </span>mp3
 </code></pre></div>
 <p>This normalizes all MP3 files in the current directory, outputs as MP3 at 320 kbps.</p>
 <h2 id="what-codec-is-chosen">What codec is chosen?</h2>
-<p>The default audio encoding method is uncompressed PCM (<code>pcm_s16le</code>) to avoid introducing compression artifacts.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This default keeps the quality high, but will result in a much higher bitrate than you might want, for example if your input files are MP3s, and now your output is much larger.</p>
-</div>
-<p>If you want to keep the file size down, use <code>-c:a</code> and specify an audio codec (e.g., <code>-c:a aac</code> for ffmpeg's built-in AAC encoder):</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input1.mp3<span class="w"> </span>-c:a<span class="w"> </span>aac
-</code></pre></div>
-<p>This will create a file called <code>normalized/input1.mkv</code> in the current directory, now using the AAC codec.</p>
+<p>ffmpeg-normalize picks the audio codec for you, based on the output container:</p>
+<ul>
+<li>For containers that can store uncompressed audio (such as WAV, MKV, or MOV), it uses <strong>PCM</strong> audio, matching the input bit depth. This is lossless, but produces large files.</li>
+<li>For containers that cannot store PCM (MP3, MP4/M4A, FLAC, Ogg, Opus, WebM), it uses the <strong>same default codec that ffmpeg itself would pick for that container</strong>, so you do not have to specify one. For example:</li>
+</ul>
+<p>For more info, see <a href="../file-input-output/#how-the-output-audio-codec-is-chosen">How the output audio codec is chosen</a>.</p>
 <h2 id="how-do-i-specify-the-output-file-name-or-extension">How do I specify the output file name or extension?</h2>
 <p>You don't have to specify an output file name (the default is <code>normalized/&lt;input&gt;.mkv</code>), but if you want to override it, you can specify one output file name for each input file with the <code>-o</code> option. In this case, the container format (e.g. <code>.wav</code>) will be inferred from the file name extension that you've given.</p>
 <p>Example:</p>
