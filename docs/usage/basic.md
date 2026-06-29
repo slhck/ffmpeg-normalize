@@ -2,7 +2,13 @@
 
 ## What does the program do?
 
-The program takes one or more input files and, by default, writes them to a folder called `normalized`, using an `.mkv` container. The reason for choosing the MKV container is that it can handle almost any codec combination without any additional configuration.
+The program takes one or more input files and, by default, writes them to a folder called `normalized`, using an `.mkv` container.
+
+!!! tip "Need a different output container?"
+
+    The reason for choosing the MKV container is that it can handle almost any codec combination without any additional configuration.
+
+    You can choose another output file with `-o output.m4a` and the program will automatically pick a suitable codec for that container.
 
 All audio streams will be normalized so that they have the same (perceived) volume according to the [EBU R128](https://tech.ebu.ch/docs/r/r128.pdf) standard. This is done by analyzing the audio streams and applying a filter to bring them to a target level. This ensures that multiple files normalized with this filter will have the same perceived loudness.
 
@@ -32,7 +38,7 @@ You can customize the normalization and output format with various options. For 
 ffmpeg-normalize input.mp3 -c:a aac -b:a 192k
 ```
 
-This uses the AAC codec at 192 kbps bitrate instead of PCM to keep file size manageable.
+This uses the AAC codec at 192 kbps bitrate instead of PCM to keep file size manageable. It will still write to an MKV file.
 
 To process multiple files, just list them all as input using wildcards (Linux):
 
@@ -44,19 +50,12 @@ This normalizes all MP3 files in the current directory, outputs as MP3 at 320 kb
 
 ## What codec is chosen?
 
-The default audio encoding method is uncompressed PCM (`pcm_s16le`) to avoid introducing compression artifacts.
+ffmpeg-normalize picks the audio codec for you, based on the output container:
 
-!!! note
+- For containers that can store uncompressed audio (such as WAV, MKV, or MOV), it uses **PCM** audio, matching the input bit depth. This is lossless, but produces large files.
+- For containers that cannot store PCM (MP3, MP4/M4A, FLAC, Ogg, Opus, WebM), it uses the **same default codec that ffmpeg itself would pick for that container**, so you do not have to specify one. For example:
 
-    This default keeps the quality high, but will result in a much higher bitrate than you might want, for example if your input files are MP3s, and now your output is much larger.
-
-If you want to keep the file size down, use `-c:a` and specify an audio codec (e.g., `-c:a aac` for ffmpeg's built-in AAC encoder):
-
-```bash
-ffmpeg-normalize input1.mp3 -c:a aac
-```
-
-This will create a file called `normalized/input1.mkv` in the current directory, now using the AAC codec.
+For more info, see [How the output audio codec is chosen](file-input-output.md#how-the-output-audio-codec-is-chosen).
 
 ## How do I specify the output file name or extension?
 

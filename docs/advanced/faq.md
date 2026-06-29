@@ -38,9 +38,7 @@ I chose MKV as a default output container since it handles almost every possible
 
 ## Which audio codec is used for my output?
 
-If you do not set `-c:a`/`--audio-codec`, the codec is chosen for you based on the output container: PCM (lossless) for containers that support it (such as WAV or MKV), or — for containers that cannot store PCM, like MP3, MP4, FLAC, or Opus — the same default codec your ffmpeg would use for that container (e.g. `.mp3` → MP3, `.m4a` → AAC, `.flac` → FLAC, `.opus` → Opus).
-
-See also: [How the output audio codec is chosen](../usage/file-input-output.md#how-the-output-audio-codec-is-chosen).
+See: [How the output audio codec is chosen](../usage/file-input-output.md#how-the-output-audio-codec-is-chosen).
 
 ## I get a "Could not write header for output file" error
 
