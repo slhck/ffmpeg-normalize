@@ -9,7 +9,7 @@ import subprocess
 import sys
 from contextlib import contextmanager
 from shutil import which
-from typing import Any, Iterator
+from typing import Any, Iterator, cast
 
 from ffmpeg_progress_yield import FfmpegProgress
 
@@ -161,13 +161,16 @@ class CommandRunner:
             _logger.debug("Dry mode specified, not actually running command")
             return self
 
-        p = subprocess.Popen(
-            cmd,
-            stdin=subprocess.PIPE,  # Apply stdin isolation by creating separate pipe.
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=False,
-            **_get_ffmpeg_popen_kwargs(),
+        p = cast(
+            subprocess.Popen[bytes],
+            subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,  # Apply stdin isolation by creating separate pipe.
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=False,
+                **_get_ffmpeg_popen_kwargs(),
+            ),
         )
 
         stdout_bytes, stderr_bytes = p.communicate()
