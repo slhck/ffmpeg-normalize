@@ -1271,3 +1271,24 @@ def test_ffmpeg_env():
     # After context, environment should be reset
     env_after = _get_ffmpeg_env()
     assert env_after is None
+
+
+def test_ffmpeg_popen_kwargs_hide_console_on_windows(monkeypatch):
+    """Verify that ffmpeg subprocesses do not open consoles on Windows."""
+    from ffmpeg_normalize import _cmd_utils
+
+    monkeypatch.setattr(_cmd_utils.sys, "platform", "win32")
+    monkeypatch.setattr(
+        _cmd_utils.subprocess, "CREATE_NO_WINDOW", 0x08000000, raising=False
+    )
+
+    assert _cmd_utils._get_ffmpeg_popen_kwargs()["creationflags"] == 0x08000000
+
+
+def test_ffmpeg_popen_kwargs_are_empty_off_windows(monkeypatch):
+    """Verify that non-Windows subprocess options remain unchanged."""
+    from ffmpeg_normalize import _cmd_utils
+
+    monkeypatch.setattr(_cmd_utils.sys, "platform", "linux")
+
+    assert "creationflags" not in _cmd_utils._get_ffmpeg_popen_kwargs()

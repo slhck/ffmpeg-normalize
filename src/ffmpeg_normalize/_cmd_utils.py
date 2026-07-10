@@ -6,6 +6,7 @@ import os
 import re
 import shlex
 import subprocess
+import sys
 from contextlib import contextmanager
 from shutil import which
 from typing import Any, Iterator
@@ -38,6 +39,16 @@ def ffmpeg_env(env: dict[str, str] | None) -> Iterator[None]:
 
 def _get_ffmpeg_env() -> dict[str, str] | None:
     return _ffmpeg_env_var.get()
+
+
+def _get_ffmpeg_popen_kwargs() -> dict[str, Any]:
+    """Return common keyword arguments for ffmpeg subprocesses."""
+    kwargs: dict[str, Any] = {"env": _get_ffmpeg_env()}
+    if sys.platform == "win32":
+        # Hide consoles spawned by GUI applications. See https://github.com/slhck/ffmpeg-normalize/issues/319.
+        # Add a public context manager if callers ever need to opt out.
+        kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+    return kwargs
 
 
 DUR_REGEX = re.compile(
@@ -124,7 +135,7 @@ class CommandRunner:
         _logger.debug(f"Running command: {shlex.join(cmd)}")
         with FfmpegProgress(cmd, dry_run=self.dry) as ff:
             yield from ff.run_command_with_progress(
-                popen_kwargs={"env": _get_ffmpeg_env()}
+                popen_kwargs=_get_ffmpeg_popen_kwargs()
             )
 
             self.output = ff.stderr
@@ -156,7 +167,7 @@ class CommandRunner:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=False,
-            env=_get_ffmpeg_env(),
+            **_get_ffmpeg_popen_kwargs(),
         )
 
         stdout_bytes, stderr_bytes = p.communicate()
