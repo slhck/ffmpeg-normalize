@@ -1,3 +1,16 @@
+## [1.41.1] - 2026-07-10
+
+### 🐛 Bug Fixes
+
+- *(windows)* Hide ffmpeg console windows, fixes #319
+
+### 📚 Documentation
+
+- Fix
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.41.1
 ## [1.41.0] - 2026-06-29
 
 ### 🚀 Features
