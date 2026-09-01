@@ -988,6 +988,67 @@ class TestFFmpegNormalize:
         )
         assert "Cannot use both" in stderr
 
+    def test_write_encoder_settings_ebu(self):
+        ffmpeg_normalize_call(
+            [
+                "tests/test.mp3",
+                "-o",
+                "normalized/test.mkv",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "128k",
+                "--write-encoder-settings",
+            ]
+        )
+        assert os.path.isfile("normalized/test.mkv")
+        tags = _get_stream_info("normalized/test.mkv")[0]["tags"]
+        settings = tags.get("ENCODER_SETTINGS") or tags.get("encoder_settings")
+        assert settings is not None
+        assert settings.startswith("-c:a aac -b:a 128k")
+        assert "-af loudnorm=" in settings
+        assert "measured_i=" in settings
+        # the diagnostic-only print_format option is stripped
+        assert "print_format" not in settings
+
+    def test_write_encoder_settings_peak(self):
+        ffmpeg_normalize_call(
+            [
+                "tests/test.mp3",
+                "-o",
+                "normalized/test.mkv",
+                "-nt",
+                "peak",
+                "-t",
+                "-5",
+                "--write-encoder-settings",
+            ]
+        )
+        assert os.path.isfile("normalized/test.mkv")
+        tags = _get_stream_info("normalized/test.mkv")[0]["tags"]
+        settings = tags.get("ENCODER_SETTINGS") or tags.get("encoder_settings")
+        assert settings is not None
+        assert settings.startswith("-c:a ")
+        assert "-af volume=" in settings
+
+    def test_write_encoder_settings_metadata_disable(self):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test.mp3",
+                "-o",
+                "normalized/test.mkv",
+                "-c:a",
+                "aac",
+                "--write-encoder-settings",
+                "-mn",
+            ]
+        )
+        assert os.path.isfile("normalized/test.mkv")
+        assert "no effect" in stderr
+        tags = _get_stream_info("normalized/test.mkv")[0].get("tags", {})
+        assert "ENCODER_SETTINGS" not in tags
+        assert "encoder_settings" not in tags
+
 
 class TestFileValidation:
     """Tests for pre-batch file validation."""

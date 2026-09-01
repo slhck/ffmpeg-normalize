@@ -203,6 +203,16 @@ Will attempt to copy video codec by default.
   {-sn,--subtitle-disable}"[Do not write subtitle streams to output]"
   {-mn,--metadata-disable}"[Do not write metadata to output]"
   {-cn,--chapters-disable}"[Do not write chapters to output]"
+  "--write-encoder-settings[Write the effective encoder settings as an ENCODER_SETTINGS tag on each
+normalized audio stream.
+
+The tag holds an ffmpeg-command-equivalent string with the audio codec,
+the bitrate, sample rate and channel count (when set), plus the
+normalization filter including the measured loudnorm values.
+
+This is a Matroska\/WebM tag convention\; other containers may store it
+differently. Has no effect together with \`--metadata-disable\`.
+]"
   {-ei,--extra-input-options}"[Extra input options list.
 
 A list of extra ffmpeg command line arguments valid for the input,

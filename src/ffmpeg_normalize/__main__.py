@@ -562,6 +562,23 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Do not write chapters to output",
     )
+    group_vcodec.add_argument(
+        "--write-encoder-settings",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Write the effective encoder settings as an ENCODER_SETTINGS tag on each
+        normalized audio stream.
+
+        The tag holds an ffmpeg-command-equivalent string with the audio codec,
+        the bitrate, sample rate and channel count (when set), plus the
+        normalization filter including the measured loudnorm values.
+
+        This is a Matroska/WebM tag convention; other containers may store it
+        differently. Has no effect together with `--metadata-disable`.
+        """
+        ),
+    )
 
     group_format = parser.add_argument_group("Input/Output options")
     group_format.add_argument(
@@ -744,6 +761,7 @@ def main() -> None:
         subtitle_disable=cli_args.subtitle_disable,
         metadata_disable=cli_args.metadata_disable,
         chapters_disable=cli_args.chapters_disable,
+        write_encoder_settings=cli_args.write_encoder_settings,
         extra_input_options=extra_input_options,
         extra_output_options=extra_output_options,
         output_format=cli_args.output_format,

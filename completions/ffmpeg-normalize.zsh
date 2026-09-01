@@ -57,6 +57,7 @@ _ffmpeg_normalize() {
     '(-sn --subtitle-disable)'{-sn,--subtitle-disable}'[Disable subtitles]'
     '(-mn --metadata-disable)'{-mn,--metadata-disable}'[Disable metadata]'
     '(-cn --chapters-disable)'{-cn,--chapters-disable}'[Disable chapters]'
+    '--write-encoder-settings[Write effective encoder settings as an ENCODER_SETTINGS stream tag]'
 
     # Format Options
     '(-ei --extra-input-options)'{-ei,--extra-input-options}'[Extra input options]:options:'

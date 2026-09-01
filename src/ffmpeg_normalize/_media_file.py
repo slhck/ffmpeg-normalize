@@ -99,6 +99,10 @@ class MediaFile:
         self.streams: StreamDict = {"audio": {}, "video": {}, "subtitle": {}}
         self.temp_file: Union[str, None] = None
         self.batch_reference: float | None = None
+        # Second-pass filter chain per normalized audio stream, keyed by stream
+        # id. Populated by _get_audio_filter_cmd() and reused by
+        # _get_encoder_settings() so the normalization filter is not built twice.
+        self._stream_filter_chains: dict[int, list[str]] = {}
         # Input (access, modification) times captured before processing, used
         # when the keep_mtime option is enabled.
         self.input_timestamps: tuple[float, float] | None = None
@@ -768,6 +772,75 @@ class MediaFile:
                 for _ in fun():
                     pass
 
+    def _get_stream_filter_chain(self, audio_stream: AudioStream) -> list[str]:
+        """
+        Return the ordered list of ffmpeg audio filters applied to a single
+        stream in the second pass: the optional pre-filter, channel conversion,
+        the normalization filter itself (loudnorm for EBU, or the volume /
+        dynaudnorm filter for peak / RMS), and the optional post-filter.
+
+        Returns:
+            list[str]: the filters, in application order
+        """
+        skip_normalization = False
+        if self.ffmpeg_normalize.lower_only:
+            if self.ffmpeg_normalize.normalization_type == "ebu":
+                if (
+                    audio_stream.loudness_statistics["ebu_pass1"] is not None
+                    and audio_stream.loudness_statistics["ebu_pass1"]["input_i"]
+                    < self.ffmpeg_normalize.target_level
+                ):
+                    skip_normalization = True
+            elif self.ffmpeg_normalize.normalization_type == "peak":
+                if (
+                    audio_stream.loudness_statistics["max"] is not None
+                    and audio_stream.loudness_statistics["max"]
+                    < self.ffmpeg_normalize.target_level
+                ):
+                    skip_normalization = True
+            elif self.ffmpeg_normalize.normalization_type == "rms":
+                if (
+                    audio_stream.loudness_statistics["mean"] is not None
+                    and audio_stream.loudness_statistics["mean"]
+                    < self.ffmpeg_normalize.target_level
+                ):
+                    skip_normalization = True
+
+        if skip_normalization:
+            _logger.warning(
+                f"Stream {audio_stream.stream_id} had measured input loudness lower than target, skipping normalization."
+            )
+            normalization_filter = "acopy"
+        else:
+            if self.ffmpeg_normalize.normalization_type == "ebu":
+                normalization_filter = audio_stream.get_second_pass_opts_ebu(
+                    batch_reference=self.batch_reference
+                )
+            else:
+                normalization_filter = audio_stream.get_second_pass_opts_peakrms(
+                    batch_reference=self.batch_reference
+                )
+
+        filter_chain = []
+
+        if self.ffmpeg_normalize.pre_filter:
+            filter_chain.append(self.ffmpeg_normalize.pre_filter)
+
+        # Apply channel conversion before normalization so that the
+        # normalization filter operates on the same channel layout that
+        # was measured in the first pass. See issue #316.
+        if self.ffmpeg_normalize.audio_channels:
+            filter_chain.append(
+                f"aformat=sample_fmts=fltp:channel_layouts={self.ffmpeg_normalize.audio_channels}c"
+            )
+
+        filter_chain.append(normalization_filter)
+
+        if self.ffmpeg_normalize.post_filter:
+            filter_chain.append(self.ffmpeg_normalize.post_filter)
+
+        return filter_chain
+
     def _get_audio_filter_cmd(self) -> tuple[str, list[str]]:
         """
         Return the audio filter command and output labels needed.
@@ -778,75 +851,53 @@ class MediaFile:
         filter_chains = []
         output_labels = []
 
-        streams_to_normalize = self._get_streams_to_normalize()
+        self._stream_filter_chains = {}
 
-        for audio_stream in streams_to_normalize:
-            skip_normalization = False
-            if self.ffmpeg_normalize.lower_only:
-                if self.ffmpeg_normalize.normalization_type == "ebu":
-                    if (
-                        audio_stream.loudness_statistics["ebu_pass1"] is not None
-                        and audio_stream.loudness_statistics["ebu_pass1"]["input_i"]
-                        < self.ffmpeg_normalize.target_level
-                    ):
-                        skip_normalization = True
-                elif self.ffmpeg_normalize.normalization_type == "peak":
-                    if (
-                        audio_stream.loudness_statistics["max"] is not None
-                        and audio_stream.loudness_statistics["max"]
-                        < self.ffmpeg_normalize.target_level
-                    ):
-                        skip_normalization = True
-                elif self.ffmpeg_normalize.normalization_type == "rms":
-                    if (
-                        audio_stream.loudness_statistics["mean"] is not None
-                        and audio_stream.loudness_statistics["mean"]
-                        < self.ffmpeg_normalize.target_level
-                    ):
-                        skip_normalization = True
-
-            if skip_normalization:
-                _logger.warning(
-                    f"Stream {audio_stream.stream_id} had measured input loudness lower than target, skipping normalization."
-                )
-                normalization_filter = "acopy"
-            else:
-                if self.ffmpeg_normalize.normalization_type == "ebu":
-                    normalization_filter = audio_stream.get_second_pass_opts_ebu(
-                        batch_reference=self.batch_reference
-                    )
-                else:
-                    normalization_filter = audio_stream.get_second_pass_opts_peakrms(
-                        batch_reference=self.batch_reference
-                    )
+        for audio_stream in self._get_streams_to_normalize():
+            filter_chain = self._get_stream_filter_chain(audio_stream)
+            self._stream_filter_chains[audio_stream.stream_id] = filter_chain
 
             input_label = f"[0:{audio_stream.stream_id}]"
             output_label = f"[norm{audio_stream.stream_id}]"
             output_labels.append(output_label)
-
-            filter_chain = []
-
-            if self.ffmpeg_normalize.pre_filter:
-                filter_chain.append(self.ffmpeg_normalize.pre_filter)
-
-            # Apply channel conversion before normalization so that the
-            # normalization filter operates on the same channel layout that
-            # was measured in the first pass. See issue #316.
-            if self.ffmpeg_normalize.audio_channels:
-                filter_chain.append(
-                    f"aformat=sample_fmts=fltp:channel_layouts={self.ffmpeg_normalize.audio_channels}c"
-                )
-
-            filter_chain.append(normalization_filter)
-
-            if self.ffmpeg_normalize.post_filter:
-                filter_chain.append(self.ffmpeg_normalize.post_filter)
 
             filter_chains.append(input_label + ",".join(filter_chain) + output_label)
 
         filter_complex_cmd = ";".join(filter_chains)
 
         return filter_complex_cmd, output_labels
+
+    def _get_encoder_settings(
+        self, audio_stream: AudioStream, audio_codec: str | None
+    ) -> str:
+        """
+        Return an ffmpeg-command-equivalent description of how a single audio
+        stream is encoded in the second pass: the codec, then the bitrate,
+        sample rate and channel count when set, followed by the effective
+        filter chain (which includes the loudnorm measured values).
+
+        Written as the ``ENCODER_SETTINGS`` stream tag when
+        ``write_encoder_settings`` is enabled. The filter chain comes from the
+        cache populated by :meth:`_get_audio_filter_cmd`, which must run first.
+        The loudnorm ``print_format`` option is dropped, as it only controls
+        first-pass diagnostics and not the normalization itself.
+
+        Returns:
+            str: e.g. ``-c:a libopus -b:a 128000 -af loudnorm=i=-23.0:...``
+        """
+        codec = audio_codec if audio_codec else audio_stream.get_pcm_codec()
+        args = ["-c:a", codec]
+        if self.ffmpeg_normalize.audio_bitrate:
+            args += ["-b:a", str(self.ffmpeg_normalize.audio_bitrate)]
+        if self.ffmpeg_normalize.sample_rate:
+            args += ["-ar", str(self.ffmpeg_normalize.sample_rate)]
+        if self.ffmpeg_normalize.audio_channels:
+            args += ["-ac", str(self.ffmpeg_normalize.audio_channels)]
+        filter_chain = self._stream_filter_chains.get(audio_stream.stream_id, [])
+        if filter_chain:
+            af = re.sub(r":print_format=\w+", "", ",".join(filter_chain))
+            args += ["-af", af]
+        return shlex.join(args)
 
     def _get_audio_codec(self) -> str | None:
         """
@@ -1010,6 +1061,21 @@ class MediaFile:
             # Only apply to normalized streams
             for idx in range(len(streams_to_normalize)):
                 cmd.extend([f"-ac:a:{idx}", str(self.ffmpeg_normalize.audio_channels)])
+
+        # record how each normalized stream was encoded as an ENCODER_SETTINGS
+        # tag (a Matroska/WebM convention), so the output documents itself
+        if (
+            self.ffmpeg_normalize.write_encoder_settings
+            and not self.ffmpeg_normalize.metadata_disable
+        ):
+            for idx, audio_stream in enumerate(streams_to_normalize):
+                cmd.extend(
+                    [
+                        f"-metadata:s:a:{idx}",
+                        "ENCODER_SETTINGS="
+                        + self._get_encoder_settings(audio_stream, audio_codec),
+                    ]
+                )
 
         # carry the input bit depth through to the output encoder, if requested
         if self.ffmpeg_normalize.keep_bit_depth:
