@@ -47,6 +47,7 @@ _ffmpeg_normalize()
           -sn --subtitle-disable \
           -mn --metadata-disable \
           -cn --chapters-disable \
+          --write-encoder-settings \
           -ei --extra-input-options \
           -e --extra-output-options \
           -ofmt --output-format \

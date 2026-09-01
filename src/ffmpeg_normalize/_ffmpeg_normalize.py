@@ -82,6 +82,7 @@ class FFmpegNormalize:
         subtitle_disable (bool, optional): Disable subtitles. Defaults to False.
         metadata_disable (bool, optional): Disable metadata. Defaults to False.
         chapters_disable (bool, optional): Disable chapters. Defaults to False.
+        write_encoder_settings (bool, optional): Write the effective encoder settings (codec, bitrate, sample rate, channels and the normalization filter including the measured loudnorm values) as an ENCODER_SETTINGS tag on each normalized audio stream. Defaults to False.
         extra_input_options (list, optional): Extra input options. Defaults to None.
         extra_output_options (list, optional): Extra output options. Defaults to None.
         output_format (str, optional): Output format. Defaults to None.
@@ -129,6 +130,7 @@ class FFmpegNormalize:
         "subtitle_disable": False,
         "metadata_disable": False,
         "chapters_disable": False,
+        "write_encoder_settings": False,
         "extra_input_options": None,
         "extra_output_options": None,
         "output_format": None,
@@ -173,6 +175,7 @@ class FFmpegNormalize:
         subtitle_disable: bool = False,
         metadata_disable: bool = False,
         chapters_disable: bool = False,
+        write_encoder_settings: bool = False,
         extra_input_options: list[str] | None = None,
         extra_output_options: list[str] | None = None,
         output_format: str | None = None,
@@ -257,6 +260,13 @@ class FFmpegNormalize:
         self.subtitle_disable = subtitle_disable
         self.metadata_disable = metadata_disable
         self.chapters_disable = chapters_disable
+        self.write_encoder_settings = write_encoder_settings
+
+        if self.write_encoder_settings and self.metadata_disable:
+            _logger.warning(
+                "write_encoder_settings has no effect together with metadata_disable; "
+                "no metadata will be written to the output."
+            )
 
         self.extra_input_options = extra_input_options
         self.extra_output_options = extra_output_options

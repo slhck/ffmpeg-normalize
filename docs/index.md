@@ -25,6 +25,7 @@ Batch processing of several input files is possible, including video files.
 - **Selective audio stream normalization** — Normalize specific audio streams or only default streams
 - **Skip files already at target** — Avoid re-encoding files already within a threshold of the target level
 - **Per-file outcome reporting** — `status` field in `--print-stats` plus exit codes for scripting
+- **Self-documenting output** — Optionally record the effective encoder settings as an `ENCODER_SETTINGS` tag
 - **Video file support** — Process video files while preserving video streams
 - **Docker support** — Run via Docker container
 - **Python API** — Use programmatically in your Python projects
@@ -32,6 +33,14 @@ Batch processing of several input files is possible, including video files.
 - **Album Batch normalization** – Process files jointly, preserving relative loudness
 
 ## 🆕 What's New
+
+- Version 1.42.0 can optionally write an **`ENCODER_SETTINGS`** tag on each normalized audio stream via `--write-encoder-settings`. The tag holds an ffmpeg-command-equivalent string — the audio codec, bitrate, sample rate and channels, plus the normalization filter including the measured loudnorm values — so a normalized file documents how it was produced. This is a Matroska/WebM convention and has no effect with `--metadata-disable`.
+
+    Example:
+
+    ```bash
+    ffmpeg-normalize input.wav -c:a libopus -b:a 128k --write-encoder-settings -o output.mkv
+    ```
 
 - Version 1.41.0 automatically picks the correct output audio codec for the output container, so you no longer need to specify `-c:a`/`--audio-codec` unless you want to override the default. PCM is chosen for containers that support it; others will use teh default that ffmpeg picks. See [the usage guide](https://slhck.info/ffmpeg-normalize/usage/file-input-output/#how-the-output-audio-codec-is-chosen) for details.
 

@@ -316,6 +316,18 @@ Do not write metadata to output
 
 Do not write chapters to output
 
+### `--write-encoder-settings`
+
+Write the effective encoder settings as an `ENCODER_SETTINGS` tag on each normalized audio stream.
+
+The tag holds an ffmpeg-command-equivalent string with the audio codec, the bitrate, sample rate and channel count (when set), plus the normalization filter including the measured loudnorm values, for example:
+
+```
+-c:a libopus -b:a 128000 -af loudnorm=i=-23.0:lra=7.0:tp=-2.0:offset=-0.1:measured_i=-19.4:measured_lra=6.1:measured_tp=-3.2:measured_thresh=-29.6:linear=true
+```
+
+This is a Matroska/WebM tag convention; other containers may store it differently. It has no effect together with `--metadata-disable`.
+
 ## Input/Output Format
 
 ### `-ei EXTRA_INPUT_OPTIONS, --extra-input-options EXTRA_INPUT_OPTIONS`
