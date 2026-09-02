@@ -1,3 +1,21 @@
+## [1.42.0] - 2026-09-02
+
+### 🚀 Features
+
+- Add --write-encoder-settings to tag streams with encoder settings
+
+### 🐛 Bug Fixes
+
+- *(ci)* Type binary subprocess output
+
+### 📚 Documentation
+
+- Add @ppetr as a contributor
+
+### ⚙️ Miscellaneous Tasks
+
+- Post code review findings as inline comments
+- Bump version to 1.42.0
 ## [1.41.1] - 2026-07-10
 
 ### 🐛 Bug Fixes
