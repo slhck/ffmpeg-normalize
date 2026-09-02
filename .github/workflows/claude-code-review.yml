@@ -69,7 +69,8 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
+          # --comment makes Claude post its findings as inline review comments
+          prompt: '/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
-          claude_args: '--allowed-tools "Bash(uv run pytest:*),Bash(uv run ruff:*),Bash(uv run ty check:*),Bash(python -m ffmpeg_normalize:*),Bash(gh pr:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+          claude_args: '--allowed-tools "mcp__github_inline_comment__create_inline_comment,Bash(uv run pytest:*),Bash(uv run ruff:*),Bash(uv run ty check:*),Bash(python -m ffmpeg_normalize:*),Bash(gh pr:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
