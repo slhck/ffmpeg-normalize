@@ -82,7 +82,7 @@ class FFmpegNormalize:
         subtitle_disable (bool, optional): Disable subtitles. Defaults to False.
         metadata_disable (bool, optional): Disable metadata. Defaults to False.
         chapters_disable (bool, optional): Disable chapters. Defaults to False.
-        write_encoder_settings (bool, optional): Write the effective encoder settings (codec, bitrate, sample rate, channels and the normalization filter including the measured loudnorm values) as an ENCODER_SETTINGS tag on each normalized audio stream. Defaults to False.
+        write_encoder_settings (bool, optional): Write the effective encoder settings (codec, bitrate, sample rate, channels, the normalization filter including the measured loudnorm values, and any extra_output_options) as an ENCODER_SETTINGS tag on each normalized audio stream. Defaults to False.
         extra_input_options (list, optional): Extra input options. Defaults to None.
         extra_output_options (list, optional): Extra output options. Defaults to None.
         output_format (str, optional): Output format. Defaults to None.

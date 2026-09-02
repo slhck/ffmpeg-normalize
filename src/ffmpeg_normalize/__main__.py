@@ -571,8 +571,11 @@ def create_parser() -> argparse.ArgumentParser:
         normalized audio stream.
 
         The tag holds an ffmpeg-command-equivalent string with the audio codec,
-        the bitrate, sample rate and channel count (when set), plus the
-        normalization filter including the measured loudnorm values.
+        the bitrate, sample rate and channel count (when set), the normalization
+        filter including the measured loudnorm values, and any
+        `-e`/`--extra-output-options` appended verbatim (these are not
+        audio-scoped, so an unrelated option passed there also ends up in the
+        tag). Extra input options are demuxer settings and are not included.
 
         This is a Matroska/WebM tag convention; other containers may store it
         differently. Has no effect together with `--metadata-disable`.
