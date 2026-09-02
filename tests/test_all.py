@@ -1031,6 +1031,26 @@ class TestFFmpegNormalize:
         assert settings.startswith("-c:a ")
         assert "-af volume=" in settings
 
+    def test_write_encoder_settings_extra_output_options(self):
+        ffmpeg_normalize_call(
+            [
+                "tests/test.mp3",
+                "-o",
+                "normalized/test.mkv",
+                "-c:a",
+                "aac",
+                "-e",
+                '[ "-cutoff", "15000" ]',
+                "--write-encoder-settings",
+            ]
+        )
+        assert os.path.isfile("normalized/test.mkv")
+        tags = _get_stream_info("normalized/test.mkv")[0]["tags"]
+        settings = tags.get("ENCODER_SETTINGS") or tags.get("encoder_settings")
+        assert settings is not None
+        # extra output options are appended verbatim after the filter chain
+        assert settings.endswith("-cutoff 15000")
+
     def test_write_encoder_settings_metadata_disable(self):
         _, stderr = ffmpeg_normalize_call(
             [

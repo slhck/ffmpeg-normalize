@@ -874,13 +874,18 @@ class MediaFile:
         Return an ffmpeg-command-equivalent description of how a single audio
         stream is encoded in the second pass: the codec, then the bitrate,
         sample rate and channel count when set, followed by the effective
-        filter chain (which includes the loudnorm measured values).
+        filter chain (which includes the loudnorm measured values) and finally
+        any ``--extra-output-options``.
 
         Written as the ``ENCODER_SETTINGS`` stream tag when
         ``write_encoder_settings`` is enabled. The filter chain comes from the
         cache populated by :meth:`_get_audio_filter_cmd`, which must run first.
         The loudnorm ``print_format`` option is dropped, as it only controls
-        first-pass diagnostics and not the normalization itself.
+        first-pass diagnostics and not the normalization itself. Extra output
+        options are appended verbatim: they commonly carry encoder tuning
+        (``-q:a``, ``-compression_level``, ``-application`` ...), but are not
+        audio-scoped, so an unrelated option passed there will also appear here.
+        Extra *input* options are demuxer settings and are deliberately omitted.
 
         Returns:
             str: e.g. ``-c:a libopus -b:a 128000 -af loudnorm=i=-23.0:...``
@@ -897,6 +902,8 @@ class MediaFile:
         if filter_chain:
             af = re.sub(r":print_format=\w+", "", ",".join(filter_chain))
             args += ["-af", af]
+        if self.ffmpeg_normalize.extra_output_options:
+            args += self.ffmpeg_normalize.extra_output_options
         return shlex.join(args)
 
     def _get_audio_codec(self) -> str | None:
