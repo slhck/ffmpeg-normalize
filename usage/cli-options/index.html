@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1318,6 +1318,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-write-encoder-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --write-encoder-settings
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2332,6 +2343,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#-write-encoder-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --write-encoder-settings
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2622,6 +2644,12 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <p>Do not write metadata to output</p>
 <h3 id="-cn-chapters-disable"><code>-cn, --chapters-disable</code></h3>
 <p>Do not write chapters to output</p>
+<h3 id="-write-encoder-settings"><code>--write-encoder-settings</code></h3>
+<p>Write the effective encoder settings as an <code>ENCODER_SETTINGS</code> tag on each normalized audio stream.</p>
+<p>The tag holds an ffmpeg-command-equivalent string with the audio codec, the bitrate, sample rate and channel count (when set), plus the normalization filter including the measured loudnorm values, for example:</p>
+<div class="highlight"><pre><span></span><code>-c:a libopus -b:a 128000 -af loudnorm=i=-23.0:lra=7.0:tp=-2.0:offset=-0.1:measured_i=-19.4:measured_lra=6.1:measured_tp=-3.2:measured_thresh=-29.6:linear=true
+</code></pre></div>
+<p>This is a Matroska/WebM tag convention; other containers may store it differently. It has no effect together with <code>--metadata-disable</code>.</p>
 <h2 id="inputoutput-format">Input/Output Format</h2>
 <h3 id="-ei-extra_input_options-extra-input-options-extra_input_options"><code>-ei EXTRA_INPUT_OPTIONS, --extra-input-options EXTRA_INPUT_OPTIONS</code></h3>
 <p>Extra input options list.</p>
@@ -2743,7 +2771,7 @@ the system default or you can provide a file name available on $PATH</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

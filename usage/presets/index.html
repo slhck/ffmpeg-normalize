@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1363,13 +1363,13 @@
 <p>You can create your own presets by creating a JSON file in your presets directory.
 A preset file is a simple JSON object with option names as keys and their values:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;normalization-type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ebu&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;target-level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-23.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;loudness-range-target&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;true-peak&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-2.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;audio-codec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aac&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;audio-bitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;192k&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="nt">"normalization-type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ebu"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"target-level"</span><span class="p">:</span><span class="w"> </span><span class="mf">-23.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"loudness-range-target"</span><span class="p">:</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"true-peak"</span><span class="p">:</span><span class="w"> </span><span class="mf">-2.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"audio-codec"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aac"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"audio-bitrate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"192k"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"progress"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Use the long form of option names (with hyphens) in presets. Examples:</p>
@@ -1385,23 +1385,23 @@ A preset file is a simple JSON object with option names as keys and their values
 </ul>
 <p>Boolean options should be <code>true</code> in the JSON:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;batch&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="nt">"progress"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"batch"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Note: It's not required to include options that are <code>false</code> because they are the default.</p>
 <h3 id="example-custom-voice-preset">Example: Custom Voice Preset</h3>
 <p>Create a file <code>~/.config/ffmpeg-normalize/presets/voice.json</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;normalization-type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ebu&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;target-level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-18.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;loudness-range-target&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;true-peak&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-3.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;audio-codec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;libopus&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;audio-bitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;96k&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;audio-channels&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;verbose&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="nt">"normalization-type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ebu"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"target-level"</span><span class="p">:</span><span class="w"> </span><span class="mf">-18.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"loudness-range-target"</span><span class="p">:</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"true-peak"</span><span class="p">:</span><span class="w"> </span><span class="mf">-3.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"audio-codec"</span><span class="p">:</span><span class="w"> </span><span class="s2">"libopus"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"audio-bitrate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"96k"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"audio-channels"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"progress"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"verbose"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Then use it:</p>
@@ -1410,13 +1410,13 @@ A preset file is a simple JSON object with option names as keys and their values
 <h3 id="example-custom-streaming-audio-preset">Example: Custom Streaming Audio Preset</h3>
 <p>Create a file <code>~/.config/ffmpeg-normalize/presets/streaming-audio.json</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;normalization-type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ebu&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;target-level&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-14.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;loudness-range-target&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;true-peak&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">-2.0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;audio-codec&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;aac&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;audio-bitrate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;192k&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="nt">"normalization-type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ebu"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"target-level"</span><span class="p">:</span><span class="w"> </span><span class="mf">-14.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"loudness-range-target"</span><span class="p">:</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"true-peak"</span><span class="p">:</span><span class="w"> </span><span class="mf">-2.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"audio-codec"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aac"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"audio-bitrate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"192k"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"progress"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>This preset normalizes audio to the streaming video standard and encodes it as AAC at 192 kbps.</p>
@@ -1512,7 +1512,7 @@ A preset file is a simple JSON object with option names as keys and their values
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

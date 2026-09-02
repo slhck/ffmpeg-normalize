@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1112,6 +1112,7 @@
 <li><strong>Selective audio stream normalization</strong> — Normalize specific audio streams or only default streams</li>
 <li><strong>Skip files already at target</strong> — Avoid re-encoding files already within a threshold of the target level</li>
 <li><strong>Per-file outcome reporting</strong> — <code>status</code> field in <code>--print-stats</code> plus exit codes for scripting</li>
+<li><strong>Self-documenting output</strong> — Optionally record the effective encoder settings as an <code>ENCODER_SETTINGS</code> tag</li>
 <li><strong>Video file support</strong> — Process video files while preserving video streams</li>
 <li><strong>Docker support</strong> — Run via Docker container</li>
 <li><strong>Python API</strong> — Use programmatically in your Python projects</li>
@@ -1120,6 +1121,12 @@
 </ul>
 <h2 id="whats-new">🆕 What's New</h2>
 <ul>
+<li>
+<p>Version 1.42.0 can optionally write an <strong><code>ENCODER_SETTINGS</code></strong> tag on each normalized audio stream via <code>--write-encoder-settings</code>. The tag holds an ffmpeg-command-equivalent string — the audio codec, bitrate, sample rate and channels, plus the normalization filter including the measured loudnorm values — so a normalized file documents how it was produced. This is a Matroska/WebM convention and has no effect with <code>--metadata-disable</code>.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.wav<span class="w"> </span>-c:a<span class="w"> </span>libopus<span class="w"> </span>-b:a<span class="w"> </span>128k<span class="w"> </span>--write-encoder-settings<span class="w"> </span>-o<span class="w"> </span>output.mkv
+</code></pre></div>
+</li>
 <li>
 <p>Version 1.41.0 automatically picks the correct output audio codec for the output container, so you no longer need to specify <code>-c:a</code>/<code>--audio-codec</code> unless you want to override the default. PCM is chosen for containers that support it; others will use teh default that ffmpeg picks. See <a href="https://slhck.info/ffmpeg-normalize/usage/file-input-output/#how-the-output-audio-codec-is-chosen">the usage guide</a> for details.</p>
 </li>
@@ -1247,7 +1254,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

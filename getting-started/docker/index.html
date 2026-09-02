@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -986,16 +986,16 @@
 
 <h1 id="docker-usage">Docker Usage</h1>
 <p>You can use the pre-built image from Docker Hub:</p>
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">:/tmp&quot;</span><span class="w"> </span>-it<span class="w"> </span>slhck/ffmpeg-normalize
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span><span class="s2">"</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">:/tmp"</span><span class="w"> </span>-it<span class="w"> </span>slhck/ffmpeg-normalize
 </code></pre></div>
 <p>Alternatively, download this repository and run</p>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>ffmpeg-normalize<span class="w"> </span>.
 </code></pre></div>
 <p>Then run the container with:</p>
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">:/tmp&quot;</span><span class="w"> </span>-it<span class="w"> </span>ffmpeg-normalize
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w">  </span>-v<span class="w"> </span><span class="s2">"</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">:/tmp"</span><span class="w"> </span>-it<span class="w"> </span>ffmpeg-normalize
 </code></pre></div>
 <p>This will mount your current directory to the <code>/tmp</code> directory inside the container. Everything else works the same way as if you had installed the program locally. For example, to normalize a file:</p>
-<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w">  </span>-v<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">:/tmp&quot;</span><span class="w"> </span>-it<span class="w"> </span>ffmpeg-normalize<span class="w"> </span>/tmp/yourfile.mp4<span class="w"> </span>-o<span class="w"> </span>/tmp/yourfile-normalized.wav
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w">  </span>-v<span class="w"> </span><span class="s2">"</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">:/tmp"</span><span class="w"> </span>-it<span class="w"> </span>ffmpeg-normalize<span class="w"> </span>/tmp/yourfile.mp4<span class="w"> </span>-o<span class="w"> </span>/tmp/yourfile-normalized.wav
 </code></pre></div>
 <p>You will then find the normalized file in your current directory.</p>
 
@@ -1090,7 +1090,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
