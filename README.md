@@ -5,7 +5,7 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/slhck/ffmpeg-normalize/python-package.yml)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-24-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A utility for batch-normalizing audio using ffmpeg.
@@ -147,6 +147,7 @@ The only reason this project exists in its current form is because [@benjaoming]
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://davidbern.com/"><img src="https://avatars.githubusercontent.com/u/371066?v=4?s=100" width="100px;" alt="David Bern"/><br /><sub><b>David Bern</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=odie5533" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/randompersona1"><img src="https://avatars.githubusercontent.com/u/74961116?v=4?s=100" width="100px;" alt="randompersona1"/><br /><sub><b>randompersona1</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=randompersona1" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ppetr"><img src="https://avatars.githubusercontent.com/u/163061?v=4?s=100" width="100px;" alt="Petr"/><br /><sub><b>Petr</b></sub></a><br /><a href="https://github.com/slhck/ffmpeg-normalize/commits?author=ppetr" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>

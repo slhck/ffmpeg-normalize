@@ -216,6 +216,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ppetr",
+      "name": "Petr",
+      "avatar_url": "https://avatars.githubusercontent.com/u/163061?v=4",
+      "profile": "https://github.com/ppetr",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
