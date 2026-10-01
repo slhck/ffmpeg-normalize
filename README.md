@@ -1,4 +1,8 @@
-# ffmpeg-normalize
+<h1 align="center">ffmpeg-normalize</h1>
+
+<p align="center">
+  <img src="icon.png" alt="ffmpeg-normalize logo" width="160" height="160">
+</p>
 
 [![PyPI version](https://img.shields.io/pypi/v/ffmpeg-normalize.svg)](https://pypi.org/project/ffmpeg-normalize)
 [![Docker Image Version](https://img.shields.io/docker/v/slhck/ffmpeg-normalize?sort=semver&label=Docker%20image)](https://hub.docker.com/r/slhck/ffmpeg-normalize)
