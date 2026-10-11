@@ -1,3 +1,18 @@
+## [1.42.1] - 2026-10-11
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update dependencies with known vulnerabilities
+
+### 📚 Documentation
+
+- *(readme)* Add centered project icon
+- Use ty for type checking in contributing guide
+
+### ⚙️ Miscellaneous Tasks
+
+- Require Python 3.10 and support Python 3.15
+- Bump version to 1.42.1
 ## [1.42.0] - 2026-09-02
 
 ### 🚀 Features
