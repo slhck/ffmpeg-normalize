@@ -1512,7 +1512,7 @@ uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span
 uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>.
 
 <span class="c1"># Type checking</span>
-uv<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>src/ffmpeg_normalize
+uv<span class="w"> </span>run<span class="w"> </span>ty<span class="w"> </span>check
 </code></pre></div>
 </li>
 </ol>
@@ -1578,7 +1578,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <li>Follow PEP 8 guidelines</li>
 <li>Use type hints where applicable</li>
 <li>Run <code>ruff format</code> before committing</li>
-<li>Ensure <code>mypy</code> passes without errors</li>
+<li>Ensure <code>ty check</code> passes without errors</li>
 </ul>
 <h2 id="development-commands-reference">Development Commands Reference</h2>
 <h3 id="testing_1">Testing</h3>
@@ -1589,7 +1589,7 @@ uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </sp
 <h3 id="code-quality">Code Quality</h3>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>.<span class="w">                </span><span class="c1"># Linting</span>
 uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>.<span class="w">               </span><span class="c1"># Auto-format code</span>
-uv<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>src/ffmpeg_normalize<span class="w">   </span><span class="c1"># Type checking</span>
+uv<span class="w"> </span>run<span class="w"> </span>ty<span class="w"> </span>check<span class="w">                    </span><span class="c1"># Type checking</span>
 </code></pre></div>
 <h3 id="documentation">Documentation</h3>
 <div class="highlight"><pre><span></span><code>pdoc<span class="w"> </span>-d<span class="w"> </span>google<span class="w"> </span>-o<span class="w"> </span>docs-api<span class="w"> </span>./ffmpeg_normalize<span class="w">          </span><span class="c1"># Generate API docs</span>
