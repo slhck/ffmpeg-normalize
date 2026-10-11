@@ -69,7 +69,7 @@ Thank you for your interest in contributing to ffmpeg-normalize! This guide will
     uv run ruff format .
 
     # Type checking
-    uv run mypy src/ffmpeg_normalize
+    uv run ty check
     ```
 
 ### Commit Guidelines
@@ -140,7 +140,7 @@ git commit -m "docs: update contributing guide"
 - Follow PEP 8 guidelines
 - Use type hints where applicable
 - Run `ruff format` before committing
-- Ensure `mypy` passes without errors
+- Ensure `ty check` passes without errors
 
 ## Development Commands Reference
 
@@ -155,7 +155,7 @@ uv run python -m ffmpeg_normalize [args]  # Test the tool directly
 ```bash
 uv run ruff check .                # Linting
 uv run ruff format .               # Auto-format code
-uv run mypy src/ffmpeg_normalize   # Type checking
+uv run ty check                    # Type checking
 ```
 
 ### Documentation
