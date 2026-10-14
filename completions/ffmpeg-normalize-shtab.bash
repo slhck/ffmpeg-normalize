@@ -2,7 +2,7 @@
 
 
 
-_shtab_ffmpeg_normalize_option_strings=('-h' '--help' '--input-list' '-o' '--output' '-of' '--output-folder' '--keep-mtime' '-f' '--force' '-d' '--debug' '-v' '--verbose' '-q' '--quiet' '-n' '--dry-run' '-pr' '--progress' '--version' '--preset' '--list-presets' '-nt' '--normalization-type' '-t' '--target-level' '-p' '--print-stats' '--replaygain' '--batch' '--threshold' '-lrt' '--loudness-range-target' '--keep-loudness-range-target' '--keep-lra-above-loudness-range-target' '-tp' '--true-peak' '--offset' '--lower-only' '--auto-lower-loudness-target' '--dual-mono' '--dynamic' '-as' '--audio-streams' '--audio-default-only' '--keep-other-audio' '-c:a' '--audio-codec' '-b:a' '--audio-bitrate' '-ar' '--sample-rate' '-ac' '--audio-channels' '-koa' '--keep-original-audio' '--keep-bit-depth' '--no-keep-bit-depth' '-prf' '--pre-filter' '-pof' '--post-filter' '-vn' '--video-disable' '-c:v' '--video-codec' '-sn' '--subtitle-disable' '-mn' '--metadata-disable' '-cn' '--chapters-disable' '--write-encoder-settings' '-ei' '--extra-input-options' '-e' '--extra-output-options' '-ofmt' '--output-format' '-ext' '--extension')
+_shtab_ffmpeg_normalize_option_strings=('-h' '--help' '--input-list' '-o' '--output' '-of' '--output-folder' '--keep-mtime' '-f' '--force' '-d' '--debug' '-v' '--verbose' '-q' '--quiet' '-n' '--dry-run' '-pr' '--progress' '--version' '--preset' '--list-presets' '-nt' '--normalization-type' '-t' '--target-level' '-p' '--print-stats' '--print-summary' '--replaygain' '--batch' '--threshold' '-lrt' '--loudness-range-target' '--keep-loudness-range-target' '--keep-lra-above-loudness-range-target' '-tp' '--true-peak' '--offset' '--lower-only' '--auto-lower-loudness-target' '--dual-mono' '--dynamic' '-as' '--audio-streams' '--audio-default-only' '--keep-other-audio' '-c:a' '--audio-codec' '-b:a' '--audio-bitrate' '-ar' '--sample-rate' '-ac' '--audio-channels' '-koa' '--keep-original-audio' '--keep-bit-depth' '--no-keep-bit-depth' '-prf' '--pre-filter' '-pof' '--post-filter' '-vn' '--video-disable' '-c:v' '--video-codec' '-sn' '--subtitle-disable' '-mn' '--metadata-disable' '-cn' '--chapters-disable' '--write-encoder-settings' '-ei' '--extra-input-options' '-e' '--extra-output-options' '-ofmt' '--output-format' '-ext' '--extension')
 
 
 
@@ -31,6 +31,7 @@ _shtab_ffmpeg_normalize___version_nargs=0
 _shtab_ffmpeg_normalize___list_presets_nargs=0
 _shtab_ffmpeg_normalize__p_nargs=0
 _shtab_ffmpeg_normalize___print_stats_nargs=0
+_shtab_ffmpeg_normalize___print_summary_nargs=0
 _shtab_ffmpeg_normalize___replaygain_nargs=0
 _shtab_ffmpeg_normalize___batch_nargs=0
 _shtab_ffmpeg_normalize___keep_loudness_range_target_nargs=0

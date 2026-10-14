@@ -27,6 +27,7 @@ from ._streams import (
     AudioStream,
     LoudnessStatisticsWithMetadata,
     SubtitleStream,
+    SummaryRow,
     VideoStream,
 )
 
@@ -811,6 +812,7 @@ class MediaFile:
                 f"Stream {audio_stream.stream_id} had measured input loudness lower than target, skipping normalization."
             )
             normalization_filter = "acopy"
+            audio_stream.applied_gain = 0.0
         else:
             if self.ffmpeg_normalize.normalization_type == "ebu":
                 normalization_filter = audio_stream.get_second_pass_opts_ebu(
@@ -1223,3 +1225,23 @@ class MediaFile:
         return (
             audio_stream.get_stats() for audio_stream in self.streams["audio"].values()
         )
+
+    def get_summary(self) -> list[SummaryRow]:
+        """
+        Return the before/after summary for each analyzed audio stream.
+
+        Streams without any measurement (e.g. streams not selected for
+        normalization) are left out, unless the file failed to process.
+
+        Returns:
+            list[SummaryRow]: One summary entry per audio stream
+        """
+        rows = [
+            audio_stream.get_summary()
+            for audio_stream in self.streams["audio"].values()
+        ]
+        return [
+            row
+            for row in rows
+            if row["status"] == "error" or row["input_level"] is not None
+        ]

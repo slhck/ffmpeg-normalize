@@ -25,6 +25,7 @@ _ffmpeg_normalize() {
     '(-nt --normalization-type)'{-nt,--normalization-type}'[Normalization type]:type:(ebu rms peak)'
     '(-t --target-level)'{-t,--target-level}'[Target level in dB/LUFS]:level:'
     '(-p --print-stats)'{-p,--print-stats}'[Print loudness statistics as JSON]'
+    '--print-summary[Print a before/after summary table to stderr]'
     '--replaygain[Write ReplayGain tags]'
 
     # EBU Options

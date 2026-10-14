@@ -24,3 +24,22 @@ with ffmpeg_env(custom_env):
 ```
 
 The context manager is thread-safe (uses `contextvars`), so concurrent normalizations in different threads can use different environments.
+
+## Before/After Summary
+
+After `run_normalization()`, `get_summary()` returns one entry per audio stream with the input level, output level, output peak and applied gain in dB, along with the file names, stream index and status. `format_summary()` returns the same data as the table printed by `--print-summary`.
+
+```python
+from ffmpeg_normalize import FFmpegNormalize
+
+normalizer = FFmpegNormalize(normalization_type="rms", target_level=-20)
+normalizer.add_media_file("input.wav", "output.wav")
+normalizer.run_normalization()
+
+for row in normalizer.get_summary():
+    print(row["input_file"], row["input_level"], row["output_level"], row["gain"])
+
+print(normalizer.format_summary())
+```
+
+Values that are not available (for example, EBU output values in a dry run) are `None`. Pass `print_summary=True` to print the table to stderr at the end of `run_normalization()`.

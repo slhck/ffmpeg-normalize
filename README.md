@@ -23,6 +23,7 @@ This program normalizes media files to a certain loudness level using the EBU R1
 - Peak normalization — Adjust audio to a specific peak level
 - Selective audio stream normalization — Normalize specific audio streams or only default streams
 - Skip files already at target — Avoid re-encoding files already within a threshold of the target level
+- Before/after summary — Print a table of input and output levels and the applied gain for all files with `--print-summary`
 - Self-documenting output — Optionally record the effective encoder settings as an `ENCODER_SETTINGS` tag
 - Video file support — Process video files while preserving video streams
 - Docker support — Run via Docker container

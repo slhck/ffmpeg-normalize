@@ -205,6 +205,23 @@ def create_parser() -> argparse.ArgumentParser:
         help="Print loudness statistics for both passes formatted as JSON to stdout.",
     )
     group_normalization.add_argument(
+        "--print-summary",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
+        Print a before/after summary table to stderr after processing.
+
+        For each file and audio stream, the table lists the input level, the
+        output level, the output peak, the applied gain, and the status. The
+        level is the integrated loudness for EBU, the RMS level for RMS, and the
+        peak level for peak normalization. Values that are not available are
+        shown as `-`.
+
+        Can be combined with `--print-stats`, which writes JSON to stdout.
+        """
+        ),
+    )
+    group_normalization.add_argument(
         "--replaygain",
         action="store_true",
         help=textwrap.dedent(
@@ -739,6 +756,7 @@ def main() -> None:
         normalization_type=cli_args.normalization_type,
         target_level=cli_args.target_level,
         print_stats=cli_args.print_stats,
+        print_summary=cli_args.print_summary,
         threshold=cli_args.threshold,
         loudness_range_target=cli_args.loudness_range_target,
         keep_loudness_range_target=cli_args.keep_loudness_range_target,

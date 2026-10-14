@@ -114,6 +114,38 @@ Print loudness statistics for both passes formatted as JSON to stdout.
 
 Each entry also includes a `status` field with the per-file result: `normalized`, `skipped` (already within the `--threshold` of the target, see below), or `error`. When the status is `error`, an additional `error` field has the error message.
 
+### `--print-summary`
+
+Print a before/after summary table to stderr after processing.
+
+For each file and audio stream, the table lists the input level, the output level, the output peak, the applied gain, and the status (`normalized`, `skipped`, or `error`). The header line shows the normalization type and the target. Values that are not available are shown as `-`.
+
+The values depend on the normalization type:
+
+- EBU: integrated loudness in LUFS and true peak in dBTP. The input level comes from the first pass; the output level, output true peak and gain come from the second pass. In dynamic mode, there is no first pass, so the input level comes from the second pass, and the gain is the difference between the integrated output and input loudness.
+- RMS: RMS level and sample peak in dBFS. The output values are computed from the measured input and the applied gain.
+- Peak: peak level in dBFS. The output values are computed from the measured input and the applied gain.
+
+The output values do not include the effect of a `--post-filter`. In a dry run, output values for EBU are not available, since the second pass does not run. Streams that are not selected for normalization (see `--audio-streams` and `--audio-default-only`) are not listed.
+
+The summary goes to stderr, so it can be combined with `--print-stats`, which writes JSON to stdout.
+
+Example:
+
+```bash
+ffmpeg-normalize *.m4a --print-summary
+```
+
+```
+Summary (EBU R128 normalization, target: -23.0 LUFS, true peak: -2.0 dBTP):
+
+File        Stream  Input (LUFS)  Output (LUFS)  True peak (dBTP)  Gain (dB)  Status
+----------  ------  ------------  -------------  ----------------  ---------  ----------
+loud.m4a         0         -14.1          -23.0             -16.7       -8.9  normalized
+quiet.m4a        0         -28.1          -23.0             -17.4       +5.2  normalized
+normal.m4a       0         -21.1          -23.0             -18.4       -1.9  normalized
+```
+
 ### `--replaygain`
 
 Write [ReplayGain](https://en.wikipedia.org/wiki/ReplayGain) tags to the original file without normalizing.

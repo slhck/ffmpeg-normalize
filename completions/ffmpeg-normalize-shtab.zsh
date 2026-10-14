@@ -67,6 +67,16 @@ in LUFS. The range is -70.0 - -5.0.
 Otherwise, the range is -99 to 0.
 ]:target_level:"
   {-p,--print-stats}"[Print loudness statistics for both passes formatted as JSON to stdout.]"
+  "--print-summary[Print a before\/after summary table to stderr after processing.
+
+For each file and audio stream, the table lists the input level, the
+output level, the output peak, the applied gain, and the status. The
+level is the integrated loudness for EBU, the RMS level for RMS, and the
+peak level for peak normalization. Values that are not available are
+shown as \`-\`.
+
+Can be combined with \`--print-stats\`, which writes JSON to stdout.
+]"
   "--replaygain[Write ReplayGain tags to the original file without normalizing.
 This mode will overwrite the input file and ignore other options. It will strip all ReplayGain tags.
 Only works with EBU normalization, and only with .mp3, .mp4\/.m4a, .ogg, .opus for now.
@@ -159,7 +169,10 @@ By default, only selected streams are included in the output.
   {-c:a,--audio-codec}"[Audio codec to use for output files.
 See \`ffmpeg -encoders\` for a list.
 
-Will use PCM audio with input stream bit depth by default.
+Will use PCM audio with input stream bit depth by default. For output
+containers that cannot store PCM (e.g. MP3, FLAC, Opus), the codec that
+ffmpeg uses by default for that container is chosen automatically, so
+you usually do not need to set this.
 ]:audio_codec:"
   {-b:a,--audio-bitrate}"[Audio bitrate in bits\/s, or with K suffix.
 

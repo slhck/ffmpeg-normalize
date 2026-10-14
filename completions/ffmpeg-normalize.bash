@@ -21,6 +21,7 @@ _ffmpeg_normalize()
           -nt --normalization-type \
           -t --target-level \
           -p --print-stats \
+          --print-summary \
           --replaygain \
           -lrt --loudness-range-target \
           --keep-loudness-range-target \

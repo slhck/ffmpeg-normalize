@@ -59,6 +59,17 @@ class LoudnessStatistics(TypedDict):
     max: float | None
 
 
+class SummaryRow(TypedDict):
+    input_file: str
+    output_file: str
+    stream_id: int
+    status: str
+    input_level: float | None
+    output_level: float | None
+    output_peak: float | None
+    gain: float | None
+
+
 class _OptionalStatisticsMetadata(TypedDict, total=False):
     error: str
 
@@ -150,6 +161,11 @@ class AudioStream(MediaStream):
             "max": None,
         }
 
+        # Gain in dB applied by the second pass volume filter (peak/RMS), or 0
+        # when normalization is skipped for this stream (e.g. with lower_only).
+        # Stays None for EBU, where the gain is derived from the second pass stats.
+        self.applied_gain: float | None = None
+
         self.sample_rate = sample_rate
         self.bit_depth = bit_depth
 
@@ -207,6 +223,78 @@ class AudioStream(MediaStream):
         if self.media_file.error is not None:
             stats["error"] = self.media_file.error
         return stats
+
+    def get_summary(self) -> SummaryRow:
+        """
+        Return the before/after levels and the applied gain for the stream.
+
+        For EBU, the input level and true peak come from the first pass (or the
+        second pass in dynamic mode), and the output level, output true peak and
+        gain come from the second pass. For RMS and peak, the input level is the
+        measured RMS or peak level, and the output values are computed from the
+        applied gain. Values that are not available are None.
+
+        Returns:
+            dict: A dictionary with the summary values.
+        """
+        normalization_type = self.ffmpeg_normalize.normalization_type
+        status = self.media_file.status
+
+        input_level: float | None = None
+        input_peak: float | None = None
+        output_level: float | None = None
+        output_peak: float | None = None
+        gain: float | None = None
+
+        if normalization_type == "ebu":
+            pass1 = self.loudness_statistics["ebu_pass1"]
+            pass2 = self.loudness_statistics["ebu_pass2"]
+            input_stats = pass1 if pass1 is not None else pass2
+            if input_stats is not None:
+                input_level = float(input_stats["input_i"])
+                input_peak = float(input_stats["input_tp"])
+            if pass2 is not None:
+                output_level = float(pass2["output_i"])
+                output_peak = float(pass2["output_tp"])
+                # Input and output of the same pass, as the first pass input
+                # measurement can differ slightly from the second pass one
+                gain = output_level - float(pass2["input_i"])
+        else:
+            measured = (
+                self.loudness_statistics["mean"]
+                if normalization_type == "rms"
+                else self.loudness_statistics["max"]
+            )
+            if measured is not None:
+                input_level = float(measured)
+            if self.loudness_statistics["max"] is not None:
+                input_peak = float(self.loudness_statistics["max"])
+
+        applied_gain = 0.0 if status == "skipped" else self.applied_gain
+        if (
+            status != "error"
+            and output_level is None
+            and applied_gain is not None
+            and input_level is not None
+        ):
+            gain = applied_gain
+            output_level = input_level + applied_gain
+            if input_peak is not None:
+                output_peak = input_peak + applied_gain
+
+        if status == "error":
+            output_level = output_peak = gain = None
+
+        return {
+            "input_file": self.media_file.input_file,
+            "output_file": self.media_file.output_file,
+            "stream_id": self.stream_id,
+            "status": status,
+            "input_level": input_level,
+            "output_level": output_level,
+            "output_peak": output_peak,
+            "gain": gain,
+        }
 
     def set_second_pass_stats(self, stats: EbuLoudnessStatistics) -> None:
         """
@@ -814,6 +902,8 @@ class AudioStream(MediaStream):
         _logger.info(
             f"Adjusting stream {self.stream_id} by {adjustment} dB to reach {target_level}"
         )
+
+        self.applied_gain = float(adjustment)
 
         clip_amount = self.loudness_statistics["max"] + adjustment
         if clip_amount > 0:

@@ -1050,6 +1050,239 @@ class TestFFmpegNormalize:
         assert "encoder_settings" not in tags
 
 
+def _summary_table(stderr: str) -> List[List[str]]:
+    """
+    Return the data rows of the --print-summary table as lists of cells.
+    """
+    lines = stderr.splitlines()
+    start = next(i for i, line in enumerate(lines) if line.startswith("Summary ("))
+    # Skip the title, empty line, headings and separator line, and stop at the
+    # first line that is not a table row (e.g. error messages)
+    rows = []
+    for line in lines[start + 4 :]:
+        if not line.startswith("tests/"):
+            break
+        rows.append(line.split())
+    return rows
+
+
+class TestPrintSummary:
+    """Tests for the --print-summary table and the summary API."""
+
+    def test_ebu_multiple_files(self, tmp_path):
+        stdout, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test_loud.m4a",
+                "tests/test_quiet.m4a",
+                "-of",
+                str(tmp_path),
+                "--print-summary",
+                "--print-stats",
+            ]
+        )
+        assert (
+            "Summary (EBU R128 normalization, target: -23.0 LUFS, "
+            "true peak: -2.0 dBTP)" in stderr
+        )
+        assert "Input (LUFS)" in stderr
+        assert "True peak (dBTP)" in stderr
+
+        # JSON on stdout is not affected by the summary
+        stats = json.loads(stdout)
+        assert len(stats) == 2
+
+        rows = _summary_table(stderr)
+        assert [row[0] for row in rows] == [
+            "tests/test_loud.m4a",
+            "tests/test_quiet.m4a",
+        ]
+        for row, stream_stats in zip(rows, stats):
+            _, stream_id, input_i, output_i, output_tp, gain, status = row
+            assert int(stream_id) == stream_stats["stream_id"]
+            assert float(input_i) == pytest.approx(
+                stream_stats["ebu_pass1"]["input_i"], abs=0.05
+            )
+            assert float(output_i) == pytest.approx(
+                stream_stats["ebu_pass2"]["output_i"], abs=0.05
+            )
+            assert float(output_tp) == pytest.approx(
+                stream_stats["ebu_pass2"]["output_tp"], abs=0.05
+            )
+            assert float(gain) == pytest.approx(
+                stream_stats["ebu_pass2"]["output_i"]
+                - stream_stats["ebu_pass2"]["input_i"],
+                abs=0.05,
+            )
+            assert status == "normalized"
+
+    def test_summary_not_printed_by_default(self, tmp_path):
+        _, stderr = ffmpeg_normalize_call(["tests/test_loud.m4a", "-of", str(tmp_path)])
+        assert "Summary (" not in stderr
+
+    @pytest.mark.parametrize("normalization_type", ["rms", "peak"])
+    def test_peak_rms_reach_target(self, tmp_path, normalization_type):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test_loud.m4a",
+                "tests/test_quiet.m4a",
+                "-of",
+                str(tmp_path),
+                "-nt",
+                normalization_type,
+                "-t",
+                "-20",
+                "--print-summary",
+            ]
+        )
+        rows = _summary_table(stderr)
+        assert len(rows) == 2
+        for row in rows:
+            input_level, output_level = float(row[2]), float(row[3])
+            gain = float(row[-2])
+            assert output_level == pytest.approx(-20.0, abs=0.05)
+            assert input_level + gain == pytest.approx(output_level, abs=0.15)
+            assert row[-1] == "normalized"
+        if normalization_type == "peak":
+            # Peak normalization has no separate peak column
+            assert "Peak (dBFS)" not in stderr
+            assert all(len(row) == 6 for row in rows)
+        else:
+            assert "Peak (dBFS)" in stderr
+            assert all(len(row) == 7 for row in rows)
+
+    def test_batch_mode_uses_same_gain(self, tmp_path):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test_loud.m4a",
+                "tests/test_quiet.m4a",
+                "tests/test_normal.m4a",
+                "-of",
+                str(tmp_path),
+                "-nt",
+                "rms",
+                "--batch",
+                "--print-summary",
+            ]
+        )
+        assert "batch mode" in stderr
+        gains = {row[-2] for row in _summary_table(stderr)}
+        assert len(gains) == 1
+
+    def test_lower_only_shows_zero_gain(self, tmp_path):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test_quiet.m4a",
+                "-of",
+                str(tmp_path),
+                "-nt",
+                "peak",
+                "-t",
+                "0",
+                "--lower-only",
+                "--print-summary",
+            ]
+        )
+        (row,) = _summary_table(stderr)
+        assert row[2] == row[3]
+        assert row[-2] == "+0.0"
+
+    def test_dynamic_mode(self, tmp_path):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test_loud.m4a",
+                "-of",
+                str(tmp_path),
+                "--dynamic",
+                "--print-summary",
+            ]
+        )
+        assert "dynamic mode" in stderr
+        (row,) = _summary_table(stderr)
+        # Input level comes from the second pass, as there is no first pass
+        assert row[2] != "-"
+        assert float(row[3]) == pytest.approx(-23.0, abs=0.5)
+
+    def test_dry_run_shows_missing_output_values(self, tmp_path):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test_loud.m4a",
+                "-of",
+                str(tmp_path),
+                "-n",
+                "--print-summary",
+            ]
+        )
+        assert "dry run" in stderr
+        (row,) = _summary_table(stderr)
+        assert row[2] != "-"
+        assert row[3:6] == ["-", "-", "-"]
+
+    def test_skipped_file(self, tmp_path):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test.m4a",
+                "-o",
+                str(tmp_path / "out.m4a"),
+                "-c:a",
+                "aac",
+                "--threshold",
+                "0.5",
+                "--print-summary",
+            ]
+        )
+        rows = _summary_table(stderr)
+        assert len(rows) > 0
+        for row in rows:
+            assert row[2] == row[3]
+            assert row[-2] == "+0.0"
+            assert row[-1] == "skipped"
+
+    def test_error_file(self, tmp_path):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test_loud.m4a",
+                "-o",
+                str(tmp_path / "out.mkv"),
+                "-c:a",
+                "definitelynotacodec",
+                "--print-summary",
+            ]
+        )
+        (row,) = _summary_table(stderr)
+        assert row[2] != "-"
+        assert row[3:] == ["-", "-", "-", "error"]
+
+    def test_selected_streams_only(self, tmp_path):
+        _, stderr = ffmpeg_normalize_call(
+            [
+                "tests/test.mp4",
+                "-o",
+                str(tmp_path / "out.mkv"),
+                "--audio-streams",
+                "2",
+                "--print-summary",
+            ]
+        )
+        rows = _summary_table(stderr)
+        assert [row[1] for row in rows] == ["2"]
+
+    def test_api_get_summary(self, tmp_path):
+        from ffmpeg_normalize import FFmpegNormalize
+
+        normalizer = FFmpegNormalize(normalization_type="rms", target_level=-20)
+        normalizer.add_media_file("tests/test_quiet.m4a", str(tmp_path / "out.mkv"))
+        normalizer.run_normalization()
+
+        (row,) = normalizer.get_summary()
+        assert row["input_file"] == "tests/test_quiet.m4a"
+        assert row["status"] == "normalized"
+        assert row["input_level"] is not None
+        assert row["gain"] is not None
+        assert row["output_level"] == pytest.approx(-20.0, abs=0.01)
+        assert row["input_level"] + row["gain"] == pytest.approx(row["output_level"])
+        assert "RMS normalization, target: -20.0 dBFS" in normalizer.format_summary()
+
+
 class TestFileValidation:
     """Tests for pre-batch file validation."""
 

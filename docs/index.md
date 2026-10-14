@@ -25,6 +25,7 @@ Batch processing of several input files is possible, including video files.
 - **Selective audio stream normalization** — Normalize specific audio streams or only default streams
 - **Skip files already at target** — Avoid re-encoding files already within a threshold of the target level
 - **Per-file outcome reporting** — `status` field in `--print-stats` plus exit codes for scripting
+- **Before/after summary** — Print a table of input and output levels and the applied gain for all files with `--print-summary`
 - **Self-documenting output** — Optionally record the effective encoder settings as an `ENCODER_SETTINGS` tag
 - **Video file support** — Process video files while preserving video streams
 - **Docker support** — Run via Docker container

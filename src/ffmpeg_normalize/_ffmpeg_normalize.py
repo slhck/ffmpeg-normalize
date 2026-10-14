@@ -21,7 +21,7 @@ from ._errors import FFmpegNormalizeError
 from ._media_file import MediaFile
 
 if TYPE_CHECKING:
-    from ._streams import LoudnessStatisticsWithMetadata
+    from ._streams import LoudnessStatisticsWithMetadata, SummaryRow
 
 _logger = logging.getLogger(__name__)
 
@@ -60,6 +60,7 @@ class FFmpegNormalize:
         normalization_type (str, optional): Normalization type. Defaults to "ebu".
         target_level (float, optional): Target level. Defaults to -23.0.
         print_stats (bool, optional): Print loudnorm stats. Defaults to False.
+        print_summary (bool, optional): Print a before/after summary table to stderr after processing. Defaults to False.
         threshold (float, optional): When set to a positive value, skip normalization when the input is already within this many dB/LU of the target level, copying it through unchanged. Defaults to 0 (disabled, always normalize).
         loudness_range_target (float, optional): Loudness range target. Defaults to 7.0.
         keep_loudness_range_target (bool, optional): Keep loudness range target. Defaults to False.
@@ -108,6 +109,7 @@ class FFmpegNormalize:
         "normalization_type": "ebu",
         "target_level": -23.0,
         "print_stats": False,
+        "print_summary": False,
         "threshold": 0.0,
         "loudness_range_target": 7.0,
         "keep_loudness_range_target": False,
@@ -153,6 +155,7 @@ class FFmpegNormalize:
         normalization_type: Literal["ebu", "rms", "peak"] = "ebu",
         target_level: float = -23.0,
         print_stats: bool = False,
+        print_summary: bool = False,
         threshold: float = 0.0,
         loudness_range_target: float = 7.0,
         keep_loudness_range_target: bool = False,
@@ -212,6 +215,7 @@ class FFmpegNormalize:
             self.target_level = check_range(target_level, -99, 0, name="target_level")
 
         self.print_stats = print_stats
+        self.print_summary = print_summary
 
         self.threshold = check_range(threshold, 0, 99, name="threshold")
 
@@ -555,3 +559,97 @@ class FFmpegNormalize:
                 indent=4,
             )
             print()
+
+        if self.print_summary:
+            print(self.format_summary(), file=sys.stderr)
+
+    def get_summary(self) -> list[SummaryRow]:
+        """
+        Return the before/after summary for all audio streams of all files.
+
+        Each entry contains the input level, output level, output peak and the
+        applied gain in dB. The level is the integrated loudness for EBU, the
+        RMS level for RMS, and the peak level for peak normalization. The
+        output peak is the true peak for EBU and the sample peak otherwise.
+        Values that are not available are None.
+
+        Returns:
+            list[SummaryRow]: One summary entry per audio stream
+        """
+        return list(
+            chain.from_iterable(
+                media_file.get_summary() for media_file in self.media_files
+            )
+        )
+
+    def format_summary(self) -> str:
+        """
+        Return the before/after summary as a human-readable table.
+
+        Returns:
+            str: The formatted table, including a header line with the target
+        """
+        if self.normalization_type == "ebu":
+            header = (
+                f"EBU R128 normalization, target: {self.target_level:.1f} LUFS, "
+                f"true peak: {self.true_peak:.1f} dBTP"
+            )
+            if self.dynamic:
+                header += ", dynamic mode"
+            columns = ["Input (LUFS)", "Output (LUFS)", "True peak (dBTP)", "Gain (dB)"]
+        elif self.normalization_type == "rms":
+            header = f"RMS normalization, target: {self.target_level:.1f} dBFS"
+            columns = [
+                "Input RMS (dBFS)",
+                "Output RMS (dBFS)",
+                "Peak (dBFS)",
+                "Gain (dB)",
+            ]
+        else:
+            header = f"Peak normalization, target: {self.target_level:.1f} dBFS"
+            columns = ["Input peak (dBFS)", "Output peak (dBFS)", "Gain (dB)"]
+
+        if self.batch:
+            header += ", batch mode (relative loudness preserved)"
+        if self.dry_run:
+            header += ", dry run"
+
+        rows = self.get_summary()
+        if not rows:
+            return f"Summary ({header}): no files processed"
+
+        def fmt(value: float | None, signed: bool = False) -> str:
+            if value is None:
+                return "-"
+            return f"{value:+.1f}" if signed else f"{value:.1f}"
+
+        table: list[list[str]] = []
+        for row in rows:
+            values = [fmt(row["input_level"]), fmt(row["output_level"])]
+            if self.normalization_type != "peak":
+                values.append(fmt(row["output_peak"]))
+            values.append(fmt(row["gain"], signed=True))
+            table.append(
+                [row["input_file"], str(row["stream_id"]), *values, row["status"]]
+            )
+
+        headings = ["File", "Stream", *columns, "Status"]
+        widths = [
+            max(len(headings[i]), *(len(line[i]) for line in table))
+            for i in range(len(headings))
+        ]
+
+        def fmt_line(cells: list[str]) -> str:
+            # Left-align the file name and status, right-align everything else
+            parts = [
+                cell.ljust(widths[i])
+                if i in (0, len(cells) - 1)
+                else cell.rjust(widths[i])
+                for i, cell in enumerate(cells)
+            ]
+            return "  ".join(parts).rstrip()
+
+        lines = [f"Summary ({header}):", "", fmt_line(headings)]
+        lines.append(fmt_line(["-" * w for w in widths]))
+        lines.extend(fmt_line(line) for line in table)
+        return "\n".join(lines)
