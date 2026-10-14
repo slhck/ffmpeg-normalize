@@ -1,3 +1,13 @@
+## [1.43.0] - 2026-10-14
+
+### 🚀 Features
+
+- *(cli)* Add --print-summary before/after table
+
+### ⚙️ Miscellaneous Tasks
+
+- Update pre-commit config
+- Bump version to 1.43.0
 ## [1.42.1] - 2026-10-11
 
 ### 🐛 Bug Fixes
