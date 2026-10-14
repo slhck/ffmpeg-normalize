@@ -943,6 +943,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-print-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --print-summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-replaygain" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1968,6 +1979,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-print-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --print-summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-replaygain" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2540,6 +2562,28 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <h3 id="-p-print-stats"><code>-p, --print-stats</code></h3>
 <p>Print loudness statistics for both passes formatted as JSON to stdout.</p>
 <p>Each entry also includes a <code>status</code> field with the per-file result: <code>normalized</code>, <code>skipped</code> (already within the <code>--threshold</code> of the target, see below), or <code>error</code>. When the status is <code>error</code>, an additional <code>error</code> field has the error message.</p>
+<h3 id="-print-summary"><code>--print-summary</code></h3>
+<p>Print a before/after summary table to stderr after processing.</p>
+<p>For each file and audio stream, the table lists the input level, the output level, the output peak, the applied gain, and the status (<code>normalized</code>, <code>skipped</code>, or <code>error</code>). The header line shows the normalization type and the target. Values that are not available are shown as <code>-</code>.</p>
+<p>The values depend on the normalization type:</p>
+<ul>
+<li>EBU: integrated loudness in LUFS and true peak in dBTP. The input level comes from the first pass; the output level, output true peak and gain come from the second pass. In dynamic mode, there is no first pass, so the input level comes from the second pass, and the gain is the difference between the integrated output and input loudness.</li>
+<li>RMS: RMS level and sample peak in dBFS. The output values are computed from the measured input and the applied gain.</li>
+<li>Peak: peak level in dBFS. The output values are computed from the measured input and the applied gain.</li>
+</ul>
+<p>The output values do not include the effect of a <code>--post-filter</code>. In a dry run, output values for EBU are not available, since the second pass does not run. Streams that are not selected for normalization (see <code>--audio-streams</code> and <code>--audio-default-only</code>) are not listed.</p>
+<p>The summary goes to stderr, so it can be combined with <code>--print-stats</code>, which writes JSON to stdout.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>*.m4a<span class="w"> </span>--print-summary
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Summary (EBU R128 normalization, target: -23.0 LUFS, true peak: -2.0 dBTP):
+
+File        Stream  Input (LUFS)  Output (LUFS)  True peak (dBTP)  Gain (dB)  Status
+----------  ------  ------------  -------------  ----------------  ---------  ----------
+loud.m4a         0         -14.1          -23.0             -16.7       -8.9  normalized
+quiet.m4a        0         -28.1          -23.0             -17.4       +5.2  normalized
+normal.m4a       0         -21.1          -23.0             -18.4       -1.9  normalized
+</code></pre></div>
 <h3 id="-replaygain"><code>--replaygain</code></h3>
 <p>Write <a href="https://en.wikipedia.org/wiki/ReplayGain">ReplayGain</a> tags to the original file without normalizing.</p>
 <p>This mode will overwrite the input file and ignore other options. It will strip all ReplayGain tags.</p>

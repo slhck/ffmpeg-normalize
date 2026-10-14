@@ -807,6 +807,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#beforeafter-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before/After Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1031,6 +1042,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#beforeafter-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before/After Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1070,6 +1092,20 @@
     <span class="n">normalizer</span><span class="o">.</span><span class="n">run_normalization</span><span class="p">()</span>
 </code></pre></div>
 <p>The context manager is thread-safe (uses <code>contextvars</code>), so concurrent normalizations in different threads can use different environments.</p>
+<h2 id="beforeafter-summary">Before/After Summary</h2>
+<p>After <code>run_normalization()</code>, <code>get_summary()</code> returns one entry per audio stream with the input level, output level, output peak and applied gain in dB, along with the file names, stream index and status. <code>format_summary()</code> returns the same data as the table printed by <code>--print-summary</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ffmpeg_normalize</span><span class="w"> </span><span class="kn">import</span> <span class="n">FFmpegNormalize</span>
+
+<span class="n">normalizer</span> <span class="o">=</span> <span class="n">FFmpegNormalize</span><span class="p">(</span><span class="n">normalization_type</span><span class="o">=</span><span class="s2">"rms"</span><span class="p">,</span> <span class="n">target_level</span><span class="o">=-</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">normalizer</span><span class="o">.</span><span class="n">add_media_file</span><span class="p">(</span><span class="s2">"input.wav"</span><span class="p">,</span> <span class="s2">"output.wav"</span><span class="p">)</span>
+<span class="n">normalizer</span><span class="o">.</span><span class="n">run_normalization</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">get_summary</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"input_file"</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">"input_level"</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">"output_level"</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">"gain"</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">normalizer</span><span class="o">.</span><span class="n">format_summary</span><span class="p">())</span>
+</code></pre></div>
+<p>Values that are not available (for example, EBU output values in a dry run) are <code>None</code>. Pass <code>print_summary=True</code> to print the table to stderr at the end of <code>run_normalization()</code>.</p>
 
 
 
