@@ -385,6 +385,45 @@ class FFmpegNormalize:
                 errors.append(error_msg)
         return errors
 
+    @staticmethod
+    def validate_output_files(input_files: list[str], output_files: list[str]) -> None:
+        """Reject duplicate destinations and outputs that overwrite another input.
+
+        Resolve symlinks and existing hard links, while allowing each file to be
+        normalized in place and multiple outputs to the null device.
+        """
+
+        def path_keys(path: str) -> list[str | tuple[int, int]]:
+            keys: list[str | tuple[int, int]] = [
+                os.path.normcase(os.path.realpath(path))
+            ]
+            if os.path.exists(path):
+                stat = os.stat(path)
+                keys.append((stat.st_dev, stat.st_ino))
+            return keys
+
+        input_owners: dict[str | tuple[int, int], set[int]] = {}
+        for index, path in enumerate(input_files):
+            for key in path_keys(path):
+                input_owners.setdefault(key, set()).add(index)
+
+        output_owners: dict[str | tuple[int, int], str] = {}
+        for index, path in enumerate(output_files):
+            if os.path.realpath(path) == os.path.realpath(os.devnull):
+                continue
+            for key in path_keys(path):
+                if key in output_owners:
+                    raise FFmpegNormalizeError(
+                        f"Output collision: '{path}' and '{output_owners[key]}' "
+                        "refer to the same destination. Specify distinct output paths."
+                    )
+                if input_owners.get(key, set()) - {index}:
+                    raise FFmpegNormalizeError(
+                        f"Output '{path}' would overwrite another input file. "
+                        "Specify a different output path."
+                    )
+                output_owners[key] = path
+
     def _calculate_batch_reference(self) -> float | None:
         """
         Calculate the batch reference loudness by averaging measurements across all files.
@@ -446,6 +485,11 @@ class FFmpegNormalize:
         In non-batch mode, each file is processed completely (both passes) before
         moving to the next file.
         """
+        if not self.replaygain:
+            self.validate_output_files(
+                [media_file.input_file for media_file in self.media_files],
+                [media_file.output_file for media_file in self.media_files],
+            )
         if self.batch:
             # Batch mode: analyze all files first, then normalize with relative adjustments
             _logger.info(

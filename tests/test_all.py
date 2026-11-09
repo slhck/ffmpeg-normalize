@@ -167,11 +167,22 @@ class TestFFmpegNormalize:
     def test_input_list(self, tmp_path):
         # Create a temporary input list file using pytest tmp_path
         input_list_path = tmp_path / "input_list.txt"
-        input_list_path.write_text("tests/test.mp4\ntests/test.mp4\n")
+        input_list_path.write_text("tests/test.mp4\ntests/test.mp3\n")
         # Run ffmpeg-normalize with --input-list
-        ffmpeg_normalize_call(["--input-list", str(input_list_path)])
+        first_output = tmp_path / "video.mkv"
+        second_output = tmp_path / "audio.mkv"
+        ffmpeg_normalize_call(
+            [
+                "--input-list",
+                str(input_list_path),
+                "-o",
+                str(first_output),
+                str(second_output),
+            ]
+        )
         # Check output files
-        assert os.path.isfile("normalized/test.mkv")
+        assert first_output.is_file()
+        assert second_output.is_file()
 
     def test_no_input_specified(self):
         """Run the CLI with no arguments; should exit with error"""

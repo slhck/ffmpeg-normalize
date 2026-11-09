@@ -23,6 +23,8 @@ Will be applied per input file.
 If no output file name is specified for an input file, the output files
 will be written to the default output folder with the name `<input>.<ext>`, where `<ext>` is the output extension (see `-ext` option).
 
+Output paths must be distinct and cannot overwrite another input in the same run, even with `--force`. Normalizing a file in place is allowed. If inputs have the same basename, specify distinct output paths with `-o`.
+
 Example: `ffmpeg-normalize 1.wav 2.wav -o 1n.wav 2n.wav`
 
 ### `-of OUTPUT_FOLDER, --output-folder OUTPUT_FOLDER`

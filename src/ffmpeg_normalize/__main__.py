@@ -76,6 +76,9 @@ def create_parser(suppress_defaults: bool = False) -> argparse.ArgumentParser:
         will be written to the default output folder with the name `<input>.<ext>`,
         where `<ext>` is the output extension (see `-ext` option).
 
+        Output paths must be distinct and cannot overwrite another input in the same run,
+        even with --force. Normalizing a file in place is allowed.
+
         Example: ffmpeg-normalize 1.wav 2.wav -o 1n.wav 2n.wav
         """
         ),
@@ -832,6 +835,7 @@ def main() -> None:
             "Please fix the issues above and try again."
         )
 
+    output_files: list[str] = []
     for index, input_file in enumerate(input_files):
         if cli_args.output is not None and index < len(cli_args.output):
             if cli_args.output_folder and cli_args.output_folder != "normalized":
@@ -850,12 +854,15 @@ def main() -> None:
                 + "."
                 + cli_args.extension,
             )
-            if not os.path.isdir(cli_args.output_folder) and not cli_args.dry_run:
-                _logger.warning(
-                    f"Output directory '{cli_args.output_folder}' does not exist, will create"
-                )
-                os.makedirs(cli_args.output_folder, exist_ok=True)
+        output_files.append(output_file)
 
+    try:
+        if not cli_args.replaygain:
+            FFmpegNormalize.validate_output_files(input_files, output_files)
+    except FFmpegNormalizeError as e:
+        error(e)
+
+    for input_file, output_file in zip(input_files, output_files):
         if (
             os.path.exists(output_file)
             and not cli_args.force
@@ -873,6 +880,10 @@ def main() -> None:
         if not os.path.isfile(input_file):
             _logger.warning(f"Input file '{input_file}' is not a file, skipping")
             continue
+
+        output_dir = os.path.dirname(output_file)
+        if output_dir and not cli_args.dry_run:
+            os.makedirs(output_dir, exist_ok=True)
 
         try:
             ffmpeg_normalize.add_media_file(input_file, output_file)
