@@ -1,3 +1,16 @@
+## [1.44.0] - 2026-11-09
+
+### 🚀 Features
+
+- *(verify)* Check encoded output levels
+
+### 🐛 Bug Fixes
+
+- *(cli)* Explain ffmpeg startup failures
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.44.0
 ## [1.43.1] - 2026-11-09
 
 ### 🐛 Bug Fixes
