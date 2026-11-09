@@ -1,3 +1,14 @@
+## [1.43.1] - 2026-11-09
+
+### 🐛 Bug Fixes
+
+- *(presets)* Respect explicit CLI defaults
+- *(io)* Reject colliding output paths
+- *(batch)* Cap album gain at peak headroom
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.43.1
 ## [1.43.0] - 2026-10-14
 
 ### 🚀 Features
@@ -362,13 +373,13 @@
 - Update explainer
 ## [1.30.0] - 2024-11-22
 
-### 💼 Other
-
-- `--print-stats` only outputs the last stream
-
 ### 📚 Documentation
 
 - Add @ahmetsait as a contributor
+
+### 💼 Other
+
+- `--print-stats` only outputs the last stream
 ## [1.29.2] - 2024-11-18
 
 ### 🐛 Bug Fixes

@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.10"
 
 [[package]]
@@ -37,7 +37,7 @@ wheels = [
 
 [[package]]
 name = "ffmpeg-normalize"
-version = "1.43.0"
+version = "1.43.1"
 source = { editable = "." }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
