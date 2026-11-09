@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -29,10 +29,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1150,10 +1150,11 @@
 <h2 id="how-it-works-rmspeak">How it works (RMS/Peak)</h2>
 <ol>
 <li>ffmpeg-normalize will analyze all files (first pass)</li>
-<li>It will calculate the average RMS or peak across all tracks</li>
-<li>A single gain adjustment needed to reach the target is calculated</li>
-<li>The same adjustment is applied to all tracks</li>
+<li>It will calculate the average RMS or the highest sample peak across the selected audio streams</li>
+<li>A single gain adjustment needed to reach the target is calculated; RMS gain is reduced if necessary to keep all measured sample peaks at or below 0 dBFS</li>
+<li>The same adjustment is applied to all selected streams, preserving relative loudness</li>
 </ol>
+<p>With <code>--lower-only</code>, the shared gain is capped at 0 dB. This applies to the album as a whole, so quieter tracks are still attenuated when the album needs to be turned down.</p>
 <p>For example, if an album's average RMS is -26 dB, and the target is -20 dB, the program will calculate a +6 dB adjustment and apply it to all tracks equally, rather than normalizing each track to -20 dB individually. This will make relatively louder tracks louder, and vice-versa.</p>
 <h2 id="usage-examples">Usage Examples</h2>
 <div class="highlight"><pre><span></span><code><span class="c1"># Recommended: RMS-based album normalization</span>
@@ -1161,7 +1162,7 @@
 ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20
 
 <span class="c1"># Or peak-based album normalization</span>
-<span class="c1"># Shifts entire album so average peak is at -1 dB</span>
+<span class="c1"># Shifts entire album so its highest sample peak is at -1 dBFS</span>
 ffmpeg-normalize<span class="w"> </span>album/*.wav<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span>-1
 </code></pre></div>
 <h2 id="windows-usage">Windows Usage</h2>
@@ -1185,40 +1186,17 @@ ffmpeg-normalize --input-list filelist.txt --batch -nt rms -t -20
 <li>Use lossless codecs (FLAC, WAV) to preserve quality</li>
 </ul>
 <h2 id="what-about-clipping">What about clipping?</h2>
-<p>When using RMS batch normalization, the same gain adjustment is applied to all tracks. This means some tracks might clip if they have higher peaks than average.</p>
-<p>For example:</p>
+<p>Peak batch normalization uses the highest measured sample peak across the album as its reference. For example, if two tracks peak at -1 and -11 dBFS and the target is -1 dBFS, both receive 0 dB gain. Their peaks remain -1 and -11 dBFS.</p>
+<p>RMS batch normalization targets the average RMS level but reduces the shared gain when necessary to avoid sample clipping. For example:</p>
 <ul>
 <li>Album average RMS: -26 dB</li>
 <li>Target RMS: -20 dB</li>
-<li>Adjustment needed: +6 dB (applied to all tracks)</li>
-<li>Track A has peak at -1 dB → after +6 dB = <strong>+5 dB</strong> → ⚠️ Clipping!</li>
-<li>Track B has peak at -8 dB → after +6 dB = -2 dB → ✅ No clipping</li>
+<li>Requested gain: +6 dB</li>
+<li>Highest input sample peak: -1 dBFS</li>
+<li>Applied gain: +1 dB to every track</li>
 </ul>
-<p>The program will warn you for each track that will clip:</p>
-<blockquote>
-<p><code>WARNING: Adjusting will lead to clipping of 5.0 dB</code></p>
-</blockquote>
-<p>There are different strategies to deal with this:</p>
-<ol>
-<li>
-<p>Use Peak normalization instead – guarantees no clipping:</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>peak<span class="w"> </span>-t<span class="w"> </span>-1<span class="w"> </span>-c:a<span class="w"> </span>flac
-</code></pre></div>
-</li>
-<li>
-<p>Use a more conservative RMS target – leave more headroom:</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-23<span class="w"> </span>-c:a<span class="w"> </span>flac<span class="w">  </span><span class="c1"># More conservative</span>
-</code></pre></div>
-</li>
-<li>
-<p>Accept minor clipping – if clipping is &lt; 0.5 dB, it may be inaudible in most cases</p>
-</li>
-<li>
-<p>Pre-process with a limiter – use <code>--pre-filter</code> to apply limiting before normalization:</p>
-<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>album/*.flac<span class="w"> </span>--batch<span class="w"> </span>-nt<span class="w"> </span>rms<span class="w"> </span>-t<span class="w"> </span>-20<span class="w"> </span>-prf<span class="w"> </span><span class="s2">"alimiter=limit=0.99"</span><span class="w"> </span>-c:a<span class="w"> </span>flac
-</code></pre></div>
-</li>
-</ol>
+<p>The program warns that the requested RMS target cannot be reached. Reducing the gain for the entire album preserves the relative levels without applying a limiter.</p>
+<p>These limits use sample peaks measured during analysis. Lossy encoding, resampling, and post-filters can change the final peaks; this is not a true-peak guarantee. Use EBU normalization when you need a true-peak target.</p>
 
 
 
@@ -1308,10 +1286,10 @@ ffmpeg-normalize --input-list filelist.txt --batch -nt rms -t -20
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.footer"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
