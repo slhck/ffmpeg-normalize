@@ -13,9 +13,11 @@ Music albums are already mastered with the correct relative loudness between tra
 ## How it works (RMS/Peak)
 
 1. ffmpeg-normalize will analyze all files (first pass)
-2. It will calculate the average RMS or peak across all tracks
-3. A single gain adjustment needed to reach the target is calculated
-4. The same adjustment is applied to all tracks
+2. It will calculate the average RMS or the highest sample peak across the selected audio streams
+3. A single gain adjustment needed to reach the target is calculated; RMS gain is reduced if necessary to keep all measured sample peaks at or below 0 dBFS
+4. The same adjustment is applied to all selected streams, preserving relative loudness
+
+With `--lower-only`, the shared gain is capped at 0 dB. This applies to the album as a whole, so quieter tracks are still attenuated when the album needs to be turned down.
 
 For example, if an album's average RMS is -26 dB, and the target is -20 dB, the program will calculate a +6 dB adjustment and apply it to all tracks equally, rather than normalizing each track to -20 dB individually. This will make relatively louder tracks louder, and vice-versa.
 
@@ -27,7 +29,7 @@ For example, if an album's average RMS is -26 dB, and the target is -20 dB, the 
 ffmpeg-normalize album/*.flac --batch -nt rms -t -20
 
 # Or peak-based album normalization
-# Shifts entire album so average peak is at -1 dB
+# Shifts entire album so its highest sample peak is at -1 dBFS
 ffmpeg-normalize album/*.wav --batch -nt peak -t -1
 ```
 
@@ -61,38 +63,16 @@ ffmpeg-normalize --input-list filelist.txt --batch -nt rms -t -20
 
 ## What about clipping?
 
-When using RMS batch normalization, the same gain adjustment is applied to all tracks. This means some tracks might clip if they have higher peaks than average.
+Peak batch normalization uses the highest measured sample peak across the album as its reference. For example, if two tracks peak at -1 and -11 dBFS and the target is -1 dBFS, both receive 0 dB gain. Their peaks remain -1 and -11 dBFS.
 
-For example:
+RMS batch normalization targets the average RMS level but reduces the shared gain when necessary to avoid sample clipping. For example:
 
 - Album average RMS: -26 dB
 - Target RMS: -20 dB
-- Adjustment needed: +6 dB (applied to all tracks)
-- Track A has peak at -1 dB → after +6 dB = **+5 dB** → ⚠️ Clipping!
-- Track B has peak at -8 dB → after +6 dB = -2 dB → ✅ No clipping
+- Requested gain: +6 dB
+- Highest input sample peak: -1 dBFS
+- Applied gain: +1 dB to every track
 
-The program will warn you for each track that will clip:
+The program warns that the requested RMS target cannot be reached. Reducing the gain for the entire album preserves the relative levels without applying a limiter.
 
-> `WARNING: Adjusting will lead to clipping of 5.0 dB`
-
-There are different strategies to deal with this:
-
-1. Use Peak normalization instead – guarantees no clipping:
-
-      ```bash
-      ffmpeg-normalize album/*.flac --batch -nt peak -t -1 -c:a flac
-      ```
-
-2. Use a more conservative RMS target – leave more headroom:
-
-      ```bash
-      ffmpeg-normalize album/*.flac --batch -nt rms -t -23 -c:a flac  # More conservative
-      ```
-
-3. Accept minor clipping – if clipping is < 0.5 dB, it may be inaudible in most cases
-
-4. Pre-process with a limiter – use `--pre-filter` to apply limiting before normalization:
-
-      ```bash
-      ffmpeg-normalize album/*.flac --batch -nt rms -t -20 -prf "alimiter=limit=0.99" -c:a flac
-      ```
+These limits use sample peaks measured during analysis. Lossy encoding, resampling, and post-filters can change the final peaks; this is not a true-peak guarantee. Use EBU normalization when you need a true-peak target.

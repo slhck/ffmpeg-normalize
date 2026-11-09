@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 import sys
 from itertools import chain
@@ -426,21 +427,27 @@ class FFmpegNormalize:
 
     def _calculate_batch_reference(self) -> float | None:
         """
-        Calculate the batch reference loudness by averaging measurements across all files.
+        Calculate a shared reference from the selected streams' measurements.
+
+        Peak mode uses the highest sample peak. RMS mode uses the average RMS,
+        with gain capped by the highest sample peak. EBU uses average LUFS.
 
         Returns:
             float | None: The batch reference loudness value, or None if no measurements found.
 
         Note:
-            TODO: Add option to specify different averaging methods (duration-weighted,
-            use quietest/loudest track, etc.)
+            RMS and EBU averages weight each selected stream equally.
         """
         measurements: list[float] = []
+        peaks: list[float] = []
 
         for media_file in self.media_files:
-            # Access audio streams from the streams dict
-            audio_streams = media_file.streams.get("audio", {})
-            for stream in audio_streams.values():
+            if media_file.status == "error":
+                continue
+            for stream in media_file._get_streams_to_normalize():
+                peak = stream.loudness_statistics.get("max")
+                if peak is not None and math.isfinite(peak):
+                    peaks.append(float(peak))
                 if self.normalization_type == "ebu":
                     # Get EBU integrated loudness from first pass
                     ebu_stats = stream.loudness_statistics.get("ebu_pass1")
@@ -457,6 +464,7 @@ class FFmpegNormalize:
                     if max_val is not None:
                         measurements.append(float(max_val))
 
+        measurements = [value for value in measurements if math.isfinite(value)]
         if not measurements:
             _logger.warning(
                 "No loudness measurements found for batch reference calculation. "
@@ -464,12 +472,27 @@ class FFmpegNormalize:
             )
             return None
 
-        # Simple average of all measurements
-        batch_reference = sum(measurements) / len(measurements)
+        # Peak mode targets the loudest sample in the album. RMS mode targets
+        # the average level, but limits the shared gain to available headroom.
+        batch_reference = (
+            max(measurements)
+            if self.normalization_type == "peak"
+            else sum(measurements) / len(measurements)
+        )
+        if self.normalization_type == "rms" and peaks:
+            safe_reference = self.target_level + max(peaks)
+            if safe_reference > batch_reference:
+                _logger.warning(
+                    "Reducing album gain to avoid sample clipping; "
+                    "the requested RMS target will not be reached."
+                )
+                batch_reference = safe_reference
+        if self.lower_only and self.normalization_type in ("peak", "rms"):
+            batch_reference = max(batch_reference, self.target_level)
         _logger.debug(f"Batch mode: Measurements for batch reference: {measurements}")
         _logger.info(
             f"Batch mode: Calculated reference loudness = {batch_reference:.2f} "
-            f"({self.normalization_type.upper()}, averaged from {len(measurements)} stream(s))"
+            f"({self.normalization_type.upper()}, based on {len(measurements)} stream(s))"
         )
 
         return batch_reference

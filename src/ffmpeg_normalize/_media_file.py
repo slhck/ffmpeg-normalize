@@ -784,7 +784,10 @@ class MediaFile:
             list[str]: the filters, in application order
         """
         skip_normalization = False
-        if self.ffmpeg_normalize.lower_only:
+        if self.ffmpeg_normalize.lower_only and not (
+            self.batch_reference is not None
+            and self.ffmpeg_normalize.normalization_type in ("peak", "rms")
+        ):
             if self.ffmpeg_normalize.normalization_type == "ebu":
                 if (
                     audio_stream.loudness_statistics["ebu_pass1"] is not None
