@@ -22,6 +22,9 @@ _ffmpeg_normalize()
           -t --target-level \
           -p --print-stats \
           --print-summary \
+          --verify \
+          --verify-loudness-tolerance \
+          --verify-peak-tolerance \
           --replaygain \
           -lrt --loudness-range-target \
           --keep-loudness-range-target \

@@ -99,6 +99,9 @@ class FFmpegNormalize:
         keep_other_audio (bool, optional): Keep non-selected audio streams in output (copy without normalization). Defaults to False.
         keep_mtime (bool, optional): Copy the input file's modification time to the output file. Defaults to False.
         keep_bit_depth (bool, optional): Carry the detected input bit depth through to the output encoder. Defaults to True.
+        verify (bool, optional): Measure the encoded output and check its effective target and peak ceiling. Defaults to False. Not available with ReplayGain; skipped during dry runs.
+        verify_loudness_tolerance (float, optional): Allowed level deviation in dB/LU. Defaults to 0.5.
+        verify_peak_tolerance (float, optional): Allowed peak overshoot in dB. Defaults to 0.1.
 
     Raises:
         FFmpegNormalizeError: If the ffmpeg executable is not found or does not support the loudnorm filter.
@@ -149,6 +152,9 @@ class FFmpegNormalize:
         "keep_other_audio": False,
         "keep_mtime": False,
         "keep_bit_depth": True,
+        "verify": False,
+        "verify_loudness_tolerance": 0.5,
+        "verify_peak_tolerance": 0.1,
     }
 
     def __init__(
@@ -194,6 +200,9 @@ class FFmpegNormalize:
         keep_other_audio: bool = False,
         keep_mtime: bool = False,
         keep_bit_depth: bool = True,
+        verify: bool = False,
+        verify_loudness_tolerance: float = 0.5,
+        verify_peak_tolerance: float = 0.1,
     ):
         self.ffmpeg_exe = get_ffmpeg_exe()
         self.has_loudnorm_capabilities = ffmpeg_has_loudnorm()
@@ -293,6 +302,20 @@ class FFmpegNormalize:
 
         self.keep_mtime = keep_mtime
         self.keep_bit_depth = keep_bit_depth
+        self.verify = verify
+        self.verify_loudness_tolerance = check_range(
+            verify_loudness_tolerance, 0, 99, name="verify_loudness_tolerance"
+        )
+        self.verify_peak_tolerance = check_range(
+            verify_peak_tolerance, 0, 99, name="verify_peak_tolerance"
+        )
+        if not all(
+            math.isfinite(value)
+            for value in (self.verify_loudness_tolerance, self.verify_peak_tolerance)
+        ):
+            raise FFmpegNormalizeError("Verification tolerances must be finite")
+        if verify and replaygain:
+            raise FFmpegNormalizeError("--verify cannot be combined with --replaygain")
 
         if self.output_format in PCM_INCOMPATIBLE_FORMATS:
             if self.audio_codec is not None and "pcm" in self.audio_codec:
@@ -508,6 +531,17 @@ class FFmpegNormalize:
         In non-batch mode, each file is processed completely (both passes) before
         moving to the next file.
         """
+        if (
+            self.verify
+            and not self.dry_run
+            and any(
+                os.path.realpath(file.output_file) == os.path.realpath(os.devnull)
+                for file in self.media_files
+            )
+        ):
+            raise FFmpegNormalizeError(
+                "--verify requires an output file, not the null device"
+            )
         if not self.replaygain:
             self.validate_output_files(
                 [media_file.input_file for media_file in self.media_files],
@@ -591,6 +625,8 @@ class FFmpegNormalize:
 
                 try:
                     media_file.run_normalization(batch_reference=batch_reference)
+                    if self.verify and not self.dry_run:
+                        media_file.verify_output()
                 except Exception as e:
                     media_file.status = "error"
                     media_file.error = str(e)
@@ -609,6 +645,8 @@ class FFmpegNormalize:
 
                 try:
                     media_file.run_normalization()
+                    if self.verify and not self.dry_run:
+                        media_file.verify_output()
                 except Exception as e:
                     media_file.status = "error"
                     media_file.error = str(e)
@@ -719,4 +757,23 @@ class FFmpegNormalize:
         lines = [f"Summary ({header}):", "", fmt_line(headings)]
         lines.append(fmt_line(["-" * w for w in widths]))
         lines.extend(fmt_line(line) for line in table)
+        lines.append(
+            "\nOutput values above: loudnorm filter statistics for EBU; "
+            "calculated from applied gain for RMS/peak; input levels for skipped files."
+        )
+        verified = [row for row in rows if "verification" in row]
+        if verified:
+            level_unit = "LUFS" if self.normalization_type == "ebu" else "dBFS"
+            peak_unit = "dBTP" if self.normalization_type == "ebu" else "dBFS"
+            lines.append("\nEncoded-output verification (measured after encoding):")
+            for row in verified:
+                result = row["verification"]
+                outcome = "passed" if result["passed"] else "FAILED"
+                lines.append(
+                    f"{row['output_file']} stream {result['output_stream_id']}: "
+                    f"level {fmt(result['output_level'])} {level_unit}, "
+                    f"peak {fmt(result['output_peak'])} {peak_unit}, {outcome}"
+                )
+        elif self.verify and self.dry_run:
+            lines.append("\nEncoded-output verification skipped: dry run.")
         return "\n".join(lines)

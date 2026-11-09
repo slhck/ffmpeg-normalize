@@ -59,7 +59,23 @@ class LoudnessStatistics(TypedDict):
     max: float | None
 
 
-class SummaryRow(TypedDict):
+class VerificationResult(TypedDict):
+    output_stream_id: int
+    output_level: float | None
+    output_peak: float | None
+    expected_level: float | None
+    peak_limit: float
+    loudness_tolerance: float
+    peak_tolerance: float
+    passed: bool
+    errors: list[str]
+
+
+class _OptionalVerification(TypedDict, total=False):
+    verification: VerificationResult
+
+
+class SummaryRow(_OptionalVerification):
     input_file: str
     output_file: str
     stream_id: int
@@ -68,9 +84,10 @@ class SummaryRow(TypedDict):
     output_level: float | None
     output_peak: float | None
     gain: float | None
+    output_source: str
 
 
-class _OptionalStatisticsMetadata(TypedDict, total=False):
+class _OptionalStatisticsMetadata(_OptionalVerification, total=False):
     error: str
 
 
@@ -165,6 +182,8 @@ class AudioStream(MediaStream):
         # when normalization is skipped for this stream (e.g. with lower_only).
         # Stays None for EBU, where the gain is derived from the second pass stats.
         self.applied_gain: float | None = None
+        self.verification_target_level: float | None = None
+        self.verification: VerificationResult | None = None
 
         self.sample_rate = sample_rate
         self.bit_depth = bit_depth
@@ -218,6 +237,8 @@ class AudioStream(MediaStream):
             "max": self.loudness_statistics["max"],
             "status": self.media_file.status,
         }
+        if self.verification is not None:
+            stats["verification"] = self.verification
         # Only present when the file failed to process, per the per-file outcome
         # reporting (status is "error").
         if self.media_file.error is not None:
@@ -232,7 +253,9 @@ class AudioStream(MediaStream):
         second pass in dynamic mode), and the output level, output true peak and
         gain come from the second pass. For RMS and peak, the input level is the
         measured RMS or peak level, and the output values are computed from the
-        applied gain. Values that are not available are None.
+        applied gain. Values that are not available are None. The output_source
+        field labels these values; verification, when present, contains separate
+        measurements of the encoded output and the check results.
 
         Returns:
             dict: A dictionary with the summary values.
@@ -285,7 +308,19 @@ class AudioStream(MediaStream):
         if status == "error":
             output_level = output_peak = gain = None
 
-        return {
+        source = "unavailable"
+        if output_level is not None:
+            source = (
+                "input"
+                if status == "skipped"
+                else (
+                    "filter"
+                    if normalization_type == "ebu"
+                    and self.loudness_statistics["ebu_pass2"] is not None
+                    else "calculated"
+                )
+            )
+        summary: SummaryRow = {
             "input_file": self.media_file.input_file,
             "output_file": self.media_file.output_file,
             "stream_id": self.stream_id,
@@ -294,7 +329,11 @@ class AudioStream(MediaStream):
             "output_level": output_level,
             "output_peak": output_peak,
             "gain": gain,
+            "output_source": source,
         }
+        if self.verification is not None:
+            summary["verification"] = self.verification
+        return summary
 
     def set_second_pass_stats(self, stats: EbuLoudnessStatistics) -> None:
         """
@@ -701,6 +740,7 @@ class AudioStream(MediaStream):
             if self.media_file.ffmpeg_normalize.dual_mono:
                 opts["dual_mono"] = "true"
 
+            self.verification_target_level = float(opts["i"])
             return "loudnorm=" + dict_to_filter_opts(opts)
 
         if not self.loudness_statistics["ebu_pass1"]:
@@ -843,6 +883,7 @@ class AudioStream(MediaStream):
         if self.media_file.ffmpeg_normalize.dual_mono:
             opts["dual_mono"] = "true"
 
+        self.verification_target_level = target_level
         return "loudnorm=" + dict_to_filter_opts(opts)
 
     def get_second_pass_opts_peakrms(self, batch_reference: float | None = None) -> str:

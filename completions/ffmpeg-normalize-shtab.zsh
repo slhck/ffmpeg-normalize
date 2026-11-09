@@ -76,10 +76,14 @@ For each file and audio stream, the table lists the input level, the
 output level, the output peak, the applied gain, and the status. The
 level is the integrated loudness for EBU, the RMS level for RMS, and the
 peak level for peak normalization. Values that are not available are
-shown as \`-\`.
+shown as \`-\`. Output values are filter statistics (EBU) or calculated
+from gain (RMS\/peak). Use --verify for separate encoded-output measurements.
 
 Can be combined with \`--print-stats\`, which writes JSON to stdout.
 ]"
+  "--verify[Measure the encoded output and fail if level or peak checks exceed tolerance. Skipped during dry runs\; incompatible with --replaygain.]"
+  "--verify-loudness-tolerance[Allowed deviation from the effective output level in dB\/LU (default\: 0.5).]:verify_loudness_tolerance:"
+  "--verify-peak-tolerance[Allowed overshoot above the output peak ceiling in dB (default\: 0.1).]:verify_peak_tolerance:"
   "--replaygain[Write ReplayGain tags to the original file without normalizing.
 This mode will overwrite the input file and ignore other options. It will strip all ReplayGain tags.
 Only works with EBU normalization, and only with .mp3, .mp4\/.m4a, .ogg, .opus for now.

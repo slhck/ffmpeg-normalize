@@ -43,3 +43,28 @@ print(normalizer.format_summary())
 ```
 
 Values that are not available (for example, EBU output values in a dry run) are `None`. Pass `print_summary=True` to print the table to stderr at the end of `run_normalization()`.
+
+## Encoded-output Verification
+
+Pass `verify=True` to decode the encoded output and check the effective level and peak ceiling. Set `verify_loudness_tolerance` (default 0.5 dB/LU) and `verify_peak_tolerance` (default 0.1 dB) to adjust the checks.
+
+```python
+normalizer = FFmpegNormalize(
+    normalization_type="rms",
+    target_level=-20,
+    verify=True,
+    verify_loudness_tolerance=0.5,
+    verify_peak_tolerance=0.1,
+)
+normalizer.add_media_file("input.wav", "output.wav")
+normalizer.run_normalization()
+
+for row in normalizer.get_summary():
+    print(row["output_source"], row["output_level"])
+    if "verification" in row:
+        print(row["verification"])
+```
+
+Summary rows retain the existing output values and add `output_source`: `calculated`, `filter`, `input` (for skipped files), or `unavailable`. The separate `verification` object contains the encoded `output_stream_id`, measured output values, the expected level and peak ceiling, tolerances, `passed`, and any `errors`.
+
+A verification failure sets the media file's `status` to `error` and records the reason in its `error` attribute. As with encoding failures, `run_normalization()` continues to the next file; API callers must inspect the statuses. Output files are kept. Verification is skipped during dry runs, and is incompatible with ReplayGain or null-device outputs. See the [verification CLI reference](../usage/cli-options.md) for effective-target and stream-selection details.

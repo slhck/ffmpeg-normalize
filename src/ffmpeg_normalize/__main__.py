@@ -218,11 +218,30 @@ def create_parser(suppress_defaults: bool = False) -> argparse.ArgumentParser:
         output level, the output peak, the applied gain, and the status. The
         level is the integrated loudness for EBU, the RMS level for RMS, and the
         peak level for peak normalization. Values that are not available are
-        shown as `-`.
+        shown as `-`. Output values are filter statistics (EBU) or calculated
+        from gain (RMS/peak). Use --verify for separate encoded-output measurements.
 
         Can be combined with `--print-stats`, which writes JSON to stdout.
         """
         ),
+    )
+    group_normalization.add_argument(
+        "--verify",
+        action="store_true",
+        help="Measure the encoded output and fail if level or peak checks exceed tolerance. "
+        "Skipped during dry runs; incompatible with --replaygain.",
+    )
+    group_normalization.add_argument(
+        "--verify-loudness-tolerance",
+        type=float,
+        default=FFmpegNormalize.DEFAULTS["verify_loudness_tolerance"],
+        help="Allowed deviation from the effective output level in dB/LU (default: 0.5).",
+    )
+    group_normalization.add_argument(
+        "--verify-peak-tolerance",
+        type=float,
+        default=FFmpegNormalize.DEFAULTS["verify_peak_tolerance"],
+        help="Allowed overshoot above the output peak ceiling in dB (default: 0.1).",
     )
     group_normalization.add_argument(
         "--replaygain",
@@ -805,6 +824,9 @@ def main() -> None:
             keep_other_audio=cli_args.keep_other_audio,
             keep_mtime=cli_args.keep_mtime,
             keep_bit_depth=cli_args.keep_bit_depth,
+            verify=cli_args.verify,
+            verify_loudness_tolerance=cli_args.verify_loudness_tolerance,
+            verify_peak_tolerance=cli_args.verify_peak_tolerance,
         )
     except FFmpegNormalizeError as e:
         error(e)

@@ -128,7 +128,7 @@ The values depend on the normalization type:
 - RMS: RMS level and sample peak in dBFS. The output values are computed from the measured input and the applied gain.
 - Peak: peak level in dBFS. The output values are computed from the measured input and the applied gain.
 
-The output values do not include the effect of a `--post-filter`. In a dry run, output values for EBU are not available, since the second pass does not run. Streams that are not selected for normalization (see `--audio-streams` and `--audio-default-only`) are not listed.
+The table labels its output values as filter statistics (EBU) or calculated from applied gain (RMS/peak). These values do not include the effect of a `--post-filter` or the final encoder. Use `--verify` to report separate measurements of the encoded output. In a dry run, output values for EBU are not available, since the second pass does not run. Streams that are not selected for normalization (see `--audio-streams` and `--audio-default-only`) are not listed.
 
 The summary goes to stderr, so it can be combined with `--print-stats`, which writes JSON to stdout.
 
@@ -147,6 +147,37 @@ loud.m4a         0         -14.1          -23.0             -16.7       -8.9  no
 quiet.m4a        0         -28.1          -23.0             -17.4       +5.2  normalized
 normal.m4a       0         -21.1          -23.0             -18.4       -1.9  normalized
 ```
+
+### `--verify`
+
+Decode and measure the finished output file, then check each normalized audio stream against its effective output level and peak ceiling. This adds an analysis pass over the encoded audio. Passthrough streams and copies retained with `--keep-original-audio` are not checked.
+
+The checks use:
+
+- EBU: integrated loudness in LUFS and true peak in dBTP. The effective target includes batch adjustments and `--auto-lower-loudness-target`.
+- RMS: RMS level and sample peak in dBFS. The expected level includes the applied gain, including album headroom limits and `--lower-only`. The sample peak ceiling is 0 dBFS.
+- Peak: sample peak in dBFS. The expected level includes the applied gain; the ceiling is `--target-level`.
+- Files copied through by `--threshold`: their unchanged input level and peak serve as the reference.
+
+A level deviation beyond `--verify-loudness-tolerance` or a peak above its ceiling plus `--verify-peak-tolerance` marks the file as `error` and makes the CLI exit nonzero. Non-finite measurements, such as the loudness of digital silence, fail verification. The output file is kept for inspection.
+
+`--print-stats` includes a separate `verification` object for each checked stream, with the encoded `output_stream_id`, measured `output_level` and `output_peak`, `expected_level`, `peak_limit`, the tolerances, `passed`, and `errors`. `--print-summary` prints the measurements separately from the calculated or filter-derived values.
+
+Verification is skipped during `--dry-run`. It cannot be combined with `--replaygain` or an output directed to the null device.
+
+```bash
+ffmpeg-normalize input.mp3 -o output.m4a --verify --print-summary --print-stats
+```
+
+### `--verify-loudness-tolerance`
+
+Allowed absolute deviation from the effective output level in dB/LU. Default: `0.5`. Must be finite and between 0 and 99.
+
+### `--verify-peak-tolerance`
+
+Allowed overshoot above the peak ceiling in dB. Default: `0.1`. Must be finite and between 0 and 99.
+
+Lossy encoding and post-filters can change the final level or peak. Inspect failed measurements before increasing the tolerances.
 
 ### `--replaygain`
 

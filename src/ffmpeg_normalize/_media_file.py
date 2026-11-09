@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+import math
+from copy import copy
 import os
 import re
 import shlex
@@ -29,6 +31,7 @@ from ._streams import (
     SubtitleStream,
     SummaryRow,
     VideoStream,
+    VerificationResult,
 )
 
 if TYPE_CHECKING:
@@ -382,6 +385,108 @@ class MediaFile:
             if self.ffmpeg_normalize.keep_mtime and not self.ffmpeg_normalize.dry_run:
                 self._apply_input_timestamps()
             _logger.info(f"Normalized file written to {self.output_file}")
+
+    def verify_output(self) -> None:
+        """Verify encoded audio, restoring requested timestamps after reading it."""
+        try:
+            self._verify_output()
+        finally:
+            if self.ffmpeg_normalize.keep_mtime:
+                self._apply_input_timestamps()
+
+    def _verify_output(self) -> None:
+        """Measure encoded audio without reapplying filters or input options.
+
+        Only normalized streams are checked. They precede passthrough and
+        original audio in encoded outputs; skipped files retain input indices.
+        Verification keeps the encoded file even if a check fails.
+        """
+        config = copy(self.ffmpeg_normalize)
+        config.pre_filter = config.post_filter = None
+        config.extra_input_options = None
+        config.audio_channels = None
+        measured_file = MediaFile(config, self.output_file, os.devnull)
+        selected = self._get_streams_to_normalize()
+        output_streams = list(measured_file.streams["audio"].values())
+        if self.status == "skipped":
+            output_streams = [
+                measured_file.streams["audio"][stream.stream_id] for stream in selected
+            ]
+        if not selected or len(output_streams) < len(selected):
+            raise FFmpegNormalizeError(
+                "Cannot verify output: selected audio streams are missing"
+            )
+
+        failures: list[str] = []
+        for source, measured in zip(selected, output_streams):
+            summary = source.get_summary()
+            expected = summary["output_level"]
+            if config.normalization_type == "ebu":
+                for _ in measured.parse_loudnorm_stats():
+                    pass
+                stats = measured.loudness_statistics["ebu_pass1"]
+                if stats is None:
+                    raise FFmpegNormalizeError(
+                        "Cannot verify output: loudness measurement is missing"
+                    )
+                level, peak = float(stats["input_i"]), float(stats["input_tp"])
+                if self.status != "skipped":
+                    expected = source.verification_target_level
+                    if expected is None:
+                        expected = summary["input_level"]
+                peak_limit = config.true_peak
+            else:
+                for _ in measured.parse_astats():
+                    pass
+                level = measured.loudness_statistics[
+                    "mean" if config.normalization_type == "rms" else "max"
+                ]
+                peak = measured.loudness_statistics["max"]
+                peak_limit = (
+                    config.target_level if config.normalization_type == "peak" else 0.0
+                )
+
+            if self.status == "skipped" and summary["output_peak"] is not None:
+                peak_limit = summary["output_peak"]
+
+            def finite(value: float | None) -> float | None:
+                return value if value is not None and math.isfinite(value) else None
+
+            level, peak, expected = finite(level), finite(peak), finite(expected)
+            errors: list[str] = []
+            if level is None or expected is None:
+                errors.append("output level or expected level is not finite")
+            elif abs(level - expected) > config.verify_loudness_tolerance:
+                errors.append(
+                    f"level {level:.2f} differs from expected {expected:.2f} "
+                    f"by more than {config.verify_loudness_tolerance:g} dB/LU"
+                )
+            if peak is None:
+                errors.append("output peak is not finite")
+            elif peak > peak_limit + config.verify_peak_tolerance:
+                errors.append(
+                    f"peak {peak:.2f} exceeds ceiling {peak_limit:.2f} "
+                    f"plus {config.verify_peak_tolerance:g} dB tolerance"
+                )
+            result: VerificationResult = {
+                "output_stream_id": measured.stream_id,
+                "output_level": level,
+                "output_peak": peak,
+                "expected_level": expected,
+                "peak_limit": peak_limit,
+                "loudness_tolerance": config.verify_loudness_tolerance,
+                "peak_tolerance": config.verify_peak_tolerance,
+                "passed": not errors,
+                "errors": errors,
+            }
+            source.verification = result
+            if errors:
+                failures.append(f"stream {source.stream_id}: " + "; ".join(errors))
+        if failures:
+            raise FFmpegNormalizeError(
+                "Encoded-output verification failed: " + "; ".join(failures)
+            )
+        _logger.info(f"Encoded-output verification passed for {self.output_file}")
 
     def _is_within_threshold(self) -> bool:
         """

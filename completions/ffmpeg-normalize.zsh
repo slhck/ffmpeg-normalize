@@ -26,6 +26,9 @@ _ffmpeg_normalize() {
     '(-t --target-level)'{-t,--target-level}'[Target level in dB/LUFS]:level:'
     '(-p --print-stats)'{-p,--print-stats}'[Print loudness statistics as JSON]'
     '--print-summary[Print a before/after summary table to stderr]'
+    '--verify[Measure and verify the encoded output]'
+    '--verify-loudness-tolerance[Allowed output level deviation in dB/LU]:tolerance:'
+    '--verify-peak-tolerance[Allowed output peak overshoot in dB]:tolerance:'
     '--replaygain[Write ReplayGain tags]'
 
     # EBU Options
