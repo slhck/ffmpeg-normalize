@@ -847,6 +847,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ffmpeg-cannot-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ffmpeg cannot start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1175,6 +1186,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ffmpeg-cannot-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ffmpeg cannot start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1323,6 +1345,11 @@
 </code></pre></div>
 <h2 id="what-options-should-i-choose-for-the-ebu-r128-filter-what-is-linear-and-dynamic-mode">What options should I choose for the EBU R128 filter? What is linear and dynamic mode?</h2>
 <p>See <a href="../../usage/normalization-options/">the audio normalization options</a>.</p>
+<h2 id="ffmpeg-cannot-start">ffmpeg cannot start</h2>
+<p>If ffmpeg is missing, is not executable, or cannot load a required shared library, the CLI reports the executable path and the startup failure without a Python traceback. Check the reported executable directly:</p>
+<div class="highlight"><pre><span></span><code>/path/to/ffmpeg<span class="w"> </span>-version
+</code></pre></div>
+<p>Repair that ffmpeg installation, or set <code>FFMPEG_PATH</code> to a working executable. Use <code>--debug</code> to include the underlying exception details.</p>
 <h2 id="the-program-doesnt-work-because-the-loudnorm-filter-cant-be-found">The program doesn't work because the "loudnorm" filter can't be found</h2>
 <p>Make sure you run a recent ffmpeg version and that <code>loudnorm</code> is part of the output when you run <code>ffmpeg -filters</code>. Many distributions package outdated ffmpeg versions, or (even worse), Libav's <code>ffmpeg</code> disguising as a real <code>ffmpeg</code> from the FFmpeg project.</p>
 <p>Some ffmpeg builds also do not have the <code>loudnorm</code> filter enabled.</p>

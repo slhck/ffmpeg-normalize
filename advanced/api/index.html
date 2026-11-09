@@ -818,6 +818,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#encoded-output-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encoded-output Verification
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1053,6 +1064,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#encoded-output-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encoded-output Verification
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1106,6 +1128,25 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">normalizer</span><span class="o">.</span><span class="n">format_summary</span><span class="p">())</span>
 </code></pre></div>
 <p>Values that are not available (for example, EBU output values in a dry run) are <code>None</code>. Pass <code>print_summary=True</code> to print the table to stderr at the end of <code>run_normalization()</code>.</p>
+<h2 id="encoded-output-verification">Encoded-output Verification</h2>
+<p>Pass <code>verify=True</code> to decode the encoded output and check the effective level and peak ceiling. Set <code>verify_loudness_tolerance</code> (default 0.5 dB/LU) and <code>verify_peak_tolerance</code> (default 0.1 dB) to adjust the checks.</p>
+<div class="highlight"><pre><span></span><code><span class="n">normalizer</span> <span class="o">=</span> <span class="n">FFmpegNormalize</span><span class="p">(</span>
+    <span class="n">normalization_type</span><span class="o">=</span><span class="s2">"rms"</span><span class="p">,</span>
+    <span class="n">target_level</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">verify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">verify_loudness_tolerance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">verify_peak_tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">normalizer</span><span class="o">.</span><span class="n">add_media_file</span><span class="p">(</span><span class="s2">"input.wav"</span><span class="p">,</span> <span class="s2">"output.wav"</span><span class="p">)</span>
+<span class="n">normalizer</span><span class="o">.</span><span class="n">run_normalization</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">get_summary</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"output_source"</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">"output_level"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"verification"</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"verification"</span><span class="p">])</span>
+</code></pre></div>
+<p>Summary rows retain the existing output values and add <code>output_source</code>: <code>calculated</code>, <code>filter</code>, <code>input</code> (for skipped files), or <code>unavailable</code>. The separate <code>verification</code> object contains the encoded <code>output_stream_id</code>, measured output values, the expected level and peak ceiling, tolerances, <code>passed</code>, and any <code>errors</code>.</p>
+<p>A verification failure sets the media file's <code>status</code> to <code>error</code> and records the reason in its <code>error</code> attribute. As with encoding failures, <code>run_normalization()</code> continues to the next file; API callers must inspect the statuses. Output files are kept. Verification is skipped during dry runs, and is incompatible with ReplayGain or null-device outputs. See the <a href="../../usage/cli-options/">verification CLI reference</a> for effective-target and stream-selection details.</p>
 
 
 

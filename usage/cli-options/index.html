@@ -954,6 +954,39 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --verify
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-verify-loudness-tolerance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --verify-loudness-tolerance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-verify-peak-tolerance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --verify-peak-tolerance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-replaygain" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1990,6 +2023,39 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --verify
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-verify-loudness-tolerance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --verify-loudness-tolerance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-verify-peak-tolerance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --verify-peak-tolerance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-replaygain" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2572,7 +2638,7 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <li>RMS: RMS level and sample peak in dBFS. The output values are computed from the measured input and the applied gain.</li>
 <li>Peak: peak level in dBFS. The output values are computed from the measured input and the applied gain.</li>
 </ul>
-<p>The output values do not include the effect of a <code>--post-filter</code>. In a dry run, output values for EBU are not available, since the second pass does not run. Streams that are not selected for normalization (see <code>--audio-streams</code> and <code>--audio-default-only</code>) are not listed.</p>
+<p>The table labels its output values as filter statistics (EBU) or calculated from applied gain (RMS/peak). These values do not include the effect of a <code>--post-filter</code> or the final encoder. Use <code>--verify</code> to report separate measurements of the encoded output. In a dry run, output values for EBU are not available, since the second pass does not run. Streams that are not selected for normalization (see <code>--audio-streams</code> and <code>--audio-default-only</code>) are not listed.</p>
 <p>The summary goes to stderr, so it can be combined with <code>--print-stats</code>, which writes JSON to stdout.</p>
 <p>Example:</p>
 <div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>*.m4a<span class="w"> </span>--print-summary
@@ -2585,6 +2651,25 @@ loud.m4a         0         -14.1          -23.0             -16.7       -8.9  no
 quiet.m4a        0         -28.1          -23.0             -17.4       +5.2  normalized
 normal.m4a       0         -21.1          -23.0             -18.4       -1.9  normalized
 </code></pre></div>
+<h3 id="-verify"><code>--verify</code></h3>
+<p>Decode and measure the finished output file, then check each normalized audio stream against its effective output level and peak ceiling. This adds an analysis pass over the encoded audio. Passthrough streams and copies retained with <code>--keep-original-audio</code> are not checked.</p>
+<p>The checks use:</p>
+<ul>
+<li>EBU: integrated loudness in LUFS and true peak in dBTP. The effective target includes batch adjustments and <code>--auto-lower-loudness-target</code>.</li>
+<li>RMS: RMS level and sample peak in dBFS. The expected level includes the applied gain, including album headroom limits and <code>--lower-only</code>. The sample peak ceiling is 0 dBFS.</li>
+<li>Peak: sample peak in dBFS. The expected level includes the applied gain; the ceiling is <code>--target-level</code>.</li>
+<li>Files copied through by <code>--threshold</code>: their unchanged input level and peak serve as the reference.</li>
+</ul>
+<p>A level deviation beyond <code>--verify-loudness-tolerance</code> or a peak above its ceiling plus <code>--verify-peak-tolerance</code> marks the file as <code>error</code> and makes the CLI exit nonzero. Non-finite measurements, such as the loudness of digital silence, fail verification. The output file is kept for inspection.</p>
+<p><code>--print-stats</code> includes a separate <code>verification</code> object for each checked stream, with the encoded <code>output_stream_id</code>, measured <code>output_level</code> and <code>output_peak</code>, <code>expected_level</code>, <code>peak_limit</code>, the tolerances, <code>passed</code>, and <code>errors</code>. <code>--print-summary</code> prints the measurements separately from the calculated or filter-derived values.</p>
+<p>Verification is skipped during <code>--dry-run</code>. It cannot be combined with <code>--replaygain</code> or an output directed to the null device.</p>
+<div class="highlight"><pre><span></span><code>ffmpeg-normalize<span class="w"> </span>input.mp3<span class="w"> </span>-o<span class="w"> </span>output.m4a<span class="w"> </span>--verify<span class="w"> </span>--print-summary<span class="w"> </span>--print-stats
+</code></pre></div>
+<h3 id="-verify-loudness-tolerance"><code>--verify-loudness-tolerance</code></h3>
+<p>Allowed absolute deviation from the effective output level in dB/LU. Default: <code>0.5</code>. Must be finite and between 0 and 99.</p>
+<h3 id="-verify-peak-tolerance"><code>--verify-peak-tolerance</code></h3>
+<p>Allowed overshoot above the peak ceiling in dB. Default: <code>0.1</code>. Must be finite and between 0 and 99.</p>
+<p>Lossy encoding and post-filters can change the final level or peak. Inspect failed measurements before increasing the tolerances.</p>
 <h3 id="-replaygain"><code>--replaygain</code></h3>
 <p>Write <a href="https://en.wikipedia.org/wiki/ReplayGain">ReplayGain</a> tags to the original file without normalizing.</p>
 <p>This mode will overwrite the input file and ignore other options. It will strip all ReplayGain tags.</p>
