@@ -14,6 +14,16 @@ ffmpeg-normalize input.wav -o output.m4a -c:a aac -b:a 192k
 
 See [the audio normalization options](../usage/normalization-options.md).
 
+## ffmpeg cannot start
+
+If ffmpeg is missing, is not executable, or cannot load a required shared library, the CLI reports the executable path and the startup failure without a Python traceback. Check the reported executable directly:
+
+```bash
+/path/to/ffmpeg -version
+```
+
+Repair that ffmpeg installation, or set `FFMPEG_PATH` to a working executable. Use `--debug` to include the underlying exception details.
+
 ## The program doesn't work because the "loudnorm" filter can't be found
 
 Make sure you run a recent ffmpeg version and that `loudnorm` is part of the output when you run `ffmpeg -filters`. Many distributions package outdated ffmpeg versions, or (even worse), Libav's `ffmpeg` disguising as a real `ffmpeg` from the FFmpeg project.

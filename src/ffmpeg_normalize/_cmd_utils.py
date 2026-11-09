@@ -179,7 +179,11 @@ class CommandRunner:
         stderr = stderr_bytes.decode("utf8", errors="replace")
 
         if p.returncode != 0:
-            raise RuntimeError(f"Error running command {shlex.join(cmd)}: {stderr}")
+            reason = (
+                stderr.strip()
+                or f"exited with status {p.returncode} without diagnostics"
+            )
+            raise RuntimeError(f"Error running command {shlex.join(cmd)}: {reason}")
 
         self.output = stdout + stderr
         return self
@@ -219,7 +223,9 @@ def get_ffmpeg_exe() -> str:
     if ff_path := os.getenv("FFMPEG_PATH"):
         if os.sep in ff_path:
             if not os.path.isfile(ff_path):
-                raise FFmpegNormalizeError(f"No file exists at {ff_path}")
+                raise FFmpegNormalizeError(
+                    f"ffmpeg executable does not exist: {ff_path}"
+                )
 
             return ff_path
 
@@ -392,7 +398,21 @@ def ffmpeg_has_loudnorm() -> bool:
     Returns:
         bool: True if loudnorm is supported, False otherwise
     """
-    output = CommandRunner().run_command([get_ffmpeg_exe(), "-filters"]).get_output()
+    executable = get_ffmpeg_exe()
+    command = [executable, "-filters"]
+    try:
+        output = CommandRunner().run_command(command).get_output()
+    except (OSError, RuntimeError) as error:
+        _logger.debug("ffmpeg startup failed", exc_info=True)
+        reason = (
+            str(error)
+            .removeprefix(f"Error running command {shlex.join(command)}: ")
+            .strip()
+        )
+        reason = " ".join(reason.splitlines()[:2])
+        raise FFmpegNormalizeError(
+            f"Could not start ffmpeg '{executable}': {reason}"
+        ) from error
     supports_loudnorm = "loudnorm" in output
     if not supports_loudnorm:
         _logger.error(
