@@ -127,7 +127,7 @@ class TestPresetManager:
         preset = manager.load_preset("podcast")
 
         # Merge
-        manager.merge_preset_with_args(preset, args)
+        manager.merge_preset_with_args(preset, args, set())
 
         # Verify preset values were applied
         assert args.normalization_type == "ebu"
@@ -149,7 +149,7 @@ class TestPresetManager:
         preset = manager.load_preset("podcast")
 
         # Merge
-        manager.merge_preset_with_args(preset, args)
+        manager.merge_preset_with_args(preset, args, {"target_level"})
 
         # CLI value should be preserved, not overridden
         assert args.target_level == -14.0
@@ -164,7 +164,7 @@ class TestPresetManager:
         args = parser.parse_args([])
         preset = manager.load_preset("music")
 
-        manager.merge_preset_with_args(preset, args)
+        manager.merge_preset_with_args(preset, args, set())
 
         assert args.normalization_type == "rms"
         assert args.target_level == -20.0

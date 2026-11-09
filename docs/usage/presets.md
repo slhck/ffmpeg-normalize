@@ -78,7 +78,7 @@ CLI options take precedence over preset values. For example, to use the podcast 
 ffmpeg-normalize input.mp3 --preset podcast --audio-codec libmp3lame
 ```
 
-The `--audio-codec` option will then override the preset's codec choice.
+The `--audio-codec` option will then override the preset's codec choice. Explicit options also take precedence when their value matches the program default. For example, `--preset podcast -t -23` uses -23 LUFS rather than the preset's -16 LUFS.
 
 ## Creating Custom Presets
 

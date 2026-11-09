@@ -23,7 +23,7 @@ __version__ = importlib.metadata.version("ffmpeg-normalize")
 _logger = logging.getLogger(__name__)
 
 
-def create_parser() -> argparse.ArgumentParser:
+def create_parser(suppress_defaults: bool = False) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ffmpeg-normalize",
         description=textwrap.dedent(
@@ -672,11 +672,16 @@ def create_parser() -> argparse.ArgumentParser:
         ),
         default=FFmpegNormalize.DEFAULTS["extension"],
     )
+    if suppress_defaults:
+        for action in parser._actions:
+            action.default = argparse.SUPPRESS
     return parser
 
 
 def main() -> None:
-    cli_args = create_parser().parse_args()
+    explicit_args = create_parser(suppress_defaults=True).parse_args()
+    cli_args = create_parser().parse_args([])
+    vars(cli_args).update(vars(explicit_args))
     setup_cli_logger(arguments=cli_args)
 
     def error(message: object) -> NoReturn:
@@ -707,7 +712,9 @@ def main() -> None:
         try:
             preset_data = preset_manager.load_preset(cli_args.preset)
             _logger.debug(f"Loaded preset '{cli_args.preset}': {preset_data}")
-            preset_manager.merge_preset_with_args(preset_data, cli_args)
+            preset_manager.merge_preset_with_args(
+                preset_data, cli_args, set(vars(explicit_args))
+            )
             _logger.info(f"Applied preset '{cli_args.preset}'")
         except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
             error(str(e))
