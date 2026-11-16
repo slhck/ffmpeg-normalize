@@ -1294,9 +1294,10 @@ class MediaFile:
 
                     reason = ""
                     if pass1_stats is not None:
-                        linear_gain = (
-                            self.ffmpeg_normalize.target_level - pass1_stats["input_i"]
-                        )
+                        target_level = audio_stream.verification_target_level
+                        if target_level is None:
+                            target_level = self.ffmpeg_normalize.target_level
+                        linear_gain = target_level - pass1_stats["input_i"]
                         estimated_tp = pass1_stats["input_tp"] + linear_gain
                         if estimated_tp > self.ffmpeg_normalize.true_peak:
                             min_tp = estimated_tp
@@ -1322,6 +1323,11 @@ class MediaFile:
                                 f"exceeds the target ({self.ffmpeg_normalize.loudness_range_target:.2f} LU). "
                                 "Consider raising the target loudness range or using "
                                 "--keep-loudness-range-target / --keep-lra-above-loudness-range-target."
+                            )
+                        elif pass1_stats["input_lra"] == 0:
+                            reason = (
+                                " Reason: the measured input loudness range is zero; "
+                                "the loudnorm filter requires a nonzero measured range for linear normalization."
                             )
 
                     _logger.warning(

@@ -809,6 +809,7 @@ class AudioStream(MediaStream):
             )
 
         target_level = self.ffmpeg_normalize.target_level
+        target_offset = self.loudness_statistics["ebu_pass1"]["target_offset"]
         if self.ffmpeg_normalize.auto_lower_loudness_target:
             safe_target = (
                 self.loudness_statistics["ebu_pass1"]["input_i"]
@@ -818,8 +819,12 @@ class AudioStream(MediaStream):
             )
             if safe_target < self.ffmpeg_normalize.target_level:
                 target_level = safe_target
+                # The first-pass correction belongs to the original target.
+                # Reusing it at the lowered target adds unwanted gain when
+                # loudnorm falls back to dynamic mode (e.g. for zero LRA).
+                target_offset = 0.0
                 _logger.warning(
-                    f"{self.media_file.input_file}: Using loudness target {target_level} because --auto-lower-loudness-target given.",
+                    f"{self.media_file.input_file}: Using loudness target {target_level:.2f} because --auto-lower-loudness-target given.",
                 )
 
         stats = self.loudness_statistics["ebu_pass1"]
@@ -865,9 +870,7 @@ class AudioStream(MediaStream):
             "i": target_level,
             "lra": self.media_file.ffmpeg_normalize.loudness_range_target,
             "tp": self.media_file.ffmpeg_normalize.true_peak,
-            "offset": self._constrain(
-                stats["target_offset"], -99, 99, name="target_offset"
-            ),
+            "offset": self._constrain(target_offset, -99, 99, name="target_offset"),
             "measured_i": self._constrain(stats["input_i"], -99, 0, name="input_i"),
             "measured_lra": self._constrain(
                 stats["input_lra"], 0, 99, name="input_lra"

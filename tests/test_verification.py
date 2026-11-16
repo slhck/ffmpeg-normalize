@@ -155,7 +155,10 @@ def test_effective_levels_are_verified(tmp_path, options):
 
 @pytest.mark.parametrize(
     "options,target,tolerance",
-    [(["--dynamic"], -10, 0.5), (["--auto-lower-loudness-target"], -5, 1.0)],
+    [
+        (["--dynamic"], -10, 0.5),
+        (["--auto-lower-loudness-target"], -5, 0.1),
+    ],
 )
 def test_ebu_effective_targets(tmp_path, options, target, tolerance):
     result = run_cli(
@@ -175,6 +178,36 @@ def test_ebu_effective_targets(tmp_path, options, target, tolerance):
     assert verification["passed"] is True
     if "--auto-lower-loudness-target" in options:
         assert verification["expected_level"] < -5
+        assert "the input true peak" not in result.stderr
+
+
+@pytest.mark.parametrize("target", [-5, -23])
+@pytest.mark.parametrize("offset", [-1.5, 1.5])
+def test_auto_lower_discards_correction_only_for_changed_target(
+    tmp_path, target, offset
+):
+    normalizer = FFmpegNormalize(target_level=target, auto_lower_loudness_target=True)
+    normalizer.add_media_file("tests/test_quiet.m4a", str(tmp_path / "output.wav"))
+    stream = normalizer.media_files[0].streams["audio"][0]
+    stream.loudness_statistics["ebu_pass1"] = {
+        "input_i": -28.14,
+        "input_tp": -22.55,
+        "input_lra": 0.0,
+        "input_thresh": -38.14,
+        "output_i": target - offset,
+        "output_tp": -2.0,
+        "output_lra": 0.0,
+        "output_thresh": target - offset - 10,
+        "target_offset": offset,
+        "normalization_type": "dynamic",
+    }
+    filter_string = stream.get_second_pass_opts_ebu()
+    options = dict(
+        option.split("=")
+        for option in filter_string.removeprefix("loudnorm=").split(":")
+    )
+    assert float(options["offset"]) == (0 if target == -5 else offset)
+    assert float(options["i"]) == pytest.approx(-7.69 if target == -5 else target)
 
 
 @pytest.mark.parametrize(
