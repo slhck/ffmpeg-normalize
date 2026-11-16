@@ -2,6 +2,7 @@ import json
 import os
 import shlex
 import shutil
+import stat
 import subprocess
 import sys
 from typing import Any, Dict, List, Literal, Tuple, cast
@@ -238,6 +239,17 @@ class TestFFmpegNormalize:
 
         assert test_file.stat().st_size > 0
         assert test_file.read_bytes() != original_bytes
+
+    def test_in_place_overwrite_keeps_file_mode(self, tmp_path):
+        test_file = tmp_path / "test.mp3"
+        shutil.copy("tests/test.mp3", test_file)
+        test_file.chmod(0o644)
+
+        ffmpeg_normalize_call(
+            [str(test_file), "-o", str(test_file), "-c:a", "libmp3lame", "-f"]
+        )
+
+        assert stat.S_IMODE(test_file.stat().st_mode) == 0o644
 
     def test_dry(self):
         ffmpeg_normalize_call(["tests/test.mp4", "-n"])

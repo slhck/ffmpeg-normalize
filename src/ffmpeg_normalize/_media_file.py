@@ -6,7 +6,7 @@ from copy import copy
 import os
 import re
 import shlex
-from shutil import copyfile, rmtree
+from shutil import copyfile, copymode, rmtree
 from tempfile import mkdtemp, mkstemp
 from typing import TYPE_CHECKING, Iterable, Iterator, Literal, TypedDict, Union
 
@@ -1239,6 +1239,8 @@ class MediaFile:
                 dir=output_dir,
             )
             os.close(fd)
+            # mkstemp creates the file with mode 0600; keep the input's mode
+            copymode(self.input_file, temp_file)
             _logger.debug(
                 f"Output file is the same as the input file, "
                 f"encoding to temporary file {temp_file} first"
