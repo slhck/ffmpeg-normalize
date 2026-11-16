@@ -992,9 +992,19 @@ def main() -> None:
         if media_file.status == "error"
     ]
     if failed_files:
-        _logger.error(f"{len(failed_files)} file(s) failed to process:")
-        for media_file in failed_files:
-            _logger.error(f"  - {media_file.input_file}: {media_file.error}")
+        # The individual errors were already logged when each file failed
+        _logger.error(
+            f"{len(failed_files)} of {len(ffmpeg_normalize.media_files)} file(s) "
+            "failed to process: "
+            + ", ".join(media_file.input_file for media_file in failed_files)
+        )
+        if not cli_args.debug:
+            get_console().print(
+                "[dim]Re-run with [bold]--debug[/bold] to see the full ffmpeg "
+                "output. Please include it when reporting a bug at "
+                "https://github.com/slhck/ffmpeg-normalize/issues[/dim]",
+                soft_wrap=True,
+            )
         sys.exit(1)
 
 

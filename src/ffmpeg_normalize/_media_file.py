@@ -1233,7 +1233,6 @@ class MediaFile:
         try:
             yield from cmd_runner.run_ffmpeg_command(cmd)
         except Exception as e:
-            _logger.error(f"Error while running command {shlex.join(cmd)}! Error: {e}")
             if temp_file and os.path.exists(temp_file):
                 os.remove(temp_file)
             raise e

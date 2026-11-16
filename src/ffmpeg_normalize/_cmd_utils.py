@@ -77,6 +77,120 @@ _MUXER_NAME_FOR_EXT = {
 }
 
 
+_INFO_LINE_PREFIXES = (
+    "input #",
+    "output #",
+    "metadata:",
+    "duration:",
+    "stream #",
+    "stream mapping:",
+    "side data:",
+    "chapters:",
+    "chapter #",
+    "press [q]",
+    "frame=",
+    "size=",
+    "video:",
+    # side data entries
+    "replay gain:",
+    "audio service type:",
+    "display matrix:",
+    "displaymatrix:",
+    "cpb:",
+    "stereo 3d:",
+    "stereo3d:",
+    "mastering display metadata:",
+    "content light level metadata:",
+    "spherical:",
+    "dovi configuration record:",
+    "ambient viewing environment:",
+    "icc profile:",
+)
+_ERROR_KEYWORDS = re.compile(
+    r"error|invalid|unable|could not|cannot|can't|failed|not found|no such|"
+    r"permission denied|unknown|unrecognized|not supported|does not|too many|"
+    r"unsupported|expected",
+    re.IGNORECASE,
+)
+_CONTEXT_PREFIX = re.compile(r"^\[[^\]]+ @ (0x)?[0-9a-fA-F]+\]\s*")
+_KEY_VALUE_LINE = re.compile(r"^[\w.-]+\s{2,}:\s")
+
+
+def summarize_ffmpeg_output(output: str, max_lines: int = 2) -> str:
+    """
+    Extract the main error message from ffmpeg's stderr output.
+
+    ffmpeg prints a lot of context (input/stream information, metadata) before
+    the actual error, and reports the root cause before any follow-up errors.
+    This skips the context and returns the first lines after it, without the
+    `[component @ 0x...]` prefixes. If there is no such line, the first lines
+    that look like errors are used instead.
+
+    Args:
+        output (str): The stderr output of ffmpeg
+        max_lines (int, optional): Maximum number of lines to keep. Defaults to 2.
+
+    Returns:
+        str: The error message, with multiple lines joined by "; "
+    """
+    all_lines: list[str] = []
+    after_info: list[str] = []
+    for raw_line in CommandRunner.prune_ffmpeg_progress_from_output(
+        output
+    ).splitlines():
+        line = _CONTEXT_PREFIX.sub("", raw_line.strip())
+        if not line:
+            continue
+        if line.lower().startswith(_INFO_LINE_PREFIXES) or _KEY_VALUE_LINE.match(line):
+            after_info = []
+            continue
+        all_lines.append(line)
+        after_info.append(line)
+
+    selected = after_info or [
+        line for line in all_lines if _ERROR_KEYWORDS.search(line)
+    ]
+    # Drop duplicates while keeping order
+    unique = list(dict.fromkeys(selected))[:max_lines]
+    return "; ".join(unique) if unique else "ffmpeg failed without an error message"
+
+
+class FFmpegCommandError(RuntimeError):
+    """
+    Raised when an ffmpeg command fails.
+
+    `str()` of the error contains the full command and output, as before.
+    Use `summary` for a short, user-facing description of the failure.
+    """
+
+    def __init__(self, cmd: list[str], output: str, returncode: int | None = None):
+        self.cmd = cmd
+        self.output = output
+        self.returncode = returncode
+        reason = output.strip() or (
+            f"exited with status {returncode} without diagnostics"
+            if returncode is not None
+            else "failed without diagnostics"
+        )
+        self.summary = summarize_ffmpeg_output(output) if output.strip() else reason
+        super().__init__(f"Error running command {shlex.join(cmd)}: {reason}")
+
+
+def describe_error(error: BaseException) -> str:
+    """
+    Return a short, user-facing description of an error.
+
+    Args:
+        error (BaseException): The error
+
+    Returns:
+        str: The ffmpeg error summary for failed ffmpeg commands, otherwise `str(error)`
+    """
+    if isinstance(error, FFmpegCommandError):
+        return f"ffmpeg failed: {error.summary}"
+    return str(error)
+
+
 class CommandRunner:
     """
     Wrapper for running ffmpeg commands
@@ -134,9 +248,16 @@ class CommandRunner:
         # wrapper for 'ffmpeg-progress-yield'
         _logger.debug(f"Running command: {shlex.join(cmd)}")
         with FfmpegProgress(cmd, dry_run=self.dry) as ff:
-            yield from ff.run_command_with_progress(
-                popen_kwargs=_get_ffmpeg_popen_kwargs()
-            )
+            try:
+                yield from ff.run_command_with_progress(
+                    popen_kwargs=_get_ffmpeg_popen_kwargs()
+                )
+            except RuntimeError as e:
+                if isinstance(e, FFmpegCommandError):
+                    raise
+                output = ff.stderr or str(e)
+                _logger.debug(f"ffmpeg command failed: {shlex.join(cmd)}\n{output}")
+                raise FFmpegCommandError(cmd, output) from e
 
             self.output = ff.stderr
 
@@ -179,11 +300,7 @@ class CommandRunner:
         stderr = stderr_bytes.decode("utf8", errors="replace")
 
         if p.returncode != 0:
-            reason = (
-                stderr.strip()
-                or f"exited with status {p.returncode} without diagnostics"
-            )
-            raise RuntimeError(f"Error running command {shlex.join(cmd)}: {reason}")
+            raise FFmpegCommandError(cmd, stderr, returncode=p.returncode)
 
         self.output = stdout + stderr
         return self

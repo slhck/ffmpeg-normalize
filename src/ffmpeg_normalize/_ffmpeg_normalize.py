@@ -14,6 +14,7 @@ from rich.table import Table
 from rich.text import Text
 
 from ._cmd_utils import (
+    describe_error,
     PCM_INCOMPATIBLE_EXTS,
     PCM_INCOMPATIBLE_FORMATS,
     ffmpeg_has_loudnorm,
@@ -640,9 +641,7 @@ class FFmpegNormalize:
                             "Dynamic EBU mode: First pass skipped for this file."
                         )
                 except Exception as e:
-                    media_file.status = "error"
-                    media_file.error = str(e)
-                    _logger.error(f"Error analyzing input file {media_file}: {e}")
+                    self._record_failure(media_file, e, "analyzing")
                     continue
 
             # Phase 2: Calculate batch reference loudness
@@ -665,9 +664,7 @@ class FFmpegNormalize:
                     if self.verify and not self.dry_run:
                         media_file.verify_output()
                 except Exception as e:
-                    media_file.status = "error"
-                    media_file.error = str(e)
-                    _logger.error(f"Error processing input file {media_file}: {e}")
+                    self._record_failure(media_file, e, "processing")
                     continue
         else:
             # Non-batch mode: process each file completely before moving to the next
@@ -681,10 +678,26 @@ class FFmpegNormalize:
                     if self.verify and not self.dry_run:
                         media_file.verify_output()
                 except Exception as e:
-                    media_file.status = "error"
-                    media_file.error = str(e)
-                    _logger.error(f"Error processing input file {media_file}: {e}")
+                    self._record_failure(media_file, e, "processing")
                     continue
+
+    @staticmethod
+    def _record_failure(media_file: MediaFile, error: Exception, action: str) -> None:
+        """
+        Mark a media file as failed and log a short description of the error.
+
+        The full error (e.g. the complete ffmpeg output) is only logged in
+        debug mode.
+
+        Args:
+            media_file (MediaFile): The file that failed
+            error (Exception): The error
+            action (str): What was being done, e.g. "processing"
+        """
+        media_file.status = "error"
+        media_file.error = describe_error(error)
+        _logger.debug(f"Full error for {media_file.input_file}: {error}", exc_info=True)
+        _logger.error(f"Error {action} input file {media_file}: {media_file.error}")
 
     def get_summary(self) -> list[SummaryRow]:
         """
