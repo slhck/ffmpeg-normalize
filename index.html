@@ -1113,6 +1113,7 @@
 <li><strong>Skip files already at target</strong> — Avoid re-encoding files already within a threshold of the target level</li>
 <li><strong>Per-file outcome reporting</strong> — <code>status</code> field in <code>--print-stats</code> plus exit codes for scripting</li>
 <li><strong>Before/after summary</strong> — Print a table of input and output levels and the applied gain for all files with <code>--print-summary</code></li>
+<li><strong>Friendly terminal output</strong> — Colored help and messages, progress bars in interactive terminals, and concise ffmpeg error messages</li>
 <li><strong>Self-documenting output</strong> — Optionally record the effective encoder settings as an <code>ENCODER_SETTINGS</code> tag</li>
 <li><strong>Video file support</strong> — Process video files while preserving video streams</li>
 <li><strong>Docker support</strong> — Run via Docker container</li>
@@ -1122,6 +1123,13 @@
 </ul>
 <h2 id="whats-new">🆕 What's New</h2>
 <ul>
+<li>
+<p>Version 1.45.0 has a <strong>refreshed terminal interface</strong> based on <a href="https://github.com/Textualize/rich">rich</a>: colored <code>--help</code> output, colored log messages, progress bars with the current file name and ETA, and a formatted <code>--print-summary</code> table. When ffmpeg fails, only the root cause is shown (once), and <code>--debug</code> shows the full ffmpeg output for bug reports. Redirected output stays plain text, and the <code>LEVEL: message</code> log format is unchanged.</p>
+<div class="admonition warning">
+<p class="admonition-title">Breaking change</p>
+<p>Progress bars are now shown <strong>by default</strong> when stderr is an interactive terminal (unless <code>--quiet</code> is set). Non-interactive use, e.g. in scripts, cron jobs or with redirected output, is not affected. If you parse the output of an interactive session (for example via a pseudo-terminal), pass <code>--no-progress</code> to disable the bars. <code>-pr</code>/<code>--progress</code> still forces them on.</p>
+</div>
+</li>
 <li>
 <p>Version 1.42.0 can optionally write an <strong><code>ENCODER_SETTINGS</code></strong> tag on each normalized audio stream via <code>--write-encoder-settings</code>. The tag holds an ffmpeg-command-equivalent string — the audio codec, bitrate, sample rate and channels, plus the normalization filter including the measured loudnorm values — so a normalized file documents how it was produced. This is a Matroska/WebM convention and has no effect with <code>--metadata-disable</code>.</p>
 <p>Example:</p>
