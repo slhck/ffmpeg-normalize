@@ -20,7 +20,7 @@ from ._presets import PresetManager
 
 __version__ = importlib.metadata.version("ffmpeg-normalize")
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger("ffmpeg_normalize.__main__")
 
 
 def create_parser(suppress_defaults: bool = False) -> argparse.ArgumentParser:
