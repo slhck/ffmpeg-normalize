@@ -1,3 +1,23 @@
+## [1.45.0] - 2026-11-16
+
+### 🚀 Features
+
+- *(cli)* Use rich for help, logs and progress
+- *(cli)* Show progress by default in terminals
+
+### 🐛 Bug Fixes
+
+- *(cli)* Show prefix and color for main errors
+- *(cli)* Show short ffmpeg errors only once
+
+### 📚 Documentation
+
+- *(api)* Regenerate API docs
+- [**breaking**] Note progress is now on by default in terminals
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.45.0
 ## [1.44.1] - 2026-11-16
 
 ### 🐛 Bug Fixes
