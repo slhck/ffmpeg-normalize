@@ -1,3 +1,17 @@
+## [1.44.1] - 2026-11-16
+
+### 🐛 Bug Fixes
+
+- *(io)* Keep the file mode when normalizing in place
+- *(ebu)* Reset offset for auto-lowered targets
+
+### 📚 Documentation
+
+- *(credits)* Add jayhemnani9910
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.44.1
 ## [1.44.0] - 2026-11-09
 
 ### 🚀 Features
