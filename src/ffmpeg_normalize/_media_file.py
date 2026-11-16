@@ -15,7 +15,6 @@ from mutagen.mp3 import MP3
 from mutagen.mp4 import MP4
 from mutagen.oggopus import OggOpus
 from mutagen.oggvorbis import OggVorbis
-from tqdm import tqdm
 
 from ._cmd_utils import (
     DUR_REGEX,
@@ -43,8 +42,6 @@ _logger = logging.getLogger(__name__)
 # We may need to remove other formats as well, to be checked.
 AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mka", "oga", "ogg", "opus", "wav"}
 ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
-
-TQDM_BAR_FORMAT = "{desc}: {percentage:3.2f}% |{bar}{r_bar}"
 
 
 def _to_ms(**kwargs: str) -> int:
@@ -352,18 +349,9 @@ class MediaFile:
             self.output_file = self.temp_file
 
         # run the second pass as a whole.
-        if self.ffmpeg_normalize.progress:
-            with tqdm(
-                total=100,
-                position=1,
-                desc="Second Pass",
-                bar_format=TQDM_BAR_FORMAT,
-            ) as pbar:
-                for progress in self._second_pass():
-                    pbar.update(progress - pbar.n)
-        else:
-            for _ in self._second_pass():
-                pass
+        with self.ffmpeg_normalize.progress_display.task("Second pass") as update:
+            for progress in self._second_pass():
+                update(progress)
 
         # remove temp dir; this will remove the temp file as well if it has not been renamed (e.g. for replaygain)
         if temp_dir and os.path.exists(temp_dir):
@@ -865,18 +853,10 @@ class MediaFile:
             else:
                 fun = getattr(audio_stream, "parse_astats")
 
-            if self.ffmpeg_normalize.progress:
-                with tqdm(
-                    total=100,
-                    position=1,
-                    desc=f"Stream {index + 1}/{len(streams_to_normalize)}",
-                    bar_format=TQDM_BAR_FORMAT,
-                ) as pbar:
-                    for progress in fun():
-                        pbar.update(progress - pbar.n)
-            else:
-                for _ in fun():
-                    pass
+            description = f"First pass, stream {index + 1}/{len(streams_to_normalize)}"
+            with self.ffmpeg_normalize.progress_display.task(description) as update:
+                for progress in fun():
+                    update(progress)
 
     def _get_stream_filter_chain(self, audio_stream: AudioStream) -> list[str]:
         """

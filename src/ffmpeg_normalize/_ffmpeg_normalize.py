@@ -6,9 +6,12 @@ import math
 import os
 import sys
 from itertools import chain
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Iterator, Literal
 
-from tqdm import tqdm
+from rich import box
+from rich.console import Group, RenderableType
+from rich.table import Table
+from rich.text import Text
 
 from ._cmd_utils import (
     PCM_INCOMPATIBLE_EXTS,
@@ -18,6 +21,7 @@ from ._cmd_utils import (
     get_muxer_default_audio_encoder,
     validate_input_file,
 )
+from ._console import ProgressDisplay, display_name, get_console
 from ._errors import FFmpegNormalizeError
 from ._media_file import MediaFile
 
@@ -292,6 +296,7 @@ class FFmpegNormalize:
         self.dry_run = dry_run
         self.debug = debug
         self.progress = progress
+        self.progress_display = ProgressDisplay(enabled=False)
         self.replaygain = replaygain
         self.batch = batch
 
@@ -520,6 +525,24 @@ class FFmpegNormalize:
 
         return batch_reference
 
+    def _iter_media_files(self, description: str) -> Iterator[tuple[int, MediaFile]]:
+        """
+        Iterate over all media files while updating the overall progress bar.
+
+        Args:
+            description (str): Label of the overall progress bar
+
+        Yields:
+            tuple[int, MediaFile]: The index and the media file
+        """
+        display = self.progress_display
+        display.start_overall(description, self.file_count)
+        for index, media_file in enumerate(self.media_files):
+            display.set_current(display_name(media_file.input_file))
+            yield index, media_file
+            display.advance_overall()
+        display.set_current(None)
+
     def run_normalization(self) -> None:
         """
         Run the normalization procedures.
@@ -547,6 +570,34 @@ class FFmpegNormalize:
                 [media_file.input_file for media_file in self.media_files],
                 [media_file.output_file for media_file in self.media_files],
             )
+        with ProgressDisplay(enabled=self.progress) as display:
+            self.progress_display = display
+            try:
+                self._process_media_files()
+            finally:
+                self.progress_display = ProgressDisplay(enabled=False)
+
+        if self.print_stats:
+            json.dump(
+                list(
+                    chain.from_iterable(
+                        media_file.get_stats() for media_file in self.media_files
+                    )
+                ),
+                sys.stdout,
+                indent=4,
+            )
+            print()
+
+        if self.print_summary:
+            console = get_console()
+            if console.is_terminal:
+                console.print(self.summary_renderable())
+            else:
+                print(self.format_summary(), file=sys.stderr)
+
+    def _process_media_files(self) -> None:
+        """Run both passes for all media files, in batch or per-file mode."""
         if self.batch:
             # Batch mode: analyze all files first, then normalize with relative adjustments
             _logger.info(
@@ -575,14 +626,7 @@ class FFmpegNormalize:
 
             # Phase 1: Run first pass on all files to collect measurements
             _logger.info("Phase 1: Analyzing all files...")
-            for index, media_file in enumerate(
-                tqdm(
-                    self.media_files,
-                    desc="Analysis",
-                    disable=not self.progress,
-                    position=0,
-                )
-            ):
+            for index, media_file in self._iter_media_files("Analysis"):
                 _logger.info(
                     f"Analyzing file {media_file} ({index + 1} of {self.file_count})"
                 )
@@ -606,14 +650,7 @@ class FFmpegNormalize:
 
             # Phase 3: Run second pass on all files with batch reference
             _logger.info("Phase 2: Normalizing all files...")
-            for index, media_file in enumerate(
-                tqdm(
-                    self.media_files,
-                    desc="Normalization",
-                    disable=not self.progress,
-                    position=0,
-                )
-            ):
+            for index, media_file in self._iter_media_files("Normalization"):
                 # Skip files that already failed during analysis
                 if media_file.status == "error":
                     _logger.debug(f"Skipping {media_file} because its analysis failed")
@@ -634,11 +671,7 @@ class FFmpegNormalize:
                     continue
         else:
             # Non-batch mode: process each file completely before moving to the next
-            for index, media_file in enumerate(
-                tqdm(
-                    self.media_files, desc="File", disable=not self.progress, position=0
-                )
-            ):
+            for index, media_file in self._iter_media_files("Files"):
                 _logger.info(
                     f"Normalizing file {media_file} ({index + 1} of {self.file_count})"
                 )
@@ -652,21 +685,6 @@ class FFmpegNormalize:
                     media_file.error = str(e)
                     _logger.error(f"Error processing input file {media_file}: {e}")
                     continue
-
-        if self.print_stats:
-            json.dump(
-                list(
-                    chain.from_iterable(
-                        media_file.get_stats() for media_file in self.media_files
-                    )
-                ),
-                sys.stdout,
-                indent=4,
-            )
-            print()
-
-        if self.print_summary:
-            print(self.format_summary(), file=sys.stderr)
 
     def get_summary(self) -> list[SummaryRow]:
         """
@@ -687,12 +705,16 @@ class FFmpegNormalize:
             )
         )
 
-    def format_summary(self) -> str:
+    def _summary_parts(
+        self,
+    ) -> tuple[str, list[str], list[list[str]], list[tuple[str, bool]], list[str]]:
         """
-        Return the before/after summary as a human-readable table.
+        Collect the pieces of the before/after summary.
 
         Returns:
-            str: The formatted table, including a header line with the target
+            tuple: The header, the column headings, the table rows, the
+                verification lines (text and whether the check passed), and
+                additional notes
         """
         if self.normalization_type == "ebu":
             header = (
@@ -719,15 +741,12 @@ class FFmpegNormalize:
         if self.dry_run:
             header += ", dry run"
 
-        rows = self.get_summary()
-        if not rows:
-            return f"Summary ({header}): no files processed"
-
         def fmt(value: float | None, signed: bool = False) -> str:
             if value is None:
                 return "-"
             return f"{value:+.1f}" if signed else f"{value:.1f}"
 
+        rows = self.get_summary()
         table: list[list[str]] = []
         for row in rows:
             values = [fmt(row["input_level"]), fmt(row["output_level"])]
@@ -738,7 +757,50 @@ class FFmpegNormalize:
                 [row["input_file"], str(row["stream_id"]), *values, row["status"]]
             )
 
-        headings = ["File", "Stream", *columns, "Status"]
+        verifications: list[tuple[str, bool]] = []
+        notes: list[str] = []
+        verified = [row for row in rows if "verification" in row]
+        if verified:
+            level_unit = "LUFS" if self.normalization_type == "ebu" else "dBFS"
+            peak_unit = "dBTP" if self.normalization_type == "ebu" else "dBFS"
+            for row in verified:
+                result = row["verification"]
+                outcome = "passed" if result["passed"] else "FAILED"
+                verifications.append(
+                    (
+                        f"{row['output_file']} stream {result['output_stream_id']}: "
+                        f"level {fmt(result['output_level'])} {level_unit}, "
+                        f"peak {fmt(result['output_peak'])} {peak_unit}, {outcome}",
+                        result["passed"],
+                    )
+                )
+        elif self.verify and self.dry_run:
+            notes.append("Encoded-output verification skipped: dry run.")
+
+        return (
+            header,
+            ["File", "Stream", *columns, "Status"],
+            table,
+            verifications,
+            notes,
+        )
+
+    _SUMMARY_FOOTNOTE = (
+        "Output values above: loudnorm filter statistics for EBU; "
+        "calculated from applied gain for RMS/peak; input levels for skipped files."
+    )
+
+    def format_summary(self) -> str:
+        """
+        Return the before/after summary as a human-readable table.
+
+        Returns:
+            str: The formatted table, including a header line with the target
+        """
+        header, headings, table, verifications, notes = self._summary_parts()
+        if not table:
+            return f"Summary ({header}): no files processed"
+
         widths = [
             max(len(headings[i]), *(len(line[i]) for line in table))
             for i in range(len(headings))
@@ -757,23 +819,65 @@ class FFmpegNormalize:
         lines = [f"Summary ({header}):", "", fmt_line(headings)]
         lines.append(fmt_line(["-" * w for w in widths]))
         lines.extend(fmt_line(line) for line in table)
-        lines.append(
-            "\nOutput values above: loudnorm filter statistics for EBU; "
-            "calculated from applied gain for RMS/peak; input levels for skipped files."
-        )
-        verified = [row for row in rows if "verification" in row]
-        if verified:
-            level_unit = "LUFS" if self.normalization_type == "ebu" else "dBFS"
-            peak_unit = "dBTP" if self.normalization_type == "ebu" else "dBFS"
+        lines.append("\n" + self._SUMMARY_FOOTNOTE)
+        if verifications:
             lines.append("\nEncoded-output verification (measured after encoding):")
-            for row in verified:
-                result = row["verification"]
-                outcome = "passed" if result["passed"] else "FAILED"
-                lines.append(
-                    f"{row['output_file']} stream {result['output_stream_id']}: "
-                    f"level {fmt(result['output_level'])} {level_unit}, "
-                    f"peak {fmt(result['output_peak'])} {peak_unit}, {outcome}"
-                )
-        elif self.verify and self.dry_run:
-            lines.append("\nEncoded-output verification skipped: dry run.")
+            lines.extend(text for text, _ in verifications)
+        for note in notes:
+            lines.append("\n" + note)
         return "\n".join(lines)
+
+    def summary_renderable(self) -> RenderableType:
+        """
+        Return the before/after summary as a rich renderable for terminals.
+
+        Returns:
+            RenderableType: A table with the same content as `format_summary()`
+        """
+        header, headings, table, verifications, notes = self._summary_parts()
+        if not table:
+            return Text(f"Summary ({header}): no files processed")
+
+        status_styles = {"normalized": "status.ok", "skipped": "status.skipped"}
+        summary = Table(
+            title=f"Summary ({header})",
+            title_justify="left",
+            title_style="bold",
+            caption=self._SUMMARY_FOOTNOTE,
+            caption_justify="left",
+            caption_style="dim",
+            header_style="bold",
+            box=box.SIMPLE_HEAD,
+        )
+        last = len(headings) - 1
+        for i, heading in enumerate(headings):
+            summary.add_column(
+                heading,
+                justify="left" if i in (0, last) else "right",
+                overflow="fold",
+                no_wrap=i != 0,
+            )
+        for line in table:
+            status = line[-1]
+            summary.add_row(
+                *line[:-1],
+                Text(status, style=status_styles.get(status, "status.error")),
+            )
+
+        parts: list[RenderableType] = [summary]
+        if verifications:
+            parts.append(
+                Text(
+                    "Encoded-output verification (measured after encoding):",
+                    style="bold",
+                )
+            )
+            for text, passed in verifications:
+                parts.append(
+                    Text(
+                        f"  {'✔' if passed else '✘'} {text}",
+                        style="status.ok" if passed else "status.error",
+                    )
+                )
+        parts.extend(Text(note, style="dim") for note in notes)
+        return Group(*parts)

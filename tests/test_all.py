@@ -616,8 +616,10 @@ class TestFFmpegNormalize:
 
     def test_progress(self):
         _, stderr = ffmpeg_normalize_call(["tests/test.mp4", "-pr"])
-        assert "0/100" in stderr
-        assert "100/100" in stderr or "100%" in stderr
+        # Without a terminal, rich prints the final state of the overall bar
+        assert "Files" in stderr
+        assert "100%" in stderr
+        assert "1/1" in stderr
         assert os.path.isfile("normalized/test.mkv")
 
     def test_duration(self):

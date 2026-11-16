@@ -13,6 +13,11 @@ import textwrap
 from json.decoder import JSONDecodeError
 from typing import NoReturn
 
+from rich.console import Console
+from rich.markup import escape
+from rich_argparse import RawTextRichHelpFormatter
+
+from ._console import get_console
 from ._errors import FFmpegNormalizeError
 from ._ffmpeg_normalize import NORMALIZATION_TYPES, FFmpegNormalize
 from ._logger import setup_cli_logger
@@ -21,6 +26,21 @@ from ._presets import PresetManager
 __version__ = importlib.metadata.version("ffmpeg-normalize")
 
 _logger = logging.getLogger("ffmpeg_normalize.__main__")
+
+
+class HelpFormatter(RawTextRichHelpFormatter):
+    """Colored help output that keeps the manual line breaks of the help texts."""
+
+    group_name_formatter = str
+    styles = {
+        **RawTextRichHelpFormatter.styles,
+        "argparse.groups": "bold yellow",
+        "argparse.args": "cyan",
+        "argparse.metavar": "dark_cyan",
+        "argparse.prog": "bold green",
+        "argparse.syntax": "bold",
+        "argparse.text": "default",
+    }
 
 
 def create_parser(suppress_defaults: bool = False) -> argparse.ArgumentParser:
@@ -34,7 +54,7 @@ def create_parser(suppress_defaults: bool = False) -> argparse.ArgumentParser:
         # manually overridden because argparse generates the wrong order of arguments, see:
         # https://github.com/slhck/ffmpeg-normalize/issues/132#issuecomment-662516535
         usage="%(prog)s INPUT [INPUT ...] [-o OUTPUT [OUTPUT ...]] [options]",
-        formatter_class=argparse.RawTextHelpFormatter,
+        formatter_class=HelpFormatter,
         epilog=textwrap.dedent(
             """\
             The program additionally respects environment variables:
@@ -702,7 +722,8 @@ def create_parser(suppress_defaults: bool = False) -> argparse.ArgumentParser:
 
 
 def main() -> None:
-    explicit_args = create_parser(suppress_defaults=True).parse_args()
+    parser = create_parser(suppress_defaults=True)
+    explicit_args = parser.parse_args()
     cli_args = create_parser().parse_args([])
     vars(cli_args).update(vars(explicit_args))
     setup_cli_logger(arguments=cli_args)
@@ -717,17 +738,27 @@ def main() -> None:
     # Handle --list-presets
     preset_manager = PresetManager()
     if cli_args.list_presets:
+        console = Console(highlight=False)
         presets_with_source = preset_manager.get_presets_with_source()
         if presets_with_source:
-            print("Available presets:")
+            console.print("[bold]Available presets:[/bold]")
             for preset_name, source in presets_with_source:
-                source_label = "(user)" if source == "user" else "(builtin)"
-                print(f"  - {preset_name} {source_label}")
+                source_label = (
+                    "[cyan](user)[/cyan]"
+                    if source == "user"
+                    else "[dim](builtin)[/dim]"
+                )
+                console.print(
+                    f"  - [green]{escape(preset_name)}[/green] {source_label}"
+                )
         else:
-            print("No presets found.")
-        print()
-        print(f"User presets directory: {preset_manager.presets_dir}")
-        print("Place custom .json preset files in this directory.")
+            console.print("No presets found.")
+        console.print()
+        console.print(
+            f"User presets directory: [bold]{escape(str(preset_manager.presets_dir))}[/bold]",
+            soft_wrap=True,
+        )
+        console.print("Place custom .json preset files in this directory.")
         sys.exit(0)
 
     # Load and apply preset if specified
@@ -847,7 +878,14 @@ def main() -> None:
             input_files.extend([line.strip() for line in f if line.strip()])
 
     if not input_files:
-        error("No input files specified. Use positional arguments or --input-list.")
+        parser.print_usage(sys.stderr)
+        _logger.error(
+            "No input files specified. Use positional arguments or --input-list."
+        )
+        get_console().print(
+            "Run [bold cyan]ffmpeg-normalize --help[/bold cyan] to see all options."
+        )
+        sys.exit(1)
 
     # Validate all input files upfront before processing
     _logger.debug("Validating all input files before processing...")

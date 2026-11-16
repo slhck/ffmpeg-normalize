@@ -99,11 +99,10 @@ This ensures users have accurate documentation and working shell completions for
 
 The project uses:
 
-- `tqdm` for progress bars
+- `rich` for progress bars, colored log output and summary tables
+- `rich-argparse` for colored `--help` output
 - `ffmpeg-progress-yield` for FFmpeg progress monitoring
-- `colorlog` for colored logging
 - `mutagen` for metadata handling
-- `colorama` (Windows only) for colored terminal output
 
 ### File Structure
 

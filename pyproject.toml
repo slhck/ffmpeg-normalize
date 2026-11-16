@@ -30,11 +30,10 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "tqdm>=4.64.1",
-    "colorama>=0.4.6; platform_system=='Windows'",
     "ffmpeg-progress-yield>=1.0.1",
-    "colorlog==6.7.0",
     "mutagen>=1.47.0",
+    "rich>=13.7.0",
+    "rich-argparse>=1.5.0",
 ]
 
 [project.urls]
@@ -52,7 +51,6 @@ package-data = {"ffmpeg_normalize" = ["data/**/*.json"]}
 dev = [
     "pytest>=9.0.3",
     "ruff>=0.12.11",
-    "types-tqdm",
     "shtab>=1.7.0",
     "ty>=0.0.24",
 ]
