@@ -152,8 +152,26 @@ def create_parser(suppress_defaults: bool = False) -> argparse.ArgumentParser:
     group_general.add_argument(
         "-pr",
         "--progress",
-        action="store_true",
-        help="Show progress bar for files and streams",
+        action="store_const",
+        const=True,
+        dest="progress",
+        default=None,
+        help=textwrap.dedent(
+            """\
+        Show progress bars for files and streams.
+
+        Enabled by default when stderr is an interactive terminal and
+        `--quiet` is not set; disabled otherwise (e.g. in scripts or when
+        output is redirected). Use this option to force progress output.
+        """
+        ),
+    )
+    group_general.add_argument(
+        "--no-progress",
+        action="store_const",
+        const=False,
+        dest="progress",
+        help="Do not show progress bars, even in an interactive terminal",
     )
     group_general.add_argument(
         "--version",
@@ -813,6 +831,12 @@ def main() -> None:
     if cli_args.audio_default_only and cli_args.audio_streams:
         error("Cannot use both --audio-default-only and --audio-streams together.")
 
+    # Show progress bars by default only in interactive terminals, so that
+    # scripts and redirected output are not cluttered with them.
+    progress = cli_args.progress
+    if progress is None:
+        progress = sys.stderr.isatty() and not cli_args.quiet
+
     try:
         ffmpeg_normalize = FFmpegNormalize(
             normalization_type=cli_args.normalization_type,
@@ -847,7 +871,7 @@ def main() -> None:
             output_format=cli_args.output_format,
             extension=cli_args.extension,
             dry_run=cli_args.dry_run,
-            progress=cli_args.progress,
+            progress=progress,
             replaygain=cli_args.replaygain,
             batch=cli_args.batch,
             audio_streams=audio_streams,

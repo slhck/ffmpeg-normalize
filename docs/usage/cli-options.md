@@ -63,7 +63,13 @@ Do not run normalization, only print what would be done
 
 ### `-pr`, `--progress`
 
-Show progress bar for files and streams
+Show progress bars for files and streams.
+
+Enabled by default when stderr is an interactive terminal and `--quiet` is not set; disabled otherwise (e.g. in scripts or when output is redirected). Use this option to force progress output.
+
+### `--no-progress`
+
+Do not show progress bars, even in an interactive terminal
 
 ### `--version`
 

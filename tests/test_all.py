@@ -622,6 +622,15 @@ class TestFFmpegNormalize:
         assert "1/1" in stderr
         assert os.path.isfile("normalized/test.mkv")
 
+    def test_no_progress_when_not_a_terminal(self):
+        # Progress bars are only shown by default in interactive terminals
+        _, stderr = ffmpeg_normalize_call(["tests/test.mp4", "-f"])
+        assert "Files" not in stderr
+        _, stderr = ffmpeg_normalize_call(
+            ["tests/test.mp4", "-f", "-pr", "--no-progress"]
+        )
+        assert "Files" not in stderr
+
     def test_duration(self):
         _, stderr = ffmpeg_normalize_call(["tests/test.m4a", "--debug"])
         assert "Found duration: " in stderr
