@@ -860,6 +860,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-no-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --no-progress
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-version" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1929,6 +1940,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#-no-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --no-progress
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#-version" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2600,7 +2622,10 @@ will be written to the default output folder with the name <code>&lt;input&gt;.&
 <h3 id="-n-dry-run"><code>-n, --dry-run</code></h3>
 <p>Do not run normalization, only print what would be done</p>
 <h3 id="-pr-progress"><code>-pr</code>, <code>--progress</code></h3>
-<p>Show progress bar for files and streams</p>
+<p>Show progress bars for files and streams.</p>
+<p>Enabled by default when stderr is an interactive terminal and <code>--quiet</code> is not set; disabled otherwise (e.g. in scripts or when output is redirected). Use this option to force progress output.</p>
+<h3 id="-no-progress"><code>--no-progress</code></h3>
+<p>Do not show progress bars, even in an interactive terminal</p>
 <h3 id="-version"><code>--version</code></h3>
 <p>Print version and exit</p>
 <h3 id="-preset-preset"><code>--preset PRESET</code></h3>
