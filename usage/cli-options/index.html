@@ -2801,9 +2801,10 @@ normal.m4a       0         -21.1          -23.0             -18.4       -1.9  no
 <p>Do not write chapters to output</p>
 <h3 id="-write-encoder-settings"><code>--write-encoder-settings</code></h3>
 <p>Write the effective encoder settings as an <code>ENCODER_SETTINGS</code> tag on each normalized audio stream.</p>
-<p>The tag holds an ffmpeg-command-equivalent string with the audio codec, the bitrate, sample rate and channel count (when set), plus the normalization filter including the measured loudnorm values, for example:</p>
+<p>The tag holds an ffmpeg-command-equivalent string with the audio codec, the bitrate, sample rate and channel count (when set), the normalization filter including the measured loudnorm values, and any <code>-e</code>/<code>--extra-output-options</code> appended verbatim, for example:</p>
 <div class="highlight"><pre><span></span><code>-c:a libopus -b:a 128000 -af loudnorm=i=-23.0:lra=7.0:tp=-2.0:offset=-0.1:measured_i=-19.4:measured_lra=6.1:measured_tp=-3.2:measured_thresh=-29.6:linear=true
 </code></pre></div>
+<p>Extra output options are not audio-scoped, so an unrelated option passed there will also appear in the tag. Extra input options are demuxer settings and are not included.</p>
 <p>This is a Matroska/WebM tag convention; other containers may store it differently. It has no effect together with <code>--metadata-disable</code>.</p>
 <h2 id="inputoutput-format">Input/Output Format</h2>
 <h3 id="-ei-extra_input_options-extra-input-options-extra_input_options"><code>-ei EXTRA_INPUT_OPTIONS, --extra-input-options EXTRA_INPUT_OPTIONS</code></h3>
