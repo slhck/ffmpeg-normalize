@@ -1,3 +1,16 @@
+## [1.45.2] - 2026-11-17
+
+### 🚀 Features
+
+- Include extra_output_options in ENCODER_SETTINGS tag (#322)
+
+### 🐛 Bug Fixes
+
+- *(ci)* Skip Claude review for fork PRs
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.45.2
 ## [1.45.1] - 2026-11-17
 
 ### 🐛 Bug Fixes
