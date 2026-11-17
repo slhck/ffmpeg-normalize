@@ -251,6 +251,58 @@ class TestFFmpegNormalize:
 
         assert stat.S_IMODE(test_file.stat().st_mode) == 0o644
 
+    def test_flac_keeps_cover_art(self, tmp_path):
+        cover = tmp_path / "cover.png"
+        track = tmp_path / "track.flac"
+        subprocess.check_call(
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "color=red:s=64x64",
+                "-frames:v",
+                "1",
+                str(cover),
+            ]
+        )
+        subprocess.check_call(
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=d=3",
+                "-i",
+                str(cover),
+                "-map",
+                "0",
+                "-map",
+                "1",
+                "-c:a",
+                "flac",
+                "-c:v",
+                "copy",
+                "-disposition:v",
+                "attached_pic",
+                str(track),
+            ]
+        )
+        output = tmp_path / "out.flac"
+
+        ffmpeg_normalize_call([str(track), "-c:a", "flac", "-o", str(output)])
+
+        pictures = [
+            s
+            for s in _get_stream_info(str(output))
+            if s["codec_type"] == "video" and s["disposition"]["attached_pic"] == 1
+        ]
+        assert len(pictures) == 1
+
     def test_dry(self):
         ffmpeg_normalize_call(["tests/test.mp4", "-n"])
         assert not os.path.isfile("normalized/test.mkv")
