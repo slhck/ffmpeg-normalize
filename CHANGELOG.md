@@ -1,3 +1,12 @@
+## [1.45.1] - 2026-11-17
+
+### 🐛 Bug Fixes
+
+- *(flac)* Keep cover art (#325)
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.45.1
 ## [1.45.0] - 2026-11-16
 
 ### 🚀 Features

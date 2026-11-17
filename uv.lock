@@ -25,7 +25,7 @@ wheels = [
 
 [[package]]
 name = "ffmpeg-normalize"
-version = "1.45.0"
+version = "1.45.1"
 source = { editable = "." }
 dependencies = [
     { name = "ffmpeg-progress-yield" },
