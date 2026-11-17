@@ -40,7 +40,7 @@ _logger = logging.getLogger(__name__)
 
 # Note: this does not contain MP3, see https://github.com/slhck/ffmpeg-normalize/issues/246
 # We may need to remove other formats as well, to be checked.
-AUDIO_ONLY_FORMATS = {"aac", "ast", "flac", "mka", "oga", "ogg", "opus", "wav"}
+AUDIO_ONLY_FORMATS = {"aac", "ast", "mka", "oga", "ogg", "opus", "wav"}
 ONE_STREAM = {"aac", "ast", "flac", "mp3", "wav"}
 
 
@@ -215,7 +215,10 @@ class MediaFile:
             elif "Video" in line:
                 _logger.debug(f"Found video stream at index {stream_id}")
                 self.streams["video"][stream_id] = VideoStream(
-                    self.ffmpeg_normalize, self, stream_id
+                    self.ffmpeg_normalize,
+                    self,
+                    stream_id,
+                    attached_pic="(attached pic)" in line,
                 )
 
             elif "Subtitle" in line:
@@ -835,6 +838,12 @@ class MediaFile:
             bool: True if the output file can contain video, False otherwise
         """
         if self.output_ext.lower() in AUDIO_ONLY_FORMATS:
+            return False
+
+        # FLAC holds pictures (cover art), not video
+        if self.output_ext.lower() == "flac" and not all(
+            stream.attached_pic for stream in self.streams["video"].values()
+        ):
             return False
 
         return not self.ffmpeg_normalize.video_disable

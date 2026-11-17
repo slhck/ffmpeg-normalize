@@ -132,9 +132,15 @@ class MediaStream:
 
 class VideoStream(MediaStream):
     def __init__(
-        self, ffmpeg_normalize: FFmpegNormalize, media_file: MediaFile, stream_id: int
+        self,
+        ffmpeg_normalize: FFmpegNormalize,
+        media_file: MediaFile,
+        stream_id: int,
+        attached_pic: bool = False,
     ):
         super().__init__(ffmpeg_normalize, media_file, "video", stream_id)
+        # Cover art rather than a video track
+        self.attached_pic = attached_pic
 
 
 class SubtitleStream(MediaStream):
