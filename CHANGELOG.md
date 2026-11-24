@@ -1,3 +1,12 @@
+## [1.45.3] - 2026-11-24
+
+### 🐛 Bug Fixes
+
+- Report truncated files without moov atom
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump version to 1.45.3
 ## [1.45.2] - 2026-11-17
 
 ### 🚀 Features
@@ -442,13 +451,13 @@
 - Update explainer
 ## [1.30.0] - 2024-11-22
 
-### 📚 Documentation
-
-- Add @ahmetsait as a contributor
-
 ### 💼 Other
 
 - `--print-stats` only outputs the last stream
+
+### 📚 Documentation
+
+- Add @ahmetsait as a contributor
 ## [1.29.2] - 2024-11-18
 
 ### 🐛 Bug Fixes
