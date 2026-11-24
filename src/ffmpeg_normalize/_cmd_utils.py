@@ -588,6 +588,10 @@ def validate_input_file(input_file: str) -> tuple[bool, str | None]:
     except RuntimeError as e:
         error_str = str(e)
         # Extract a cleaner error message from ffmpeg output
+        if "moov atom not found" in error_str:
+            return False, (
+                f"Incomplete or truncated file (moov atom not found): {input_file}"
+            )
         if "Invalid data found" in error_str:
             return False, f"Invalid or corrupted media file: {input_file}"
         if "No such file or directory" in error_str:

@@ -691,6 +691,35 @@ class TestFileValidationAPI:
         assert error_msg is not None
         assert "audio" in error_msg.lower()
 
+    def test_validate_input_file_truncated_mp4(self, tmp_path):
+        """Test validation reports an MP4 that ends before its moov atom."""
+        complete = tmp_path / "complete.mp4"
+        cmd = [
+            "ffmpeg",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=440:duration=1",
+            "-c:a",
+            "aac",
+            str(complete),
+        ]
+        subprocess.run(cmd, check=True, capture_output=True)
+
+        # Without +faststart, ffmpeg writes the moov atom after the media data,
+        # so cutting the file just before it leaves no moov atom at all.
+        data = complete.read_bytes()
+        moov_box_start = data.index(b"moov") - 4
+        assert moov_box_start > data.index(b"mdat")
+        truncated = tmp_path / "truncated.mp4"
+        truncated.write_bytes(data[:moov_box_start])
+
+        is_valid, error_msg = validate_input_file(str(truncated))
+        assert is_valid is False
+        assert error_msg is not None
+        assert "moov atom not found" in error_msg
+
     def test_validate_input_files_batch(self):
         """Test batch validation with multiple files."""
         test_dir = Path(__file__).parent
