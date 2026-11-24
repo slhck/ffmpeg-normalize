@@ -661,6 +661,16 @@ class TestFileValidationAPI:
         assert error_msg is not None
         assert "does not exist" in error_msg
 
+    def test_validate_input_file_interrupted_recording(self, tmp_path):
+        """Test validation reports a recording cut off before its moov atom was written."""
+        data = (Path(__file__).parent / "test.mp4").read_bytes()
+        interrupted = tmp_path / "interrupted.mp4"
+        interrupted.write_bytes(data[: len(data) // 2])
+        is_valid, error_msg = validate_input_file(str(interrupted))
+        assert is_valid is False
+        assert error_msg is not None
+        assert "no moov atom" in error_msg
+
     def test_validate_input_file_directory(self, tmp_path):
         """Test validation fails for directories."""
         is_valid, error_msg = validate_input_file(str(tmp_path))
