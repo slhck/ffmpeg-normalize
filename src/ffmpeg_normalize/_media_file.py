@@ -1147,6 +1147,13 @@ class MediaFile:
             cmd.extend([f"-c:a:{output_audio_idx}", "copy"])
             output_audio_idx += 1
 
+        # filter outputs carry no disposition, so without this the muxer would
+        # mark the first audio stream as default instead of the input's default
+        if any(stream.is_default for stream in all_audio_streams):
+            for idx, audio_stream in enumerate(streams_to_normalize):
+                disposition = "default" if audio_stream.is_default else "0"
+                cmd.extend([f"-disposition:a:{idx}", disposition])
+
         # other audio options (if any) - only apply to normalized streams
         if self.ffmpeg_normalize.audio_bitrate:
             if audio_codec == "libvorbis":
