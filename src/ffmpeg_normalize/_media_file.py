@@ -98,6 +98,8 @@ class MediaFile:
             )
             self.output_ext = current_ext
         self.streams: StreamDict = {"audio": {}, "video": {}, "subtitle": {}}
+        # stream ids of attachments, e.g. fonts used by styled subtitles
+        self.attachment_streams: list[int] = []
         self.temp_file: Union[str, None] = None
         self.batch_reference: float | None = None
         # Second-pass filter chain per normalized audio stream, keyed by stream
@@ -227,6 +229,10 @@ class MediaFile:
                     self.ffmpeg_normalize, self, stream_id
                 )
 
+            elif "Attachment" in line and stream_id not in self.attachment_streams:
+                _logger.debug(f"Found attachment stream at index {stream_id}")
+                self.attachment_streams.append(stream_id)
+
         if not self.streams["audio"]:
             raise FFmpegNormalizeError(
                 f"Input file {self.input_file} does not contain any audio streams"
@@ -243,6 +249,7 @@ class MediaFile:
             self.streams["audio"] = {first_stream.stream_id: first_stream}
             self.streams["video"] = {}
             self.streams["subtitle"] = {}
+            self.attachment_streams = []
 
     def _get_streams_to_normalize(self) -> list[AudioStream]:
         """
@@ -1196,6 +1203,15 @@ class MediaFile:
                 cmd.extend(["-map", f"0:{s}"])
             # copy subtitles
             cmd.extend(["-c:s", "copy"])
+
+        # ... and attachments, which only Matroska can hold
+        if self.attachment_streams and self.output_ext.lower() in ("mkv", "mka"):
+            for idx, s in enumerate(self.attachment_streams):
+                # the muxer needs each attachment's filename and mimetype tags
+                cmd.extend(
+                    ["-map", f"0:{s}", f"-map_metadata:s:t:{idx}", f"0:s:t:{idx}"]
+                )
+            cmd.extend(["-c:t", "copy"])
 
         if self.ffmpeg_normalize.keep_original_audio:
             # Map all original audio streams after normalized and passthrough streams
