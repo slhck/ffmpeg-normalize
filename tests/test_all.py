@@ -303,6 +303,45 @@ class TestFFmpegNormalize:
         ]
         assert len(pictures) == 1
 
+    def test_keeps_default_audio_track(self, tmp_path):
+        track = tmp_path / "track.mkv"
+        subprocess.check_call(
+            [
+                "ffmpeg",
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=f=440:d=3",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=f=880:d=3",
+                "-map",
+                "0",
+                "-map",
+                "1",
+                "-c:a",
+                "aac",
+                "-disposition:a:0",
+                "0",
+                "-disposition:a:1",
+                "default",
+                str(track),
+            ]
+        )
+        output = tmp_path / "out.mkv"
+
+        ffmpeg_normalize_call([str(track), "-c:a", "aac", "-o", str(output)])
+
+        defaults = [
+            s["disposition"]["default"]
+            for s in _get_stream_info(str(output))
+            if s["codec_type"] == "audio"
+        ]
+        assert defaults == [0, 1]
+
     def test_dry(self):
         ffmpeg_normalize_call(["tests/test.mp4", "-n"])
         assert not os.path.isfile("normalized/test.mkv")
